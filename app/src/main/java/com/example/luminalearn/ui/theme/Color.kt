@@ -30,3 +30,5 @@ val ErrorLight = Color(0xFFFEE2E2)
 // ── White / Black ─────────────────────────────────────────────
 val White = Color(0xFFFFFFFF)
 val Black = Color(0xFF000000)
+
+val Yellow=Color(0xFFFEF3C7)
