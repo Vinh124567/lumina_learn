@@ -27,13 +27,13 @@ class LoginViewModel : BaseViewModel<LoginUiState, LoginUiIntent, LoginUiEffect>
         val email = currentState.email.trim()
         val password = currentState.password
 
-        // Validate đơn giản
+        // Validate
         if (email.isBlank()) {
-            setState { copy(emailError = "Email không được để trống") }
+            setState { copy(emailError = "Email cannot be empty") }
             return
         }
         if (password.isBlank()) {
-            setState { copy(passwordError = "Mật khẩu không được để trống") }
+            setState { copy(passwordError = "Password cannot be empty") }
             return
         }
         setState { copy(isLoading = true) }

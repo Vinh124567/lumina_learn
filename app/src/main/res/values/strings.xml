@@ -1,3 +1,80 @@
 <resources>
     <string name="app_name">Lumina Learn</string>
+    <string name="app_brand_name">Lumina</string>
+
+    <!-- Content Descriptions -->
+    <string name="cd_avatar">Avatar</string>
+    <string name="cd_streak">Streak</string>
+    <string name="cd_energy">Energy</string>
+    <string name="cd_speaker">Speaker</string>
+    <string name="cd_welcome">Welcome</string>
+    <string name="cd_spark_ai">AI Spark</string>
+    <string name="cd_sparks">Sparks</string>
+    <string name="cd_play">Play</string>
+    <string name="cd_flame">Flame</string>
+    <string name="cd_completed">Completed</string>
+    <string name="cd_bouncing_image">Bouncing Banner</string>
+
+    <!-- Login Screen -->
+    <string name="login_subtitle">Micro-learning 5 minutes a day &amp; ignite your creative spark</string>
+    <string name="label_email">Email</string>
+    <string name="label_password">Password</string>
+    <string name="btn_login">Log In</string>
+    <string name="err_email_empty">Email cannot be empty</string>
+    <string name="err_password_empty">Password cannot be empty</string>
+
+    <!-- TopBar & Stats -->
+    <string name="stat_days_format">%1$d Days</string>
+    <string name="stat_points_format">%1$d</string>
+
+    <!-- Greeting Header -->
+    <string name="welcome_back">WELCOME BACK</string>
+    <string name="greeting_title_part1">Brighten your mind today,\n</string>
+    <string name="greeting_title_part2">Alex Vance!</string>
+    <string name="daily_goal_done_subtitle">You are done from your daily goal.</string>
+    <string name="btn_ask_spark_ai">Ask Spark AI Lab</string>
+
+    <!-- Daily Goal Tracker Card -->
+    <string name="daily_goal_tracker_title">DAILY GOAL TRACKER</string>
+    <string name="goal_mins_format">%1$d / %2$d Mins</string>
+    <string name="completed_today">completed today</string>
+    <string name="earn_sparks_bonus_format">Earn +%1$d Sparks upon goal\ncompletion</string>
+    <string name="btn_start_lesson">Start 3-min\nLesson</string>
+
+    <!-- Streak Card -->
+    <string name="streak_label">STREAK</string>
+    <string name="streak_active">Active</string>
+    <string name="streak_flame_title_format">%1$d Days Flame!</string>
+    <string name="streak_subtitle">Keep your momentum alive with 1 lesson daily.</string>
+    <string name="btn_claim_streak">Claim Today\'s Streak Check-In</string>
+    <string name="msg_streak_claimed">Streak check-in claimed!</string>
+
+    <!-- Daily Spark Challenge Card -->
+    <string name="challenge_badge_format">★ DAILY SPARK CHALLENGE (+%1$d SPARKS)</string>
+    <string name="challenge_title">The 5-Why Problem Audit</string>
+    <string name="challenge_desc">Pick one current frustration and write down 5 layers of \"Why did this happen?\"</string>
+    <string name="btn_complete_earn_format">Complete &amp; Earn +%1$d</string>
+    <string name="cd_puzzle">Puzzle</string>
+    <string name="msg_challenge_completed">Challenge completed! +20 Sparks earned.</string>
+
+    <!-- Recommended Lessons Section -->
+    <string name="recommended_lessons_title">Recommended Lessons</string>
+    <string name="view_all">View All →</string>
+    <string name="recommended_lessons_subtitle">4-minute interactive cards designed for fast mastery</string>
+    <string name="category_creative_thinking">CREATIVE THINKING</string>
+    <string name="category_focus_productivity">FOCUS &amp; PRODUCTIVITY</string>
+    <string name="lesson_meta_format">%1$d mins • +%2$d Sparks</string>
+    <string name="interactive_slides_format">%1$d interactive slides</string>
+    <string name="btn_start_arrow">Start →</string>
+    <string name="lesson_1_title">First Principles Thinking</string>
+    <string name="lesson_1_desc">Deconstruct complex problems to basic truths and build innovative solutions from scratch.</string>
+    <string name="lesson_2_title">The 2-Minute Micro-Habit Rule</string>
+    <string name="lesson_2_desc">Transform big daunting goals into tiny 2-minute rituals that make consistency effortless.</string>
+    <string name="cd_slides">Slides</string>
+
+    <!-- Daily Wisdom Card -->
+    <string name="daily_wisdom_label">LUMINA DAILY WISDOM</string>
+    <string name="daily_wisdom_quote">\"Small daily improvements over time lead to stunning results.\"</string>
+    <string name="daily_wisdom_author">— Robin Sharma</string>
+    <string name="cd_refresh">Refresh</string>
 </resources>
