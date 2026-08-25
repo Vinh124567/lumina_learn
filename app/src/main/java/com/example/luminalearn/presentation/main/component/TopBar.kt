@@ -33,35 +33,14 @@ fun TopBar(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Logo 'L' + App Name
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(38.dp)
-                    .clip(CircleShape)
-                    .background(Color(0xFFEDE9FE)),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "L",
-                    color = Color(0xFF5C50F6),
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.ExtraBold
-                    )
-                )
-            }
-
-            Text(
-                text = stringResource(R.string.app_brand_name),
-                style = MaterialTheme.typography.titleLarge.copy(
-                    fontWeight = FontWeight.ExtraBold
-                ),
-                color = Color(0xFF0F172A)
-            )
-        }
+        // App Name
+        Text(
+            text = stringResource(R.string.app_brand_name),
+            style = MaterialTheme.typography.titleLarge.copy(
+                fontWeight = FontWeight.ExtraBold
+            ),
+            color = Color(0xFF0F172A)
+        )
         Spacer(modifier = Modifier.weight(1f))
         Row(
             verticalAlignment = Alignment.CenterVertically,
