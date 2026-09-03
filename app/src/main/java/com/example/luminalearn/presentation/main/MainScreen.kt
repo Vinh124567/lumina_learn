@@ -31,6 +31,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,6 +50,7 @@ import androidx.navigation.NavHostController
 import com.example.luminalearn.R
 import com.example.luminalearn.presentation.common.AppScaffold
 import com.example.luminalearn.presentation.common.AppTopBar
+import com.example.luminalearn.presentation.common.CelebrationEffect
 import com.example.luminalearn.presentation.main.component.GreetingHeader
 import com.example.luminalearn.presentation.main.component.TopBar
 import com.example.luminalearn.ui.theme.TextSecondary
@@ -72,9 +76,9 @@ fun MainScreen(
     onNavigateToSparkAi: () -> Unit = { navController.navigate(AppDestination.SparkAI.route) },
     onNavigateToLesson: () -> Unit = { navController.navigate(AppDestination.Lesson.route) }
 ) {
-    val state by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val scrollState = rememberScrollState()
+    var confettiTrigger by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collectLatest { effect ->
@@ -87,41 +91,46 @@ fun MainScreen(
     }
 
     AppScaffold { paddingValues ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .verticalScroll(scrollState)
-                .padding(16.dp),
         ) {
-            TopBar()
-            Spacer(modifier = Modifier.height(24.dp))
-            GreetingHeader(
-                onAskAiClick = onNavigateToSparkAi
-            )
-            Spacer(modifier = Modifier.height(20.dp))
-            DailyGoalCard(
-                currentMinutes = 10,
-                targetMinutes = 10,
-                bonusSparks = 30,
-                onStartLessonClick = onNavigateToLesson
-            )
-            Spacer(modifier = Modifier.height(20.dp))
-            StreakCard(
-                streakDays = 5,
-                checkedDays = listOf(true, true, true, true, true, false, false),
-                onClaimClick = {
-                    Toast.makeText(context, context.getString(R.string.msg_streak_claimed), Toast.LENGTH_SHORT).show()
-                }
-            )
-            Spacer(modifier = Modifier.height(20.dp))
-            SparkChallengeCard(
-                bonusSparks = 20,
-                onCompleteClick = {
-                    Toast.makeText(context, context.getString(R.string.msg_challenge_completed), Toast.LENGTH_SHORT).show()
-                }
-            )
-            Spacer(modifier = Modifier.height(28.dp))
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(scrollState)
+                    .padding(16.dp),
+            ) {
+                TopBar()
+                Spacer(modifier = Modifier.height(24.dp))
+                GreetingHeader(
+                    onAskAiClick = onNavigateToSparkAi
+                )
+                Spacer(modifier = Modifier.height(20.dp))
+                DailyGoalCard(
+                    currentMinutes = 10,
+                    targetMinutes = 10,
+                    bonusSparks = 30,
+                    onStartLessonClick = onNavigateToLesson
+                )
+                Spacer(modifier = Modifier.height(20.dp))
+                StreakCard(
+                    streakDays = 5,
+                    checkedDays = listOf(true, true, true, true, true, false, false),
+                    onClaimClick = {
+                        confettiTrigger++
+                    }
+                )
+                Spacer(modifier = Modifier.height(20.dp))
+                SparkChallengeCard(
+                    bonusSparks = 20,
+                    onCompleteClick = {
+                        confettiTrigger++
+                        Toast.makeText(context, context.getString(R.string.msg_challenge_completed), Toast.LENGTH_SHORT).show()
+                    }
+                )
+                Spacer(modifier = Modifier.height(28.dp))
 
             // ── Section: Recommended Lessons ────────────────────────────
             Row(
@@ -165,9 +174,9 @@ fun MainScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Lesson 1: First Principles Thinking
+            // Lesson 1: Pinyin
             LessonCard(
-                category = stringResource(R.string.category_creative_thinking),
+                category = stringResource(R.string.category_pinyin),
                 categoryBgColor = Color(0xFFFCE7F3),
                 categoryTextColor = Color(0xFF9333EA),
                 durationMins = 4,
@@ -180,9 +189,9 @@ fun MainScreen(
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            // Lesson 2: The 2-Minute Micro-Habit Rule
+            // Lesson 2: Radicals
             LessonCard(
-                category = stringResource(R.string.category_focus_productivity),
+                category = stringResource(R.string.category_radicals),
                 categoryBgColor = Color(0xFFDBEAFE),
                 categoryTextColor = Color(0xFF2563EB),
                 durationMins = 3,
@@ -202,7 +211,14 @@ fun MainScreen(
                 }
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(96.dp))
         }
+
+        // Hiệu ứng pháo hoa nổ đè lên giữa màn hình khi nhận thưởng
+        CelebrationEffect(
+            triggerKey = confettiTrigger,
+            modifier = Modifier.fillMaxSize()
+        )
     }
+}
 }

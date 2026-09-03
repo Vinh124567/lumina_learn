@@ -1,4 +1,4 @@
-package com.example.luminalearn.presentation.main.component
+package com.example.luminalearn.presentation.common
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -27,6 +27,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -34,76 +35,61 @@ import androidx.compose.ui.unit.sp
 import com.example.luminalearn.R
 import com.example.luminalearn.presentation.main.AppDestination
 
-/**
- * Floating Bottom Navigation Bar phong cách hiện đại (hình viên thuốc / floating pill).
- * Bao gồm các tab: Home, Explore, nút nổi bật Spark AI, và Trophy/Reward.
- */
 @Composable
-fun LuminaBottomBar(
+fun AppBottomBar(
+    modifier: Modifier = Modifier,
     currentRoute: String = AppDestination.Main.route,
     onNavigate: (String) -> Unit = {},
     onSparkAiClick: () -> Unit = { onNavigate(AppDestination.SparkAI.route) },
-    modifier: Modifier = Modifier
 ) {
-    Box(
+    val navItems = remember {
+        listOf(
+            BottomNavItem(R.drawable.ic_nav_home, R.string.nav_home, AppDestination.Main.route),
+            BottomNavItem(R.drawable.ic_nav_explore, R.string.nav_lessons, AppDestination.Lesson.route),
+            BottomNavItem(R.drawable.ic_nav_bulb, R.string.nav_spark_ai, AppDestination.SparkAI.route),
+            BottomNavItem(R.drawable.ic_nav_trophy, R.string.nav_rewards, AppDestination.Reward.route)
+        )
+    }
+
+    Surface(
         modifier = modifier
             .fillMaxWidth()
             .navigationBarsPadding()
-            .padding(horizontal = 20.dp, vertical = 12.dp),
-        contentAlignment = Alignment.Center
+            .padding(horizontal = 20.dp, vertical = 12.dp)
+            .height(64.dp)
+            .shadow(
+                elevation = 16.dp,
+                shape = RoundedCornerShape(32.dp),
+                spotColor = Color(0x261E293B),
+                ambientColor = Color(0x1A000000)
+            ),
+        shape = RoundedCornerShape(32.dp),
+        color = Color.White
     ) {
-        Surface(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(64.dp)
-                .shadow(
-                    elevation = 16.dp,
-                    shape = RoundedCornerShape(32.dp),
-                    spotColor = Color(0x261E293B),
-                    ambientColor = Color(0x1A000000)
-                ),
-            shape = RoundedCornerShape(32.dp),
-            color = Color.White
+                .padding(horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                // 1. Home tab
+            navItems.forEach { item ->
                 NavIconButton(
-                    iconRes = R.drawable.ic_nav_home,
-                    contentDescription = "Home",
-                    isSelected = currentRoute == AppDestination.Main.route,
-                    onClick = { onNavigate(AppDestination.Main.route) }
-                )
-
-                // 2. Explore tab
-                NavIconButton(
-                    iconRes = R.drawable.ic_nav_explore,
-                    contentDescription = "Explore",
-                    isSelected = currentRoute == AppDestination.Lesson.route,
-                    onClick = { onNavigate(AppDestination.Lesson.route) }
-                )
-
-                // 3. Highlighted Spark AI Pill Button
-                SparkAiPillButton(
-                    onClick = onSparkAiClick
-                )
-
-                // 4. Reward / Trophy tab
-                NavIconButton(
-                    iconRes = R.drawable.ic_nav_trophy,
-                    contentDescription = "Rewards",
-                    isSelected = currentRoute == AppDestination.Reward.route,
-                    onClick = { onNavigate(AppDestination.Reward.route) }
+                    iconRes = item.iconRes,
+                    contentDescription = stringResource(item.titleRes),
+                    isSelected = currentRoute == item.route,
+                    onClick = { onNavigate(item.route) }
                 )
             }
         }
     }
 }
+
+private data class BottomNavItem(
+    val iconRes: Int,
+    val titleRes: Int,
+    val route: String
+)
 
 @Composable
 private fun NavIconButton(
@@ -185,13 +171,13 @@ private fun SparkAiPillButton(
 
 @Preview(showBackground = true)
 @Composable
-private fun LuminaBottomBarPreview() {
+private fun AppBottomBarPreview() {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .background(Color(0xFFF1F5F9))
             .padding(16.dp)
     ) {
-        LuminaBottomBar()
+        AppBottomBar()
     }
 }

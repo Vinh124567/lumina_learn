@@ -62,5 +62,5 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     implementation("com.google.ai.client.generativeai:generativeai:0.9.0")
-
+    implementation(libs.konfetti.compose)
 }
