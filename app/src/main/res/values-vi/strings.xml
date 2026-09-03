@@ -92,4 +92,22 @@
     <string name="btn_generate">Tạo bài</string>
     <string name="placeholder_explore_lessons">Khám phá Lộ trình Tiếng Trung (HSK 1 - HSK 6)</string>
     <string name="placeholder_rewards">Huy hiệu Thành tích &amp; Kho Từ vựng</string>
+
+    <!-- Explore Lessons Screen -->
+    <string name="library_badge">THƯ VIỆN HÁN NGỮ VI MÔ</string>
+    <string name="library_title">Khám phá Bài học Tiếng Trung</string>
+    <string name="library_desc">Các bài học vi mô tương tác cô đọng trong 3–5 phút, giải thích bằng tiếng Việt trực quan, dễ nhớ.</string>
+    <string name="search_placeholder">Tìm bài học, chữ Hán, Pinyin, giao tiếp...</string>
+    <string name="filter_all">Tất cả</string>
+    <string name="filter_pinyin">Phát âm Pinyin</string>
+    <string name="filter_conversation">Giao tiếp thực tế</string>
+    <string name="filter_radicals">Chữ Hán &amp; Bộ thủ</string>
+    <string name="filter_grammar">Ngữ pháp thú vị</string>
+    <string name="level_basic">Cơ bản</string>
+    <string name="level_hsk1">HSK 1</string>
+    <string name="status_completed">Đã hoàn thành</string>
+    <string name="btn_review">Ôn lại →</string>
+    <string name="btn_start_now">Bắt đầu →</string>
+    <string name="sparks_earned_format">+%1$d Tia Sáng</string>
+    <string name="duration_mins_format">%1$d phút</string>
 </resources>

@@ -1,19 +1,11 @@
 package com.example.luminalearn.presentation.login
 
 import android.widget.Toast
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
@@ -27,7 +19,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -85,11 +76,7 @@ fun LoginScreen(
                 .padding(horizontal = 24.dp, vertical = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Spacer(modifier = Modifier.height(16.dp))
-
-            BouncingImage()
-
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(48.dp))
 
             Text(
                 text = stringResource(R.string.app_name),
@@ -174,28 +161,4 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(24.dp))
         }
     }
-}
-
-
-@Composable
-fun BouncingImage() {
-    val infiniteTransition = rememberInfiniteTransition(label = "bounce")
-
-    val offsetY by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = -30f, // nảy lên 30dp
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 500, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse // đi lên rồi tự quay xuống
-        ),
-        label = "offsetY"
-    )
-
-    Image(
-        painter = painterResource(id = R.drawable.banner_login),
-        contentDescription = stringResource(R.string.cd_bouncing_image),
-        modifier = Modifier
-            .size(250.dp)
-            .offset(y = offsetY.dp)
-    )
 }

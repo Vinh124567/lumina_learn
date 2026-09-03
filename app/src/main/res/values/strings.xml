@@ -92,4 +92,22 @@
     <string name="btn_generate">Generate</string>
     <string name="placeholder_explore_lessons">Explore Chinese Lessons (HSK 1 - HSK 6)</string>
     <string name="placeholder_rewards">Achievements &amp; Vocabulary Badges</string>
+
+    <!-- Explore Lessons Screen -->
+    <string name="library_badge">MICRO CHINESE LIBRARY</string>
+    <string name="library_title">Explore Chinese Lessons</string>
+    <string name="library_desc">Interactive 3–5 min micro-lessons with intuitive explanations for rapid mastery.</string>
+    <string name="search_placeholder">Search lessons, Hanzi, Pinyin, topics...</string>
+    <string name="filter_all">All</string>
+    <string name="filter_pinyin">Pinyin Tones</string>
+    <string name="filter_conversation">Practical Talk</string>
+    <string name="filter_radicals">Hanzi &amp; Radicals</string>
+    <string name="filter_grammar">Fun Grammar</string>
+    <string name="level_basic">Basic</string>
+    <string name="level_hsk1">HSK 1</string>
+    <string name="status_completed">Completed</string>
+    <string name="btn_review">Review →</string>
+    <string name="btn_start_now">Start →</string>
+    <string name="sparks_earned_format">+%1$d Sparks</string>
+    <string name="duration_mins_format">%1$d mins</string>
 </resources>

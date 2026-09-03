@@ -97,128 +97,139 @@ fun MainScreen(
                 .padding(paddingValues)
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(scrollState)
-                    .padding(16.dp),
+                modifier = Modifier.fillMaxSize()
             ) {
-                TopBar()
-                Spacer(modifier = Modifier.height(24.dp))
-                GreetingHeader(
-                    onAskAiClick = onNavigateToSparkAi
+                TopBar(
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
                 )
-                Spacer(modifier = Modifier.height(20.dp))
-                DailyGoalCard(
-                    currentMinutes = 10,
-                    targetMinutes = 10,
-                    bonusSparks = 30,
-                    onStartLessonClick = onNavigateToLesson
-                )
-                Spacer(modifier = Modifier.height(20.dp))
-                StreakCard(
-                    streakDays = 5,
-                    checkedDays = listOf(true, true, true, true, true, false, false),
-                    onClaimClick = {
-                        confettiTrigger++
-                    }
-                )
-                Spacer(modifier = Modifier.height(20.dp))
-                SparkChallengeCard(
-                    bonusSparks = 20,
-                    onCompleteClick = {
-                        confettiTrigger++
-                        Toast.makeText(context, context.getString(R.string.msg_challenge_completed), Toast.LENGTH_SHORT).show()
-                    }
-                )
-                Spacer(modifier = Modifier.height(28.dp))
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(scrollState)
+                        .padding(horizontal = 16.dp),
+                ) {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    GreetingHeader(
+                        onAskAiClick = onNavigateToSparkAi
+                    )
+                    Spacer(modifier = Modifier.height(20.dp))
+                    DailyGoalCard(
+                        currentMinutes = 10,
+                        targetMinutes = 10,
+                        bonusSparks = 30,
+                        onStartLessonClick = onNavigateToLesson
+                    )
+                    Spacer(modifier = Modifier.height(20.dp))
+                    StreakCard(
+                        streakDays = 5,
+                        checkedDays = listOf(true, true, true, true, true, false, false),
+                        onClaimClick = {
+                            confettiTrigger++
+                        }
+                    )
+                    Spacer(modifier = Modifier.height(20.dp))
+                    SparkChallengeCard(
+                        bonusSparks = 20,
+                        onCompleteClick = {
+                            confettiTrigger++
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.msg_challenge_completed),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    )
+                    Spacer(modifier = Modifier.height(28.dp))
 
-            // ── Section: Recommended Lessons ────────────────────────────
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = stringResource(R.string.recommended_lessons_title),
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.ExtraBold,
-                        fontSize = 18.sp
-                    ),
-                    color = Color(0xFF0F172A),
-                    modifier = Modifier.weight(1f),
-                    maxLines = 1
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = stringResource(R.string.view_all),
-                    style = MaterialTheme.typography.labelLarge.copy(
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp
-                    ),
-                    color = Color(0xFF5C50F6),
-                    softWrap = false,
-                    maxLines = 1,
-                    modifier = Modifier.clickable { onNavigateToLesson() }
-                )
+                    // ── Section: Recommended Lessons ────────────────────────────
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = stringResource(R.string.recommended_lessons_title),
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.ExtraBold,
+                                fontSize = 18.sp
+                            ),
+                            color = Color(0xFF0F172A),
+                            modifier = Modifier.weight(1f),
+                            maxLines = 1
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = stringResource(R.string.view_all),
+                            style = MaterialTheme.typography.labelLarge.copy(
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 14.sp
+                            ),
+                            color = Color(0xFF5C50F6),
+                            softWrap = false,
+                            maxLines = 1,
+                            modifier = Modifier.clickable { onNavigateToLesson() }
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    Text(
+                        text = stringResource(R.string.recommended_lessons_subtitle),
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            fontSize = 13.sp
+                        ),
+                        color = Color(0xFF64748B)
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Lesson 1: Pinyin
+                    LessonCard(
+                        category = stringResource(R.string.category_pinyin),
+                        categoryBgColor = Color(0xFFFCE7F3),
+                        categoryTextColor = Color(0xFF9333EA),
+                        durationMins = 4,
+                        sparks = 30,
+                        title = stringResource(R.string.lesson_1_title),
+                        description = stringResource(R.string.lesson_1_desc),
+                        slideCount = 4,
+                        onStartClick = onNavigateToLesson
+                    )
+
+                    Spacer(modifier = Modifier.height(14.dp))
+
+                    // Lesson 2: Radicals
+                    LessonCard(
+                        category = stringResource(R.string.category_radicals),
+                        categoryBgColor = Color(0xFFDBEAFE),
+                        categoryTextColor = Color(0xFF2563EB),
+                        durationMins = 3,
+                        sparks = 25,
+                        title = stringResource(R.string.lesson_2_title),
+                        description = stringResource(R.string.lesson_2_desc),
+                        slideCount = 4,
+                        onStartClick = onNavigateToLesson
+                    )
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    // ── Section: Daily Wisdom Card ──────────────────────────────
+                    DailyWisdomCard(
+                        onRefreshClick = {
+                            Toast.makeText(context, "Refreshed daily wisdom!", Toast.LENGTH_SHORT)
+                                .show()
+                        }
+                    )
+
+                    Spacer(modifier = Modifier.height(96.dp))
+                }
             }
 
-            Spacer(modifier = Modifier.height(4.dp))
-
-            Text(
-                text = stringResource(R.string.recommended_lessons_subtitle),
-                style = MaterialTheme.typography.bodySmall.copy(
-                    fontSize = 13.sp
-                ),
-                color = Color(0xFF64748B)
+            // Hiệu ứng pháo hoa nổ đè lên giữa màn hình khi nhận thưởng
+            CelebrationEffect(
+                triggerKey = confettiTrigger,
+                modifier = Modifier.fillMaxSize()
             )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Lesson 1: Pinyin
-            LessonCard(
-                category = stringResource(R.string.category_pinyin),
-                categoryBgColor = Color(0xFFFCE7F3),
-                categoryTextColor = Color(0xFF9333EA),
-                durationMins = 4,
-                sparks = 30,
-                title = stringResource(R.string.lesson_1_title),
-                description = stringResource(R.string.lesson_1_desc),
-                slideCount = 4,
-                onStartClick = onNavigateToLesson
-            )
-
-            Spacer(modifier = Modifier.height(14.dp))
-
-            // Lesson 2: Radicals
-            LessonCard(
-                category = stringResource(R.string.category_radicals),
-                categoryBgColor = Color(0xFFDBEAFE),
-                categoryTextColor = Color(0xFF2563EB),
-                durationMins = 3,
-                sparks = 25,
-                title = stringResource(R.string.lesson_2_title),
-                description = stringResource(R.string.lesson_2_desc),
-                slideCount = 4,
-                onStartClick = onNavigateToLesson
-            )
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            // ── Section: Daily Wisdom Card ──────────────────────────────
-            DailyWisdomCard(
-                onRefreshClick = {
-                    Toast.makeText(context, "Refreshed daily wisdom!", Toast.LENGTH_SHORT).show()
-                }
-            )
-
-            Spacer(modifier = Modifier.height(96.dp))
         }
-
-        // Hiệu ứng pháo hoa nổ đè lên giữa màn hình khi nhận thưởng
-        CelebrationEffect(
-            triggerKey = confettiTrigger,
-            modifier = Modifier.fillMaxSize()
-        )
     }
-}
 }

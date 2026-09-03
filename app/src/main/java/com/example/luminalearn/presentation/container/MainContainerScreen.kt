@@ -24,6 +24,7 @@ import com.example.luminalearn.R
 import com.example.luminalearn.presentation.common.AppBottomBar
 import com.example.luminalearn.presentation.main.AppDestination
 import com.example.luminalearn.presentation.main.MainScreen
+import com.example.luminalearn.presentation.lesson.LessonScreen
 import com.example.luminalearn.presentation.spark_ai_lab.SparkAILab
 
 /**
@@ -72,7 +73,7 @@ fun MainContainerScreen(
             }
 
             composable(AppDestination.Lesson.route) {
-                PlaceholderScreen(title = stringResource(R.string.placeholder_explore_lessons))
+                LessonScreen()
             }
 
             composable(AppDestination.SparkAI.route) {

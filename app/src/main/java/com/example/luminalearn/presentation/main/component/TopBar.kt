@@ -26,11 +26,12 @@ import com.example.luminalearn.R
 
 @Composable
 fun TopBar(
+    modifier: Modifier = Modifier,
     streakDays: Int = 5,
-    points: Int = 240
+    points: Int = 240,
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
         // App Name
