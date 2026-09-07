@@ -35,17 +35,19 @@ import androidx.compose.ui.unit.sp
 import com.example.luminalearn.R
 
 data class ChineseLessonData(
-    val id: String,
-    val category: String,
-    val categoryBgColor: Color,
-    val categoryTextColor: Color,
-    val level: String,
-    val pinyinHanziTitle: String,
-    val title: String,
-    val description: String,
-    val durationMins: Int,
-    val sparks: Int,
-    val isCompleted: Boolean
+    val id: String = "",
+    val category: String = "",
+    val level: String = "Cơ bản",
+    val pinyinHanziTitle: String = "",
+    val title: String = "",
+    val description: String = "",
+    val durationMins: Int = 0,
+    val sparks: Int = 0,
+    val isCompleted: Boolean = false,
+    val totalSlides: Int = 0,
+    val slides: List<ToneCardData> = emptyList(),
+    val categoryBgColor: Color = Color(0xFFF3E8FF),
+    val categoryTextColor: Color = Color(0xFF7E22CE)
 )
 
 @Composable

@@ -1,11 +1,9 @@
 package com.example.luminalearn.presentation.main
 
-import android.widget.Space
 import android.widget.Toast
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,60 +11,43 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.luminalearn.R
 import com.example.luminalearn.presentation.common.AppScaffold
-import com.example.luminalearn.presentation.common.AppTopBar
 import com.example.luminalearn.presentation.common.CelebrationEffect
-import com.example.luminalearn.presentation.main.component.GreetingHeader
-import com.example.luminalearn.presentation.main.component.TopBar
-import com.example.luminalearn.ui.theme.TextSecondary
-import com.example.luminalearn.ui.theme.Yellow
-import kotlinx.coroutines.flow.collectLatest
-
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.sp
+import com.example.luminalearn.presentation.lesson.component.LessonAction
+import com.example.luminalearn.presentation.lesson.component.LessonDetailDialog
+import com.example.luminalearn.presentation.lesson.component.ToneCardData
 import com.example.luminalearn.presentation.main.component.DailyGoalCard
 import com.example.luminalearn.presentation.main.component.DailyWisdomCard
+import com.example.luminalearn.presentation.main.component.GreetingHeader
 import com.example.luminalearn.presentation.main.component.LessonCard
 import com.example.luminalearn.presentation.main.component.SparkChallengeCard
 import com.example.luminalearn.presentation.main.component.StreakCard
+import com.example.luminalearn.presentation.main.component.TopBar
+import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -79,7 +60,7 @@ fun MainScreen(
     val context = LocalContext.current
     val scrollState = rememberScrollState()
     var confettiTrigger by remember { mutableIntStateOf(0) }
-
+    var lessonContent by remember { mutableStateOf<ToneCardData?>(null) }
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collectLatest { effect ->
             when (effect) {
@@ -193,7 +174,19 @@ fun MainScreen(
                         title = stringResource(R.string.lesson_1_title),
                         description = stringResource(R.string.lesson_1_desc),
                         slideCount = 4,
-                        onStartClick = onNavigateToLesson
+                        onStartClick = {
+                            lessonContent = ToneCardData(
+                                category = "PHÁT ÂM PINYIN",
+                                subTitle = "四声与变调 (Sì shēng yǔ biàntiào)",
+                                title = "4 Thanh điệu Pinyin & Quy tắc biến âm",
+                                pinyinVariants = listOf("mā", "má", "mǎ", "mà"),
+                                hanViet = "Ma (Mẹ) · Ma (Gái) · Mã (Ngựa) · Mắng",
+                                meaning = "Bốn ý nghĩa hoàn toàn khác nhau chỉ nhờ thay đổi thanh điệu!",
+                                explanationText = "Tiếng Trung có 4 thanh điệu chính. Thanh 1 bằng phẳng cao...",
+                                currentIndex = 1,
+                                totalCount = 4
+                            )
+                        }
                     )
 
                     Spacer(modifier = Modifier.height(14.dp))
@@ -231,5 +224,14 @@ fun MainScreen(
                 modifier = Modifier.fillMaxSize()
             )
         }
+    }
+
+    lessonContent?.let {
+        LessonDetailDialog(
+            toneCardData  = it,
+            action = LessonAction(
+                onDismiss = { lessonContent = null }
+            )
+        )
     }
 }
