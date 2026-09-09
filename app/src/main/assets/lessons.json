@@ -1,0 +1,264 @@
+[
+  {
+    "id": "1",
+    "category": "Phát âm Pinyin",
+    "level": "Cơ bản",
+    "pinyinHanziTitle": "四声与变调 (Sì shēng yǔ biàntiào)",
+    "title": "4 Thanh điệu Pinyin & Quy tắc biến âm",
+    "description": "Nắm chắc 4 thanh điệu tiếng Trung và quy tắc biến điệu hai thanh 3 kinh điển giúp nói tự nhiên như người bản xứ.",
+    "durationMins": 4,
+    "sparks": 30,
+    "isCompleted": true,
+    "totalSlides": 4,
+    "slides": [
+      {
+        "slideIndex": 1,
+        "category": "PHÁT ÂM PINYIN",
+        "cardType": "Khái niệm",
+        "subTitle": "四声与变调 (Sì shēng yǔ biàntiào)",
+        "title": "4 Thanh điệu Pinyin & Quy tắc biến âm",
+        "pinyinVariants": ["mā", "má", "mǎ", "mà"],
+        "hanViet": "Ma (Mẹ) · Ma (Gai) · Mã (Ngựa) · Mạ (Mắng)",
+        "meaning": "Bốn ý nghĩa hoàn toàn khác nhau chỉ nhờ thay đổi thanh điệu!",
+        "explanationText": "Tiếng Trung có 4 thanh điệu chính: Thanh 1 (Cao phẳng ā), Thanh 2 (Lên cao á), Thanh 3 (Xuống rồi lên ǎ), Thanh 4 (Dứt khoát rơi xuống à). Thay đổi thanh điệu sẽ thay đổi hoàn toàn ý nghĩa của từ.",
+        "audioUrl": "https://assets.luminalearn.com/audio/tones_overview.mp3"
+      },
+      {
+        "slideIndex": 2,
+        "category": "PHÁT ÂM PINYIN",
+        "cardType": "Luyện âm",
+        "subTitle": "第一声 & 第二声 (Thanh 1 & Thanh 2)",
+        "title": "Thanh 1 (Cao bằng) & Thanh 2 (Dấu sắc)",
+        "pinyinVariants": ["bā (Tám)", "bá (Nhổ)"],
+        "hanViet": "Bát - Bạt",
+        "meaning": "Thanh 1 giữ giọng cao đều độ cao 5-5. Thanh 2 vuốt giọng từ 3 lên 5 giống dấu sắc tiếng Việt.",
+        "explanationText": "Mẹo phát âm: Thanh 1 ngân dài và giữ thanh quản ổn định ở nốt cao nhất. Thanh 2 phát âm tự nhiên như khi bạn hỏi ngạc nhiên: 'Ủa?' trong tiếng Việt.",
+        "audioUrl": "https://assets.luminalearn.com/audio/tones_1_2.mp3"
+      },
+      {
+        "slideIndex": 3,
+        "category": "PHÁT ÂM PINYIN",
+        "cardType": "Luyện âm",
+        "subTitle": "第三声 & 第四声 (Thanh 3 & Thanh 4)",
+        "title": "Thanh 3 (Uốn lượn) & Thanh 4 (Dứt khoát)",
+        "pinyinVariants": ["hǎo (Tốt)", "hào (Số/Ngày)"],
+        "hanViet": "Hảo - Hiệu",
+        "meaning": "Thanh 3 hạ xuống vực sâu rồi lượn nhẹ. Thanh 4 rơi nhanh, mạnh mẽ từ đỉnh xuống đáy.",
+        "explanationText": "Mẹo phát âm: Thanh 3 trong câu thường chỉ cần đọc nửa đầu (hạ giọng xuống thấp nhất). Thanh 4 không phải dấu huyền tiếng Việt, mà như lệnh dứt khoát: 'Dừng!'.",
+        "audioUrl": "https://assets.luminalearn.com/audio/tones_3_4.mp3"
+      },
+      {
+        "slideIndex": 4,
+        "category": "PHÁT ÂM PINYIN",
+        "cardType": "Quy tắc biến âm",
+        "subTitle": "三声变调 (Biến điệu hai thanh 3)",
+        "title": "Quy tắc 2 thanh 3 đi liền nhau",
+        "pinyinVariants": ["Nǐ hǎo -> Ní hǎo", "Kěyǐ -> Kéyǐ"],
+        "hanViet": "Nhĩ hảo (Xin chào) · Khả dĩ (Có thể)",
+        "meaning": "Khi hai thanh 3 đứng cạnh nhau, thanh 3 thứ nhất bắt buộc biến thành thanh 2.",
+        "explanationText": "Ví dụ kinh điển: 你 (nǐ) + 好 (hǎo) = 你好 (phát âm là Ní hǎo). Quy tắc này giúp luồng hơi liên tục và nói không bị đứt quãng hay mệt mỏi.",
+        "audioUrl": "https://assets.luminalearn.com/audio/sandhi_rule.mp3"
+      }
+    ]
+  },
+  {
+    "id": "2",
+    "category": "Giao tiếp thực tế",
+    "level": "HSK 1",
+    "pinyinHanziTitle": "日常问候 (Rìcháng wènhòu)",
+    "title": "Câu chào hỏi & Xã giao thường nhật",
+    "description": "Học 5 mẫu câu chào hỏi, cảm ơn và xin lỗi thông dụng nhất kèm cử chỉ văn hóa chuẩn xác.",
+    "durationMins": 3,
+    "sparks": 25,
+    "isCompleted": true,
+    "totalSlides": 3,
+    "slides": [
+      {
+        "slideIndex": 1,
+        "category": "GIAO TIẾP THỰC TẾ",
+        "cardType": "Mẫu câu",
+        "subTitle": "你好！ / 您好！(Nǐ hǎo! / Nín hǎo!)",
+        "title": "Chào hỏi thông thường và Kính ngữ",
+        "pinyinVariants": ["Nǐ hǎo (Bạn chào)", "Nín hǎo (Kính chào quý vị/người lớn)"],
+        "hanViet": "Nhĩ hảo / Nẫm hảo",
+        "meaning": "Lời chào cơ bản mở đầu mọi cuộc giao tiếp hàng ngày.",
+        "explanationText": "Dùng '你好' với bạn bè cùng trang lứa, đồng nghiệp. Dùng '您好' khi chào người lớn tuổi, thầy cô, đối tác hoặc cấp trên để thể hiện sự tôn kính.",
+        "audioUrl": "https://assets.luminalearn.com/audio/greet_nihao.mp3"
+      },
+      {
+        "slideIndex": 2,
+        "category": "GIAO TIẾP THỰC TẾ",
+        "cardType": "Mẫu câu",
+        "subTitle": "谢谢！/ 不客气！(Xièxie! / Bù kèqì!)",
+        "title": "Cảm ơn & Đáp lại lịch sự",
+        "pinyinVariants": ["Xièxie! (Cảm ơn)", "Bú kèqi! (Không có chi/Đừng khách sáo)"],
+        "hanViet": "Tạ tạ / Bất khách khí",
+        "meaning": "Cặp câu đối đáp văn minh và phổ biến bậc nhất trong đời sống.",
+        "explanationText": "Khi ai đó giúp đỡ bạn, hãy nói '谢谢'. Người được cảm ơn sẽ mỉm cười đáp lại '不客气' (Bú kèqi) hoặc '不用谢' (Bú yòng xiè - Không cần cảm ơn).",
+        "audioUrl": "https://assets.luminalearn.com/audio/greet_thanks.mp3"
+      },
+      {
+        "slideIndex": 3,
+        "category": "GIAO TIẾP THỰC TẾ",
+        "cardType": "Mẫu câu",
+        "subTitle": "对不起！/ 没关系！(Duìbùqǐ! / Méi guānxi!)",
+        "title": "Xin lỗi & Tha thứ / Bỏ qua",
+        "pinyinVariants": ["Duìbuqǐ! (Xin lỗi)", "Méi guānxi! (Không sao đâu/Không hề gì)"],
+        "hanViet": "Đối bất khởi / Một quan hệ",
+        "meaning": "Lời xin lỗi chân thành và lời trấn an khi gặp sự cố nhỏ.",
+        "explanationText": "Khi vô tình va vào ai đó trên tàu điện ngầm hay làm rơi đồ, câu cửa miệng phản xạ luôn là '对不起', và đối phương sẽ đáp lại '没关系'.",
+        "audioUrl": "https://assets.luminalearn.com/audio/greet_sorry.mp3"
+      }
+    ]
+  },
+  {
+    "id": "3",
+    "category": "Chữ Hán & Bộ thủ",
+    "level": "Cơ bản",
+    "pinyinHanziTitle": "汉字偏旁部首 (Hànzì piānpáng)",
+    "title": "Bí kíp Chiết tự: Bộ Nhân, Bộ Nữ, Bộ Mộc",
+    "description": "Mở khóa hàng trăm chữ Hán chỉ bằng việc hiểu sâu 3 bộ thủ tượng hình quen thuộc nhất.",
+    "durationMins": 5,
+    "sparks": 35,
+    "isCompleted": false,
+    "totalSlides": 3,
+    "slides": [
+      {
+        "slideIndex": 1,
+        "category": "CHỮ HÁN & BỘ THỦ",
+        "cardType": "Chiết tự",
+        "subTitle": "亻- 单人旁 (Dān rén páng)",
+        "title": "Bộ Nhân Đứng - Hành vi con người",
+        "pinyinVariants": ["他 (Anh ấy)", "你 (Bạn)", "休 (Nghỉ ngơi)"],
+        "hanViet": "Bộ Nhân đứng",
+        "meaning": "Mọi chữ có bộ Nhân đứng đều xoay quanh đặc tính, hoạt động hoặc danh xưng con người.",
+        "explanationText": "Ví dụ thú vị: Chữ '休' (Xiū - Nghỉ ngơi) gồm bộ Nhân đứng (người) tựa vào bộ Mộc (cái cây) - hình ảnh người nông dân tựa lưng bóng cây nghỉ ngơi.",
+        "audioUrl": "https://assets.luminalearn.com/audio/radical_ren.mp3"
+      },
+      {
+        "slideIndex": 2,
+        "category": "CHỮ HÁN & BỘ THỦ",
+        "cardType": "Chiết tự",
+        "subTitle": "女 - 女字旁 (Nǚ zì páng)",
+        "title": "Bộ Nữ - Phụ nữ, gia đình & cái đẹp",
+        "pinyinVariants": ["好 (Tốt đẹp)", "妈 (Mẹ)", "她 (Cô ấy)"],
+        "hanViet": "Bộ Nữ",
+        "meaning": "Tượng hình người phụ nữ quỳ gối ngày xưa, biểu thị phái nữ và các giá trị êm ấm.",
+        "explanationText": "Ví dụ: Chữ '好' (Hǎo - Tốt đẹp) ghép từ bộ Nữ (người mẹ) và bộ Tử (đứa con). Có cả mẹ lẫn con vẹn tròn chính là điều tốt lành viên mãn nhất.",
+        "audioUrl": "https://assets.luminalearn.com/audio/radical_nu.mp3"
+      },
+      {
+        "slideIndex": 3,
+        "category": "CHỮ HÁN & BỘ THỦ",
+        "cardType": "Chiết tự",
+        "subTitle": "木 - 木字旁 (Mù zì páng)",
+        "title": "Bộ Mộc - Cây cỏ, rừng xanh & đồ gỗ",
+        "pinyinVariants": ["林 (Rừng thưa)", "森 (Rừng rậm)", "桌 (Cái bàn)"],
+        "hanViet": "Bộ Mộc",
+        "meaning": "Tượng hình thân cây tỏa cành rễ, chỉ giới thực vật hoặc vật dụng chế tác từ gỗ.",
+        "explanationText": "Nguyên lý nhân chữ: Một cây là 木 (Mộc), hai cây xếp cạnh nhau là 林 (Rừng thưa), ba cây chụm lại thành 森 (Rừng đại ngàn). Rất trực quan và dễ nhớ!",
+        "audioUrl": "https://assets.luminalearn.com/audio/radical_mu.mp3"
+      }
+    ]
+  },
+  {
+    "id": "4",
+    "category": "Giao tiếp thực tế",
+    "level": "HSK 1",
+    "pinyinHanziTitle": "数字与购物 (Shùzì yǔ gòuwù)",
+    "title": "Số đếm 1–10 & Mẹo hỏi giá khi du lịch",
+    "description": "Học cách đọc số từ 1 đến 10, cấu trúc hỏi giá 'Cái này bao nhiêu tiền' và cách dùng cử chỉ tay số đếm.",
+    "durationMins": 4,
+    "sparks": 30,
+    "isCompleted": false,
+    "totalSlides": 3,
+    "slides": [
+      {
+        "slideIndex": 1,
+        "category": "GIAO TIẾP THỰC TẾ",
+        "cardType": "Từ vựng",
+        "subTitle": "一 到 五 (Yī dào wǔ)",
+        "title": "Số đếm cơ bản 1 đến 5",
+        "pinyinVariants": ["yī (1)", "èr (2)", "sān (3)", "sì (4)", "wǔ (5)"],
+        "hanViet": "Nhất · Nhị · Tam · Tứ · Ngũ",
+        "meaning": "5 chữ số nền tảng của hệ thống số đếm Trung Hoa.",
+        "explanationText": "Số 1 (一), 2 (二), 3 (三) chỉ đơn giản là các nét gạch ngang. Số 4 là chữ Tứ (四) và số 5 là chữ Ngũ (五).",
+        "audioUrl": "https://assets.luminalearn.com/audio/numbers_1_5.mp3"
+      },
+      {
+        "slideIndex": 2,
+        "category": "GIAO TIẾP THỰC TẾ",
+        "cardType": "Từ vựng",
+        "subTitle": "六 到 十 (Liù dào shí)",
+        "title": "Số đếm 6 đến 10 & Cử chỉ tay",
+        "pinyinVariants": ["liù (6)", "qī (7)", "bā (8)", "jiǔ (9)", "shí (10)"],
+        "hanViet": "Lục · Thất · Bát · Cửu · Thập",
+        "meaning": "Các số từ 6 đến 10 có hệ thống ra dấu bằng 1 bàn tay đặc trưng của người Trung Quốc.",
+        "explanationText": "Người Trung Quốc có thể ra dấu từ 1 đến 10 chỉ bằng một bàn tay. Ví dụ giơ ngón cái và ngón út như điệu 'Alo' biểu thị số 6 (六).",
+        "audioUrl": "https://assets.luminalearn.com/audio/numbers_6_10.mp3"
+      },
+      {
+        "slideIndex": 3,
+        "category": "GIAO TIẾP THỰC TẾ",
+        "cardType": "Mẫu câu",
+        "subTitle": "这个多少钱？(Zhège duōshǎo qián?)",
+        "title": "Mẫu câu hỏi giá kinh điển khi mua sắm",
+        "pinyinVariants": ["Zhège duōshao qián? (Cái này bao nhiêu tiền?)", "Tài guì le! (Đắt quá!)"],
+        "hanViet": "Giá cá đa thiểu tiền?",
+        "meaning": "Cấu trúc quan trọng nhất khi đi chợ đêm, siêu thị hoặc mua sắm lưu niệm.",
+        "explanationText": "Cấu trúc: '这个' (Cái này) + '多少' (Bao nhiêu) + '钱' (Tiền)? Khi muốn mặc cả hãy nói: '便宜一点吧' (Piányi yīdiǎn ba - Bớt một chút nhé).",
+        "audioUrl": "https://assets.luminalearn.com/audio/shopping_price.mp3"
+      }
+    ]
+  },
+  {
+    "id": "5",
+    "category": "Ngữ pháp căn bản",
+    "level": "HSK 1",
+    "pinyinHanziTitle": "“是”字句与“吗”疑问句",
+    "title": "Cấu trúc câu khẳng định '是' & Nghi vấn '吗'",
+    "description": "Nắm vững công thức A là B và cách chuyển mọi câu khẳng định thành câu hỏi chỉ với trợ từ '吗'.",
+    "durationMins": 4,
+    "sparks": 30,
+    "isCompleted": false,
+    "totalSlides": 3,
+    "slides": [
+      {
+        "slideIndex": 1,
+        "category": "NGỮ PHÁP CĂN BẢN",
+        "cardType": "Công thức",
+        "subTitle": "A 是 B (A shì B)",
+        "title": "Câu phán đoán: A là B",
+        "pinyinVariants": ["Wǒ shì Xuéshēng (Tôi là học sinh)", "Tā shì Lǎoshī (Cô ấy là giáo viên)"],
+        "hanViet": "Ngã thị học sinh / Tha thị lão sư",
+        "meaning": "Động từ '是' (shì) tương đương với 'is/am/are' trong tiếng Anh hoặc 'là' trong tiếng Việt.",
+        "explanationText": "Cấu trúc: [Chủ ngữ] + 是 + [Danh từ]. Ví dụ: 我是越南人 (Wǒ shì Yuènán rén - Tôi là người Việt Nam).",
+        "audioUrl": "https://assets.luminalearn.com/audio/grammar_shi.mp3"
+      },
+      {
+        "slideIndex": 2,
+        "category": "NGỮ PHÁP CĂN BẢN",
+        "cardType": "Công thức",
+        "subTitle": "A 不是 B (A bù shì B)",
+        "title": "Dạng phủ định: A không phải là B",
+        "pinyinVariants": ["Wǒ bú shì Lǎoshī (Tôi không phải giáo viên)"],
+        "hanViet": "Ngã bất thị lão sư",
+        "meaning": "Thêm phó từ phủ định '不' (bù) trước '是' để biểu thị quan hệ không phải là.",
+        "explanationText": "Lưu ý biến âm: '不' mang thanh 4, khi đi trước '是' (thanh 4) thì '不' phải đọc thành thanh 2: 'Bú shì'.",
+        "audioUrl": "https://assets.luminalearn.com/audio/grammar_bushi.mp3"
+      },
+      {
+        "slideIndex": 3,
+        "category": "NGỮ PHÁP CĂN BẢN",
+        "cardType": "Công thức",
+        "subTitle": "Câu khẳng định + 吗？(... ma?)",
+        "title": "Biến câu kể thành câu hỏi Có/Không",
+        "pinyinVariants": ["Nǐ shì Xuéshēng ma? (Bạn là học sinh phải không?)", "Nǐ hǎo ma? (Bạn có khỏe không?)"],
+        "hanViet": "... ma?",
+        "meaning": "Chỉ cần thêm chữ '吗' (ma - thanh nhẹ) vào cuối bất kỳ câu khẳng định nào để tạo thành câu hỏi Có/Không.",
+        "explanationText": "Trật tự từ trong tiếng Trung hoàn toàn không bị đảo lộn như tiếng Anh. Bạn giữ nguyên câu kể, thêm '吗?' ở đuôi là hoàn thành câu hỏi.",
+        "audioUrl": "https://assets.luminalearn.com/audio/grammar_ma.mp3"
+      }
+    ]
+  }
+]

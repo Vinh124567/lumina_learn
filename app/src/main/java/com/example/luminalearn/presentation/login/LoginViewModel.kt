@@ -1,6 +1,7 @@
 package com.example.luminalearn.presentation.login
 
 import com.example.luminalearn.core.base.BaseViewModel
+import com.example.luminalearn.utils.ValidationUtils
 
 /**
  * LoginViewModel xử lý logic đăng nhập theo pattern MVI.
@@ -14,9 +15,11 @@ class LoginViewModel : BaseViewModel<LoginUiState, LoginUiIntent, LoginUiEffect>
             is LoginUiIntent.EmailChanged -> {
                 setState { copy(email = intent.email, emailError = null) }
             }
+
             is LoginUiIntent.PasswordChanged -> {
                 setState { copy(password = intent.password, passwordError = null) }
             }
+
             is LoginUiIntent.LoginClicked -> {
                 handleLogin()
             }
@@ -24,19 +27,21 @@ class LoginViewModel : BaseViewModel<LoginUiState, LoginUiIntent, LoginUiEffect>
     }
 
     private fun handleLogin() {
-        val email = currentState.email.trim()
+        val email = currentState.email
         val password = currentState.password
-
-        // Validate đơn giản
-        if (email.isBlank()) {
-            setState { copy(emailError = "Email không được để trống") }
-            return
-        }
-        if (password.isBlank()) {
-            setState { copy(passwordError = "Mật khẩu không được để trống") }
-            return
-        }
+        val emailError = ValidationUtils.validateField(
+            value = email,
+            blankMessage = "The email field cannot be left blank.",
+            invalidMessage = "Invalid email"
+        )
+        val passwordError = ValidationUtils.validateField(
+            value = password,
+            blankMessage = "The password field cannot be left blank.",
+            invalidMessage = "Invalid password"
+        )
+        setState { copy(emailError = emailError, passwordError = passwordError) }
         setState { copy(isLoading = true) }
         setEffect(LoginUiEffect.NavigateToMain)
     }
 }
+

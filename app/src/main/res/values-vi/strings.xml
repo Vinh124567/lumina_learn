@@ -1,0 +1,113 @@
+<resources>
+    <string name="app_name">Lumina Tiếng Trung</string>
+    <string name="app_brand_name">Lumina</string>
+
+    <!-- Content Descriptions -->
+    <string name="cd_avatar">Ảnh đại diện</string>
+    <string name="cd_streak">Chuỗi ngày</string>
+    <string name="cd_energy">Năng lượng</string>
+    <string name="cd_speaker">Loa phát âm</string>
+    <string name="cd_welcome">Chào mừng</string>
+    <string name="cd_spark_ai">Spark AI</string>
+    <string name="cd_sparks">Điểm Spark</string>
+    <string name="cd_play">Bắt đầu</string>
+    <string name="cd_flame">Ngọn lửa chuỗi</string>
+    <string name="cd_completed">Đã hoàn thành</string>
+    <string name="cd_bouncing_image">Banner chuyển động</string>
+    <string name="cd_slides">Trang bài giảng</string>
+    <string name="cd_puzzle">Thử thách</string>
+    <string name="cd_refresh">Làm mới</string>
+
+    <!-- Navigation Tabs -->
+    <string name="nav_home">Trang chủ</string>
+    <string name="nav_lessons">Bài học</string>
+    <string name="nav_spark_ai">Spark AI</string>
+    <string name="nav_rewards">Thành tích</string>
+
+    <!-- Login Screen -->
+    <string name="login_subtitle">Học tiếng Trung 5 phút mỗi ngày &amp; chinh phục HSK từng bước</string>
+    <string name="label_email">Email</string>
+    <string name="label_password">Mật khẩu</string>
+    <string name="btn_login">Đăng nhập</string>
+    <string name="err_email_empty">Email không được để trống</string>
+    <string name="err_password_empty">Mật khẩu không được để trống</string>
+
+    <!-- TopBar & Stats -->
+    <string name="stat_days_format">%1$d Ngày</string>
+    <string name="stat_points_format">%1$d</string>
+
+    <!-- Greeting Header -->
+    <string name="welcome_back">CHÀO MỪNG TRỞ LẠI • 欢迎</string>
+    <string name="greeting_title_part1">Nǐ hǎo! Sẵn sàng học tiếng Trung,\n</string>
+    <string name="greeting_title_part2">Alex Vance!</string>
+    <string name="daily_goal_done_subtitle">Bạn đã hoàn thành mục tiêu học hôm nay.</string>
+    <string name="btn_ask_spark_ai">Luyện cùng Spark AI</string>
+
+    <!-- Daily Goal Tracker Card -->
+    <string name="daily_goal_tracker_title">MỤC TIÊU TIẾNG TRUNG HÔM NAY</string>
+    <string name="goal_mins_format">%1$d / %2$d Phút</string>
+    <string name="completed_today">đã hoàn thành</string>
+    <string name="earn_sparks_bonus_format">Nhận +%1$d Sparks khi hoàn thành\nmục tiêu</string>
+    <string name="btn_start_lesson">Học bài 3 phút\nngay</string>
+
+    <!-- Streak Card -->
+    <string name="streak_label">CHUỖI NGÀY</string>
+    <string name="streak_active">Đang duy trì</string>
+    <string name="streak_flame_title_format">%1$d Ngày rực lửa!</string>
+    <string name="streak_subtitle">Duy trì phản xạ tiếng Trung với 1 bài học mỗi ngày.</string>
+    <string name="btn_claim_streak">Điểm danh chuỗi ngày hôm nay</string>
+    <string name="msg_streak_claimed">Đã điểm danh chuỗi ngày thành công!</string>
+
+    <!-- Daily Spark Challenge Card -->
+    <string name="challenge_badge_format">★ THỬ THÁCH TIẾNG TRUNG HÔM NAY (+%1$d SPARKS)</string>
+    <string name="challenge_title">Luyện tai phân biệt thanh điệu Pinyin</string>
+    <string name="challenge_desc">Nghe và phân biệt thanh 2 (dấu sắc) và thanh 3 (dấu hỏi) qua 5 cặp từ vựng quen thuộc.</string>
+    <string name="btn_complete_earn_format">Hoàn thành &amp; Nhận +%1$d</string>
+    <string name="msg_challenge_completed">Chúc mừng! Bạn đã nhận +20 Sparks.</string>
+
+    <!-- Recommended Lessons Section -->
+    <string name="recommended_lessons_title">Bài học đề xuất</string>
+    <string name="view_all">Xem tất cả →</string>
+    <string name="recommended_lessons_subtitle">Thẻ bài học tương tác vi mô giúp ghi nhớ chữ Hán siêu nhanh</string>
+    <string name="category_pinyin">PHÁT ÂM &amp; THANH ĐIỆU</string>
+    <string name="category_radicals">CHỮ HÁN &amp; BỘ THỦ</string>
+    <string name="lesson_meta_format">%1$d phút • +%2$d Sparks</string>
+    <string name="interactive_slides_format">%1$d thẻ tương tác</string>
+    <string name="btn_start_arrow">Bắt đầu →</string>
+    <string name="lesson_1_title">Làm chủ 4 Thanh điệu Pinyin</string>
+    <string name="lesson_1_desc">Luyện nghe và phát âm chuẩn xác 4 thanh điệu cùng các quy tắc biến điệu quan trọng.</string>
+    <string name="lesson_2_title">10 Bộ thủ Chữ Hán thường gặp nhất</string>
+    <string name="lesson_2_desc">Học các bộ Thủy (氵), Hỏa (灬), Nhân (亻) để dễ dàng bẻ khóa và nhớ hàng trăm chữ Hán.</string>
+
+    <!-- Daily Wisdom Card -->
+    <string name="daily_wisdom_label">THÀNH NGỮ TIẾNG TRUNG • 每日名言</string>
+    <string name="daily_wisdom_quote">\"Hành trình vạn dặm bắt đầu từ một bước chân.\" (千里之行，始于足下)</string>
+    <string name="daily_wisdom_author">— Lão Tử • 老子</string>
+
+    <!-- Spark AI Lab -->
+    <string name="spark_ai_badge">POWERED BY GEMINI</string>
+    <string name="spark_ai_title">Lumina Spark AI Lab</string>
+    <string name="spark_ai_desc">Hỏi bất kỳ điều gì về Pinyin, bộ thủ chữ Hán, ngữ pháp hoặc tự động tạo đề trắc nghiệm HSK.</string>
+    <string name="spark_ai_prompt_placeholder">VD: Giải thích bộ Thủy (氵), tạo quiz HSK 2, phân biệt 了 và 过...</string>
+    <string name="btn_generate">Tạo bài</string>
+    <string name="placeholder_explore_lessons">Khám phá Lộ trình Tiếng Trung (HSK 1 - HSK 6)</string>
+    <string name="placeholder_rewards">Huy hiệu Thành tích &amp; Kho Từ vựng</string>
+
+    <!-- Explore Lessons Screen -->
+    <string name="library_badge">THƯ VIỆN HÁN NGỮ VI MÔ</string>
+    <string name="library_title">Khám phá Bài học Tiếng Trung</string>
+    <string name="library_desc">Các bài học vi mô tương tác cô đọng trong 3–5 phút, giải thích bằng tiếng Việt trực quan, dễ nhớ.</string>
+    <string name="search_placeholder">Tìm bài học, chữ Hán, Pinyin, giao tiếp...</string>
+    <string name="filter_all">Tất cả</string>
+    <string name="filter_pinyin">Phát âm Pinyin</string>
+    <string name="filter_conversation">Giao tiếp thực tế</string>
+    <string name="filter_radicals">Chữ Hán &amp; Bộ thủ</string>
+    <string name="filter_grammar">Ngữ pháp thú vị</string>
+    <string name="level_basic">Cơ bản</string>
+    <string name="level_hsk1">HSK 1</string>
+    <string name="status_completed">Đã hoàn thành</string>
+    <string name="btn_review">Ôn lại →</string>
+    <string name="btn_start_now">Bắt đầu →</string>
+    <string name="sparks_earned_format">+%1$d Tia Sáng</string>
+    <string name="duration_mins_format">%1$d phút</string>
+</resources>
