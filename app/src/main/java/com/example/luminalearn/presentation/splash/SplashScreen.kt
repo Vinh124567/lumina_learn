@@ -98,3 +98,9 @@ fun SplashScreen(
         }
     }
 }
+
+@androidx.compose.ui.tooling.preview.Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun SplashScreenPreview() {
+    SplashScreen(navController = androidx.navigation.compose.rememberNavController())
+}

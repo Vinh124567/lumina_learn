@@ -115,3 +115,11 @@ private fun PlaceholderScreen(
         )
     }
 }
+
+@androidx.compose.ui.tooling.preview.Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun MainContainerScreenPreview() {
+    MainContainerScreen(
+        rootNavController = androidx.navigation.compose.rememberNavController()
+    )
+}

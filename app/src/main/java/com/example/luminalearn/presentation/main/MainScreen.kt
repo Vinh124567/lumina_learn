@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -26,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -44,6 +46,7 @@ import com.example.luminalearn.presentation.main.component.DailyGoalCard
 import com.example.luminalearn.presentation.main.component.DailyWisdomCard
 import com.example.luminalearn.presentation.main.component.GreetingHeader
 import com.example.luminalearn.presentation.main.component.LessonCard
+import com.example.luminalearn.presentation.main.component.LessonCardData
 import com.example.luminalearn.presentation.main.component.SparkChallengeCard
 import com.example.luminalearn.presentation.main.component.StreakCard
 import com.example.luminalearn.presentation.main.component.TopBar
@@ -148,7 +151,10 @@ fun MainScreen(
                             color = Color(0xFF5C50F6),
                             softWrap = false,
                             maxLines = 1,
-                            modifier = Modifier.clickable { onNavigateToLesson() }
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .clickable { onNavigateToLesson() }
+                                .padding(horizontal = 8.dp, vertical = 6.dp)
                         )
                     }
 
@@ -166,14 +172,16 @@ fun MainScreen(
 
                     // Lesson 1: Pinyin
                     LessonCard(
-                        category = stringResource(R.string.category_pinyin),
-                        categoryBgColor = Color(0xFFFCE7F3),
-                        categoryTextColor = Color(0xFF9333EA),
-                        durationMins = 4,
-                        sparks = 30,
-                        title = stringResource(R.string.lesson_1_title),
-                        description = stringResource(R.string.lesson_1_desc),
-                        slideCount = 4,
+                        data = LessonCardData(
+                            category = stringResource(R.string.category_pinyin),
+                            categoryBgColor = Color(0xFFFCE7F3),
+                            categoryTextColor = Color(0xFF9333EA),
+                            durationMins = 4,
+                            sparks = 30,
+                            title = stringResource(R.string.lesson_1_title),
+                            description = stringResource(R.string.lesson_1_desc),
+                            slideCount = 4
+                        ),
                         onStartClick = {
                             lessonContent = ToneCardData(
                                 category = "PHÁT ÂM PINYIN",
@@ -182,7 +190,7 @@ fun MainScreen(
                                 pinyinVariants = listOf("mā", "má", "mǎ", "mà"),
                                 hanViet = "Ma (Mẹ) · Ma (Gái) · Mã (Ngựa) · Mắng",
                                 meaning = "Bốn ý nghĩa hoàn toàn khác nhau chỉ nhờ thay đổi thanh điệu!",
-                                explanationText = "Tiếng Trung có 4 thanh điệu chính. Thanh 1 bằng phẳng cao...",
+                                explanationText = "Bản đồ 4 Thanh điệu qua chữ \"ma\"",
                                 currentIndex = 1,
                                 totalCount = 4
                             )
@@ -193,14 +201,16 @@ fun MainScreen(
 
                     // Lesson 2: Radicals
                     LessonCard(
-                        category = stringResource(R.string.category_radicals),
-                        categoryBgColor = Color(0xFFDBEAFE),
-                        categoryTextColor = Color(0xFF2563EB),
-                        durationMins = 3,
-                        sparks = 25,
-                        title = stringResource(R.string.lesson_2_title),
-                        description = stringResource(R.string.lesson_2_desc),
-                        slideCount = 4,
+                        data = LessonCardData(
+                            category = stringResource(R.string.category_radicals),
+                            categoryBgColor = Color(0xFFDBEAFE),
+                            categoryTextColor = Color(0xFF2563EB),
+                            durationMins = 3,
+                            sparks = 25,
+                            title = stringResource(R.string.lesson_2_title),
+                            description = stringResource(R.string.lesson_2_desc),
+                            slideCount = 4
+                        ),
                         onStartClick = onNavigateToLesson
                     )
 
@@ -234,4 +244,12 @@ fun MainScreen(
             )
         )
     }
+}
+
+@androidx.compose.ui.tooling.preview.Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun MainScreenPreview() {
+    MainScreen(
+        navController = androidx.navigation.compose.rememberNavController()
+    )
 }

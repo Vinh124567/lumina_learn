@@ -162,3 +162,11 @@ fun LoginScreen(
         }
     }
 }
+
+@androidx.compose.ui.tooling.preview.Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun LoginScreenPreview() {
+    LoginScreen(
+        navController = androidx.navigation.compose.rememberNavController()
+    )
+}

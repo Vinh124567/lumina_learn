@@ -31,17 +31,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.luminalearn.R
 
+data class LessonCardData(
+    val category: String,
+    val categoryBgColor: Color,
+    val categoryTextColor: Color,
+    val durationMins: Int,
+    val sparks: Int,
+    val title: String,
+    val description: String,
+    val slideCount: Int = 4
+)
+
 @Composable
 fun LessonCard(
+    data: LessonCardData,
     modifier: Modifier = Modifier,
-    category: String,
-    categoryBgColor: Color,
-    categoryTextColor: Color,
-    durationMins: Int,
-    sparks: Int,
-    title: String,
-    description: String,
-    slideCount: Int = 4,
     onStartClick: () -> Unit = {}
 ) {
     Card(
@@ -64,12 +68,12 @@ fun LessonCard(
                 Box(
                     modifier = Modifier
                         .clip(CircleShape)
-                        .background(categoryBgColor)
+                        .background(data.categoryBgColor)
                         .padding(horizontal = 10.dp, vertical = 4.dp)
                 ) {
                     Text(
-                        text = category,
-                        color = categoryTextColor,
+                        text = data.category,
+                        color = data.categoryTextColor,
                         style = MaterialTheme.typography.labelSmall.copy(
                             fontWeight = FontWeight.ExtraBold,
                             fontSize = 11.sp,
@@ -79,7 +83,7 @@ fun LessonCard(
                 }
 
                 Text(
-                    text = stringResource(R.string.lesson_meta_format, durationMins, sparks),
+                    text = stringResource(R.string.lesson_meta_format, data.durationMins, data.sparks),
                     style = MaterialTheme.typography.bodySmall.copy(
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Medium
@@ -92,7 +96,7 @@ fun LessonCard(
 
             // Title
             Text(
-                text = title,
+                text = data.title,
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontWeight = FontWeight.Bold,
                     fontSize = 17.sp
@@ -104,7 +108,7 @@ fun LessonCard(
 
             // Description
             Text(
-                text = description,
+                text = data.description,
                 style = MaterialTheme.typography.bodySmall.copy(
                     fontSize = 13.sp,
                     lineHeight = 18.sp
@@ -113,8 +117,6 @@ fun LessonCard(
             )
 
             Spacer(modifier = Modifier.height(16.dp))
-
-            // Footer Row: Slides count + Start button
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -131,7 +133,7 @@ fun LessonCard(
                         modifier = Modifier.size(15.dp)
                     )
                     Text(
-                        text = stringResource(R.string.interactive_slides_format, slideCount),
+                        text = stringResource(R.string.interactive_slides_format, data.slideCount),
                         style = MaterialTheme.typography.bodySmall.copy(
                             fontSize = 12.sp
                         ),

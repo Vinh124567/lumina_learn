@@ -174,3 +174,9 @@ fun LessonScreen(
         }
     }
 }
+
+@androidx.compose.ui.tooling.preview.Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun LessonScreenPreview() {
+    LessonScreen()
+}

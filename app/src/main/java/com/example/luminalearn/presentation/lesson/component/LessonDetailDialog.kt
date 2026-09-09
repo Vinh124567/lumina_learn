@@ -2,6 +2,7 @@ package com.example.luminalearn.presentation.lesson.component
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,8 +32,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -112,13 +116,18 @@ fun LessonDetailDialog(
                         .verticalScroll(rememberScrollState())
                 ) {
                     TopHeaderBar(
-                        category = toneCardData.category,
-                        subTitle = toneCardData.subTitle,
-                        onAskAi = action.onAskAi,
-                        onDismiss = action.onDismiss
+                        onDismiss = action.onDismiss,
+                        onAskAi = action.onAskAi
                     )
 
-                    Spacer(modifier = Modifier.height(14.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    CategoryAndTopicRow(
+                        category = toneCardData.category,
+                        subTitle = toneCardData.subTitle
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
 
                     TitleAndProgress(
                         title = toneCardData.title,
@@ -127,14 +136,14 @@ fun LessonDetailDialog(
                         cardType = toneCardData.cardType
                     )
 
-                    Spacer(modifier = Modifier.height(14.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
 
                     HanziAndPronunciationCard(
                         toneCardData = toneCardData,
                         onPlayAudio = action.onPlayAudio
                     )
 
-                    Spacer(modifier = Modifier.height(14.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
 
                     ToneMapExplanationCard(
                         explanationTitle = toneCardData.explanationText,
@@ -142,7 +151,7 @@ fun LessonDetailDialog(
                         rules = toneCardData.toneRules
                     )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(32.dp))
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -158,72 +167,39 @@ fun LessonDetailDialog(
 
 @Composable
 private fun TopHeaderBar(
-    category: String,
-    subTitle: String,
-    onAskAi: () -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    onAskAi: () -> Unit
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Row(
-            modifier = Modifier.weight(1f, fill = false),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(6.dp)
+        // Nút đóng X ở góc trái với vùng bấm chuẩn 40dp
+        Box(
+            modifier = Modifier
+                .size(40.dp)
+                .clip(CircleShape)
+                .clickable(onClick = onDismiss),
+            contentAlignment = Alignment.Center
         ) {
-            // Nút đóng X
-            IconButton(
-                onClick = onDismiss,
+            Box(
                 modifier = Modifier
                     .size(32.dp)
                     .clip(CircleShape)
-                    .background(Color(0xFFF1F5F9))
+                    .background(Color(0xFFF1F5F9)),
+                contentAlignment = Alignment.Center
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_close),
                     contentDescription = "Đóng dialog",
                     tint = Color(0xFF64748B),
-                    modifier = Modifier.size(15.dp)
-                )
-            }
-
-            // Badge PHÁT ÂM PINYIN
-            Surface(
-                shape = RoundedCornerShape(50),
-                color = Color(0xFFF5F3FF),
-                border = BorderStroke(1.dp, Color(0xFFDDD6FE))
-            ) {
-                Text(
-                    text = category,
-                    fontFamily = PlusJakartaSans,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 10.5.sp,
-                    color = Color(0xFF6366F1),
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                    maxLines = 1
-                )
-            }
-
-            // Chữ Hán phụ
-            if (subTitle.isNotBlank()) {
-                val cleanSubTitle = if (subTitle.contains("(")) subTitle.substringBefore("(").trim() else subTitle
-                Text(
-                    text = cleanSubTitle,
-                    fontFamily = PlusJakartaSans,
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 11.5.sp,
-                    color = Color(0xFF64748B),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    modifier = Modifier.size(14.dp)
                 )
             }
         }
 
-        Spacer(modifier = Modifier.width(6.dp))
-
-        // Nút Hỏi Gia sư AI
+        // Nút Hỏi Gia sư AI ở góc phải
         Surface(
             onClick = onAskAi,
             shape = RoundedCornerShape(50),
@@ -232,23 +208,66 @@ private fun TopHeaderBar(
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                modifier = Modifier.padding(horizontal = 9.dp, vertical = 5.dp)
+                horizontalArrangement = Arrangement.spacedBy(5.dp),
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_ai_chat),
                     contentDescription = null,
                     tint = Color(0xFF4F46E5),
-                    modifier = Modifier.size(12.dp)
+                    modifier = Modifier.size(13.dp)
                 )
                 Text(
                     text = "Hỏi Gia sư AI",
                     fontFamily = PlusJakartaSans,
                     fontWeight = FontWeight.SemiBold,
-                    fontSize = 10.5.sp,
+                    fontSize = 11.5.sp,
                     color = Color(0xFF4F46E5)
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun CategoryAndTopicRow(
+    category: String,
+    subTitle: String
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        // Badge PHÁT ÂM PINYIN
+        Surface(
+            shape = RoundedCornerShape(50),
+            color = Color(0xFFF5F3FF),
+            border = BorderStroke(1.dp, Color(0xFFDDD6FE))
+        ) {
+            Text(
+                text = category,
+                fontFamily = PlusJakartaSans,
+                fontWeight = FontWeight.Bold,
+                fontSize = 11.sp,
+                color = Color(0xFF6366F1),
+                modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+                maxLines = 1
+            )
+        }
+
+        // Chữ Hán phụ
+        if (subTitle.isNotBlank()) {
+            val cleanSubTitle = if (subTitle.contains("(")) subTitle.substringBefore("(").trim() else subTitle
+            Text(
+                text = cleanSubTitle,
+                fontFamily = PlusJakartaSans,
+                fontWeight = FontWeight.Medium,
+                fontSize = 12.sp,
+                color = Color(0xFF64748B),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
         }
     }
 }
@@ -260,13 +279,19 @@ private fun TitleAndProgress(
     totalCount: Int,
     cardType: String
 ) {
+    val formattedTitle = if (title.contains(" & ")) {
+        title.replace(" & ", "\n& ")
+    } else {
+        title
+    }
+
     Text(
-        text = title,
+        text = formattedTitle,
         fontFamily = PlusJakartaSans,
         fontWeight = FontWeight.ExtraBold,
-        fontSize = 17.5.sp,
+        fontSize = 18.sp,
         color = Color(0xFF0F172A),
-        lineHeight = 23.sp
+        lineHeight = 25.sp
     )
 
     Spacer(modifier = Modifier.height(10.dp))
@@ -325,13 +350,12 @@ private fun HanziAndPronunciationCard(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
         color = Color.White,
-        border = BorderStroke(1.dp, Color(0xFFE2E8F0)),
-        shadowElevation = 2.dp
+        border = BorderStroke(1.dp, Color(0xFFE2E8F0))
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(14.dp)
+                .padding(16.dp)
         ) {
             // Hàng 4 ô vuông chữ Hán lớn kèm Pinyin dưới chân
             HanziBoxRow(
@@ -339,7 +363,7 @@ private fun HanziAndPronunciationCard(
                 pinyinList = toneCardData.pinyinVariants
             )
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             // Hàng phát âm mā · má · mǎ · mà kèm nút Nghe đọc
             PronunciationAndAudioRow(
@@ -347,15 +371,13 @@ private fun HanziAndPronunciationCard(
                 onPlayAudio = onPlayAudio
             )
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
-            // Tag Hán Việt
-            HanVietBadge(hanViet = toneCardData.hanViet)
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Dòng Ý nghĩa
-            MeaningRow(meaning = toneCardData.meaning)
+            // Box vàng chứa cả Hán Việt và Ý nghĩa
+            HanVietAndMeaningBox(
+                hanViet = toneCardData.hanViet,
+                meaning = toneCardData.meaning
+            )
         }
     }
 }
@@ -376,7 +398,7 @@ private fun HanziBoxRow(
         hanzis.forEachIndexed { index, hanzi ->
             val pinyin = pinyins.getOrElse(index) { "" }
             Surface(
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(14.dp),
                 color = Color(0xFF5538EE),
                 modifier = Modifier
                     .weight(1f)
@@ -414,7 +436,7 @@ private fun PronunciationAndAudioRow(
     onPlayAudio: () -> Unit
 ) {
     Surface(
-        shape = RoundedCornerShape(50),
+        shape = RoundedCornerShape(14.dp),
         color = Color(0xFFF8FAFC),
         border = BorderStroke(1.dp, Color(0xFFF1F5F9)),
         modifier = Modifier.fillMaxWidth()
@@ -422,7 +444,7 @@ private fun PronunciationAndAudioRow(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 6.dp),
+                .padding(horizontal = 12.dp, vertical = 8.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -457,7 +479,7 @@ private fun PronunciationAndAudioRow(
                 border = BorderStroke(1.dp, Color(0xFF818CF8))
             ) {
                 Row(
-                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
@@ -481,9 +503,13 @@ private fun PronunciationAndAudioRow(
 }
 
 @Composable
-private fun HanVietBadge(hanViet: String) {
-    val text = hanViet.ifBlank { "Ma (Mẹ) - Ma (Gai) - Mã (Ngựa) - Mạ (Mắng)" }
-    val displayContent = if (text.startsWith("Hán Việt:")) text.substringAfter("Hán Việt:").trim() else text
+private fun HanVietAndMeaningBox(
+    hanViet: String,
+    meaning: String
+) {
+    val text = hanViet.ifBlank { "Ma (Mẹ) · Ma (Gái) · Mã (Ngựa) · Mắng" }
+    val displayHanViet = if (text.startsWith("Hán Việt:")) text.substringAfter("Hán Việt:").trim() else text
+    val displayMeaning = meaning.ifBlank { "Bốn ý nghĩa hoàn toàn khác nhau chỉ nhờ thay đổi thanh điệu!" }
 
     Surface(
         shape = RoundedCornerShape(14.dp),
@@ -491,48 +517,57 @@ private fun HanVietBadge(hanViet: String) {
         border = BorderStroke(1.dp, Color(0xFFFDE68A)),
         modifier = Modifier.fillMaxWidth()
     ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp, vertical = 10.dp)
         ) {
-            Text(
-                text = "Hán Việt: ",
-                fontFamily = PlusJakartaSans,
-                fontWeight = FontWeight.Bold,
-                fontSize = 11.sp,
-                color = Color(0xFF92400E)
-            )
-            Text(
-                text = displayContent,
-                fontFamily = PlusJakartaSans,
-                fontWeight = FontWeight.Medium,
-                fontSize = 11.sp,
-                color = Color(0xFF78350F),
-                lineHeight = 15.sp
-            )
-        }
-    }
-}
+            // Dòng 1: Hán Việt
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.Top
+            ) {
+                Text(
+                    text = "Hán Việt: ",
+                    fontFamily = PlusJakartaSans,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 11.5.sp,
+                    color = Color(0xFF92400E)
+                )
+                Text(
+                    text = displayHanViet,
+                    fontFamily = PlusJakartaSans,
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 11.5.sp,
+                    color = Color(0xFF78350F),
+                    lineHeight = 16.sp
+                )
+            }
 
-@Composable
-private fun MeaningRow(meaning: String) {
-    val text = meaning.ifBlank { "Bốn ý nghĩa hoàn toàn khác nhau chỉ nhờ thay đổi thanh điệu!" }
-    Row(modifier = Modifier.fillMaxWidth()) {
-        Text(
-            text = "Ý nghĩa: ",
-            fontFamily = PlusJakartaSans,
-            fontWeight = FontWeight.Bold,
-            fontSize = 11.5.sp,
-            color = Color(0xFF0F172A)
-        )
-        Text(
-            text = text,
-            fontFamily = PlusJakartaSans,
-            fontWeight = FontWeight.Medium,
-            fontSize = 11.5.sp,
-            color = Color(0xFF4338CA),
-            lineHeight = 16.sp
-        )
+            Spacer(modifier = Modifier.height(6.dp))
+
+            // Dòng 2: Ý nghĩa
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.Top
+            ) {
+                Text(
+                    text = "Ý nghĩa: ",
+                    fontFamily = PlusJakartaSans,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 11.5.sp,
+                    color = Color(0xFF92400E)
+                )
+                Text(
+                    text = displayMeaning,
+                    fontFamily = PlusJakartaSans,
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 11.5.sp,
+                    color = Color(0xFF78350F),
+                    lineHeight = 16.sp
+                )
+            }
+        }
     }
 }
 
@@ -544,7 +579,7 @@ private fun ToneMapExplanationCard(
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(22.dp),
+        shape = RoundedCornerShape(20.dp),
         color = Color(0xFF4C35DE)
     ) {
         Column(
@@ -552,23 +587,25 @@ private fun ToneMapExplanationCard(
                 .fillMaxWidth()
                 .padding(16.dp)
         ) {
-            // Tiêu đề có chấm tròn xanh ngọc
+            // Tiêu đề có chấm tròn xanh ngọc gióng chuẩn dòng 1
             Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(7.dp)
+                verticalAlignment = Alignment.Top,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Box(
                     modifier = Modifier
+                        .padding(top = 5.dp)
                         .size(8.dp)
                         .clip(CircleShape)
                         .background(Color(0xFF10B981))
                 )
                 Text(
-                    text = explanationTitle.ifBlank { "Bản đồ 4 Thanh điệu qua chữ \"ma\"" },
+                    text = explanationTitle.ifBlank { "Bản đồ 4 Thanh điệu" },
                     fontFamily = PlusJakartaSans,
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.5.sp,
-                    color = Color.White
+                    color = Color.White,
+                    lineHeight = 20.sp
                 )
             }
 
@@ -596,7 +633,7 @@ private fun ToneMapExplanationCard(
 @Composable
 private fun ToneRuleRowItem(rule: ToneRuleItem) {
     Surface(
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(14.dp),
         color = Color(0x2EFFFFFF),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -623,15 +660,46 @@ private fun ToneRuleRowItem(rule: ToneRuleItem) {
                 )
             }
 
-            Text(
-                text = rule.text,
-                fontFamily = PlusJakartaSans,
-                fontWeight = FontWeight.Medium,
-                fontSize = 11.5.sp,
-                color = Color.White,
-                lineHeight = 16.sp,
-                modifier = Modifier.weight(1f)
-            )
+            val text = rule.text
+            val colonIndex = text.indexOf(':')
+            if (colonIndex != -1) {
+                val prefix = text.substring(0, colonIndex + 1)
+                val suffix = text.substring(colonIndex + 1)
+                Text(
+                    text = buildAnnotatedString {
+                        withStyle(
+                            SpanStyle(
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
+                        ) {
+                            append(prefix)
+                        }
+                        withStyle(
+                            SpanStyle(
+                                fontWeight = FontWeight.Normal,
+                                color = Color(0xFFDDD6FE)
+                            )
+                        ) {
+                            append(suffix)
+                        }
+                    },
+                    fontFamily = PlusJakartaSans,
+                    fontSize = 11.5.sp,
+                    lineHeight = 16.sp,
+                    modifier = Modifier.weight(1f)
+                )
+            } else {
+                Text(
+                    text = rule.text,
+                    fontFamily = PlusJakartaSans,
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 11.5.sp,
+                    color = Color.White,
+                    lineHeight = 16.sp,
+                    modifier = Modifier.weight(1f)
+                )
+            }
         }
     }
 }

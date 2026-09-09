@@ -50,3 +50,9 @@ fun SparkAILab(
         Spacer(modifier = Modifier.height(96.dp))
     }
 }
+
+@androidx.compose.ui.tooling.preview.Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun SparkAILabPreview() {
+    SparkAILab()
+}
