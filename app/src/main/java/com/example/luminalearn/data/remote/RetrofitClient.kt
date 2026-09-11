@@ -18,7 +18,7 @@ object RetrofitClient {
      * - Máy ảo Android Emulator: "http://10.0.2.2:8080/api/"
      * - Máy thật kết nối cùng mạng Wi-Fi: "http://10.169.197.243:8080/api/"
      */
-    const val BASE_URL = "http://localhost:8080/api/"
+    const val BASE_URL = "http://10.169.197.243:8080/api/"
 
     private var tokenManager: TokenManager? = null
 

@@ -11,15 +11,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -37,6 +40,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.luminalearn.R
+import com.example.luminalearn.data.model.toLessonCardData
 import com.example.luminalearn.presentation.common.AppScaffold
 import com.example.luminalearn.presentation.common.CelebrationEffect
 import com.example.luminalearn.presentation.lesson.component.LessonAction
@@ -46,7 +50,6 @@ import com.example.luminalearn.presentation.main.component.DailyGoalCard
 import com.example.luminalearn.presentation.main.component.DailyWisdomCard
 import com.example.luminalearn.presentation.main.component.GreetingHeader
 import com.example.luminalearn.presentation.main.component.LessonCard
-import com.example.luminalearn.presentation.main.component.LessonCardData
 import com.example.luminalearn.presentation.main.component.SparkChallengeCard
 import com.example.luminalearn.presentation.main.component.StreakCard
 import com.example.luminalearn.presentation.main.component.TopBar
@@ -62,8 +65,15 @@ fun MainScreen(
 ) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
+    val uiState by viewModel.uiState.collectAsState()
     var confettiTrigger by remember { mutableIntStateOf(0) }
     var lessonContent by remember { mutableStateOf<ToneCardData?>(null) }
+
+    LaunchedEffect(uiState.lessonSlides) {
+        if (uiState.lessonSlides.isNotEmpty()) {
+            lessonContent = uiState.lessonSlides.first()
+        }
+    }
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collectLatest { effect ->
             when (effect) {
@@ -170,53 +180,34 @@ fun MainScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // Lesson 1: Pinyin
-                    LessonCard(
-                        data = LessonCardData(
-                            category = stringResource(R.string.category_pinyin),
-                            categoryBgColor = Color(0xFFFCE7F3),
-                            categoryTextColor = Color(0xFF9333EA),
-                            durationMins = 4,
-                            sparks = 30,
-                            title = stringResource(R.string.lesson_1_title),
-                            description = stringResource(R.string.lesson_1_desc),
-                            slideCount = 4
-                        ),
-                        onStartClick = {
-                            lessonContent = ToneCardData(
-                                category = "PHÁT ÂM PINYIN",
-                                subTitle = "四声与变调 (Sì shēng yǔ biàntiào)",
-                                title = "4 Thanh điệu Pinyin & Quy tắc biến âm",
-                                pinyinVariants = listOf("mā", "má", "mǎ", "mà"),
-                                hanViet = "Ma (Mẹ) · Ma (Gái) · Mã (Ngựa) · Mắng",
-                                meaning = "Bốn ý nghĩa hoàn toàn khác nhau chỉ nhờ thay đổi thanh điệu!",
-                                explanationText = "Bản đồ 4 Thanh điệu qua chữ \"ma\"",
-                                currentIndex = 1,
-                                totalCount = 4
+                    if (uiState.isRecommendedLessonsLoading && uiState.recommendedLessons.isEmpty()) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 24.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(32.dp),
+                                color = Color(0xFF5538EE)
                             )
                         }
-                    )
-
-                    Spacer(modifier = Modifier.height(14.dp))
-
-                    // Lesson 2: Radicals
-                    LessonCard(
-                        data = LessonCardData(
-                            category = stringResource(R.string.category_radicals),
-                            categoryBgColor = Color(0xFFDBEAFE),
-                            categoryTextColor = Color(0xFF2563EB),
-                            durationMins = 3,
-                            sparks = 25,
-                            title = stringResource(R.string.lesson_2_title),
-                            description = stringResource(R.string.lesson_2_desc),
-                            slideCount = 4
-                        ),
-                        onStartClick = onNavigateToLesson
-                    )
+                    } else {
+                        uiState.recommendedLessons.forEachIndexed { index, lessonDto ->
+                            LessonCard(
+                                data = lessonDto.toLessonCardData(),
+                                onStartClick = {
+                                    viewModel.loadLesson(lessonDto.id)
+                                }
+                            )
+                            if (index < uiState.recommendedLessons.lastIndex) {
+                                Spacer(modifier = Modifier.height(14.dp))
+                            }
+                        }
+                    }
 
                     Spacer(modifier = Modifier.height(20.dp))
 
-                    // ── Section: Daily Wisdom Card ──────────────────────────────
                     DailyWisdomCard(
                         onRefreshClick = {
                             Toast.makeText(context, "Refreshed daily wisdom!", Toast.LENGTH_SHORT)
@@ -227,8 +218,6 @@ fun MainScreen(
                     Spacer(modifier = Modifier.height(96.dp))
                 }
             }
-
-            // Hiệu ứng pháo hoa nổ đè lên giữa màn hình khi nhận thưởng
             CelebrationEffect(
                 triggerKey = confettiTrigger,
                 modifier = Modifier.fillMaxSize()
@@ -236,11 +225,28 @@ fun MainScreen(
         }
     }
 
-    lessonContent?.let {
+    lessonContent?.let { currentCard ->
         LessonDetailDialog(
-            toneCardData  = it,
+            toneCardData = currentCard,
             action = LessonAction(
-                onDismiss = { lessonContent = null }
+                onDismiss = {
+                    lessonContent = null
+                    viewModel.clearLesson()
+                },
+                onNext = {
+                    lessonContent = uiState.lessonSlides.getOrNull(currentCard.currentIndex)
+                },
+                onPrev = {
+                    val prevIndex = currentCard.currentIndex - 2
+                    if (prevIndex >= 0) {
+                        lessonContent = uiState.lessonSlides.getOrNull(prevIndex)
+                    }
+                },
+                onComplete = {
+                    lessonContent = null
+                    viewModel.clearLesson()
+                    confettiTrigger++
+                }
             )
         )
     }
