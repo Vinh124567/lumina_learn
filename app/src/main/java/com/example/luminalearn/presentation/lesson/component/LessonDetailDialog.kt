@@ -165,6 +165,8 @@ private fun LessonSlideContent(
                         cardType = currentSlide.cardType
                     )
 
+                    Spacer(modifier = Modifier.height(14.dp))
+
                     when (currentSlide.slideType) {
                         SlideType.INTERACTIVE -> {
                             InteractiveSlideBody(

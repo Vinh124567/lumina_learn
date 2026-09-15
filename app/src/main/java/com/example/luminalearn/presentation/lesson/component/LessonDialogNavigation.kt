@@ -238,7 +238,7 @@ internal fun TitleAndHeaderInfo(
                     fontWeight = FontWeight.Bold,
                     fontSize = 11.5.sp,
                     color = Color(0xFF6366F1),
-                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
                 )
             }
         }
@@ -258,58 +258,81 @@ internal fun DialogBottomNavigation(
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Nút Thẻ trước (vô hiệu hoá nếu đang ở thẻ đầu)
-        Surface(
-            onClick = onPrev,
-            enabled = !isFirst,
-            shape = RoundedCornerShape(50),
-            color = if (isFirst) Color(0xFFF8FAFC) else Color.White,
-            border = BorderStroke(1.dp, if (isFirst) Color(0xFFF1F5F9) else Color(0xFFE2E8F0)),
-            modifier = Modifier
-                .weight(1f)
-                .height(46.dp)
-        ) {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = "← Thẻ trước",
-                    fontFamily = PlusJakartaSans,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 13.5.sp,
-                    color = if (isFirst) Color(0xFF94A3B8) else Color(0xFF64748B)
-                )
-            }
-        }
+        PrevButton(
+            isFirst = isFirst,
+            onPrev = onPrev,
+            modifier = Modifier.weight(1f)
+        )
 
-        // Nút Thẻ tiếp theo (chuyển thành Hoàn thành nếu ở thẻ cuối)
-        Surface(
-            onClick = {
-                if (isLast) {
-                    onComplete()
-                } else {
-                    onNext()
-                }
-            },
-            shape = RoundedCornerShape(50),
-            color = Color(0xFF5538EE),
-            modifier = Modifier
-                .weight(1.3f)
-                .height(46.dp)
+        NextOrCompleteButton(
+            isLast = isLast,
+            onNext = onNext,
+            onComplete = onComplete,
+            modifier = Modifier.weight(1.3f)
+        )
+    }
+}
+
+@Composable
+private fun PrevButton(
+    isFirst: Boolean,
+    onPrev: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val bgColor = if (isFirst) Color(0xFFF8FAFC) else Color.White
+    val borderColor = if (isFirst) Color(0xFFF1F5F9) else Color(0xFFE2E8F0)
+    val textColor = if (isFirst) Color(0xFF94A3B8) else Color(0xFF64748B)
+
+    Surface(
+        onClick = onPrev,
+        enabled = !isFirst,
+        shape = RoundedCornerShape(50),
+        color = bgColor,
+        border = BorderStroke(1.dp, borderColor),
+        modifier = modifier.height(46.dp)
+    ) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = if (isLast) "Hoàn thành bài học ➔" else "Thẻ tiếp theo →",
-                    fontFamily = PlusJakartaSans,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 13.5.sp,
-                    color = Color.White
-                )
-            }
+            Text(
+                text = "← Thẻ trước",
+                fontFamily = PlusJakartaSans,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 13.5.sp,
+                color = textColor
+            )
+        }
+    }
+}
+
+@Composable
+private fun NextOrCompleteButton(
+    isLast: Boolean,
+    onNext: () -> Unit,
+    onComplete: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val text = if (isLast) "Hoàn thành bài học ➔" else "Thẻ tiếp theo →"
+    val onClickAction = if (isLast) onComplete else onNext
+
+    Surface(
+        onClick = onClickAction,
+        shape = RoundedCornerShape(50),
+        color = Color(0xFF5538EE),
+        modifier = modifier.height(46.dp)
+    ) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = text,
+                fontFamily = PlusJakartaSans,
+                fontWeight = FontWeight.Bold,
+                fontSize = 13.5.sp,
+                color = Color.White
+            )
         }
     }
 }

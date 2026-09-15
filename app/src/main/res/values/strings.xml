@@ -1,6 +1,6 @@
 <resources>
-    <string name="app_name">Lumina Chinese</string>
-    <string name="app_brand_name">Lumina</string>
+    <string name="app_name">Lumina Lingo</string>
+    <string name="app_brand_name">Lumina Lingo</string>
 
     <!-- Content Descriptions -->
     <string name="cd_avatar">Avatar</string>
@@ -20,9 +20,11 @@
 
     <!-- Navigation Tabs -->
     <string name="nav_home">Home</string>
-    <string name="nav_lessons">Lessons</string>
+    <string name="nav_roadmap">Lộ trình</string>
+    <string name="nav_vocabulary">Từ vựng</string>
+    <string name="nav_lessons">Khám phá</string>
     <string name="nav_spark_ai">Spark AI</string>
-    <string name="nav_rewards">Rewards</string>
+    <string name="nav_rewards">Thành tích</string>
 
     <!-- Login Screen -->
     <string name="login_subtitle">Learn Chinese 5 minutes a day &amp; master HSK step by step</string>

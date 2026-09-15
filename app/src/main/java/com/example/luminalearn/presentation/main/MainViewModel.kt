@@ -5,19 +5,23 @@ import com.example.luminalearn.core.base.BaseViewModel
 import com.example.luminalearn.data.model.toToneCardData
 import com.example.luminalearn.data.repository.LessonRepository
 import com.example.luminalearn.data.repository.LessonRepositoryImpl
+import com.example.luminalearn.data.repository.WisdomRepository
+import com.example.luminalearn.data.repository.WisdomRepositoryImpl
 import kotlinx.coroutines.launch
 
 /**
  * MainViewModel triển khai logic xử lý MVI cho màn hình Main.
  */
 class MainViewModel(
-    private val lessonRepository: LessonRepository = LessonRepositoryImpl()
+    private val lessonRepository: LessonRepository = LessonRepositoryImpl(),
+    private val wisdomRepository: WisdomRepository = WisdomRepositoryImpl()
 ) : BaseViewModel<MainUiState, MainUiIntent, MainUiEffect>(
     initialState = MainUiState()
 ) {
 
     init {
         loadRecommendedLessons()
+        loadDailyWisdom()
     }
 
     override fun handleIntent(intent: MainUiIntent) {
@@ -42,6 +46,12 @@ class MainViewModel(
             }
             is MainUiIntent.ClearLesson -> {
                 setState { copy(lessonSlides = emptyList()) }
+            }
+            is MainUiIntent.LoadDailyWisdom -> {
+                loadDailyWisdom()
+            }
+            is MainUiIntent.RefreshDailyWisdom -> {
+                refreshDailyWisdom()
             }
         }
     }
@@ -87,5 +97,42 @@ class MainViewModel(
 
     fun clearLesson() {
         setState { copy(lessonSlides = emptyList()) }
+    }
+
+    fun loadDailyWisdom() {
+        viewModelScope.launch {
+            setState { copy(isWisdomLoading = true) }
+            wisdomRepository.getTodayWisdom()
+                .onSuccess { wisdom ->
+                    setState {
+                        copy(
+                            isWisdomLoading = false,
+                            dailyWisdom = wisdom
+                        )
+                    }
+                }
+                .onFailure { _ ->
+                    setState { copy(isWisdomLoading = false) }
+                }
+        }
+    }
+
+    fun refreshDailyWisdom() {
+        viewModelScope.launch {
+            setState { copy(isWisdomLoading = true) }
+            wisdomRepository.getRandomWisdom()
+                .onSuccess { wisdom ->
+                    setState {
+                        copy(
+                            isWisdomLoading = false,
+                            dailyWisdom = wisdom
+                        )
+                    }
+                }
+                .onFailure { error ->
+                    setState { copy(isWisdomLoading = false) }
+                    setEffect(MainUiEffect.ShowToast(error.message ?: "Không thể đổi thành ngữ"))
+                }
+        }
     }
 }

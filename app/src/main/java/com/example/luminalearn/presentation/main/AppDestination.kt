@@ -4,6 +4,8 @@ sealed class AppDestination(val route: String) {
     data object Splash : AppDestination("splash")
     data object Login : AppDestination("login")
     data object Main : AppDestination("main")
+    data object Roadmap : AppDestination("roadmap")
+    data object Vocabulary : AppDestination("vocabulary")
     data object Lesson : AppDestination("lesson")
     data object SparkAI : AppDestination("spark_ai")
     data object Reward : AppDestination("reward")

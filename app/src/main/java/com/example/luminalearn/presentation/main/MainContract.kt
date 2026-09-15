@@ -17,7 +17,9 @@ data class MainUiState(
     val recommendedLessons: List<LessonDto> = emptyList(),
     val isRecommendedLessonsLoading: Boolean = false,
     val lessonSlides: List<ToneCardData> = emptyList(),
-    val isLessonLoading: Boolean = false
+    val isLessonLoading: Boolean = false,
+    val dailyWisdom: com.example.luminalearn.data.model.DailyWisdomDto? = null,
+    val isWisdomLoading: Boolean = false
 ) : UiState
 
 /**
@@ -31,6 +33,8 @@ sealed interface MainUiIntent : UiIntent {
     data object LoadRecommendedLessons : MainUiIntent
     data class LoadLesson(val lessonId: String = "lesson_pinyin_1") : MainUiIntent
     data object ClearLesson : MainUiIntent
+    data object LoadDailyWisdom : MainUiIntent
+    data object RefreshDailyWisdom : MainUiIntent
 }
 
 /**

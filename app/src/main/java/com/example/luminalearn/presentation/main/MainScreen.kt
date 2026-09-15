@@ -76,11 +76,7 @@ fun MainScreen(
     }
     LaunchedEffect(Unit) {
         viewModel.uiEffect.collectLatest { effect ->
-            when (effect) {
-                is MainUiEffect.ShowToast -> {
-                    Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
-                }
-            }
+            handleMainUiEffect(context, effect)
         }
     }
 
@@ -135,83 +131,21 @@ fun MainScreen(
                     )
                     Spacer(modifier = Modifier.height(28.dp))
 
-                    // ── Section: Recommended Lessons ────────────────────────────
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = stringResource(R.string.recommended_lessons_title),
-                            style = MaterialTheme.typography.titleMedium.copy(
-                                fontWeight = FontWeight.ExtraBold,
-                                fontSize = 18.sp
-                            ),
-                            color = Color(0xFF0F172A),
-                            modifier = Modifier.weight(1f),
-                            maxLines = 1
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = stringResource(R.string.view_all),
-                            style = MaterialTheme.typography.labelLarge.copy(
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 14.sp
-                            ),
-                            color = Color(0xFF5C50F6),
-                            softWrap = false,
-                            maxLines = 1,
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(8.dp))
-                                .clickable { onNavigateToLesson() }
-                                .padding(horizontal = 8.dp, vertical = 6.dp)
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(4.dp))
-
-                    Text(
-                        text = stringResource(R.string.recommended_lessons_subtitle),
-                        style = MaterialTheme.typography.bodySmall.copy(
-                            fontSize = 13.sp
-                        ),
-                        color = Color(0xFF64748B)
+                    RecommendedLessonsSection(
+                        isLoading = uiState.isRecommendedLessonsLoading && uiState.recommendedLessons.isEmpty(),
+                        lessons = uiState.recommendedLessons,
+                        onViewAllClick = onNavigateToLesson,
+                        onStartLessonClick = { lessonId ->
+                            viewModel.loadLesson(lessonId)
+                        }
                     )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    if (uiState.isRecommendedLessonsLoading && uiState.recommendedLessons.isEmpty()) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 24.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(32.dp),
-                                color = Color(0xFF5538EE)
-                            )
-                        }
-                    } else {
-                        uiState.recommendedLessons.forEachIndexed { index, lessonDto ->
-                            LessonCard(
-                                data = lessonDto.toLessonCardData(),
-                                onStartClick = {
-                                    viewModel.loadLesson(lessonDto.id)
-                                }
-                            )
-                            if (index < uiState.recommendedLessons.lastIndex) {
-                                Spacer(modifier = Modifier.height(14.dp))
-                            }
-                        }
-                    }
 
                     Spacer(modifier = Modifier.height(20.dp))
 
                     DailyWisdomCard(
+                        wisdom = uiState.dailyWisdom,
                         onRefreshClick = {
-                            Toast.makeText(context, "Refreshed daily wisdom!", Toast.LENGTH_SHORT)
-                                .show()
+                            viewModel.refreshDailyWisdom()
                         }
                     )
 
@@ -226,30 +160,135 @@ fun MainScreen(
     }
 
     lessonContent?.let { currentCard ->
-        LessonDetailDialog(
-            toneCardData = currentCard,
-            action = LessonAction(
-                onDismiss = {
-                    lessonContent = null
-                    viewModel.clearLesson()
-                },
-                onNext = {
-                    lessonContent = uiState.lessonSlides.getOrNull(currentCard.currentIndex)
-                },
-                onPrev = {
-                    val prevIndex = currentCard.currentIndex - 2
-                    if (prevIndex >= 0) {
-                        lessonContent = uiState.lessonSlides.getOrNull(prevIndex)
-                    }
-                },
-                onComplete = {
-                    lessonContent = null
-                    viewModel.clearLesson()
-                    confettiTrigger++
-                }
-            )
+        MainLessonDetailDialog(
+            currentCard = currentCard,
+            slides = uiState.lessonSlides,
+            onDismiss = {
+                lessonContent = null
+                viewModel.clearLesson()
+            },
+            onCardChange = { nextCard ->
+                lessonContent = nextCard
+            },
+            onComplete = {
+                lessonContent = null
+                viewModel.clearLesson()
+                confettiTrigger++
+            }
         )
     }
+}
+
+private fun handleMainUiEffect(context: android.content.Context, effect: MainUiEffect) {
+    when (effect) {
+        is MainUiEffect.ShowToast -> {
+            Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
+        }
+    }
+}
+
+@Composable
+private fun RecommendedLessonsSection(
+    isLoading: Boolean,
+    lessons: List<com.example.luminalearn.data.model.LessonDto>,
+    onViewAllClick: () -> Unit,
+    onStartLessonClick: (String) -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = stringResource(R.string.recommended_lessons_title),
+            style = MaterialTheme.typography.titleMedium.copy(
+                fontWeight = FontWeight.ExtraBold,
+                fontSize = 18.sp
+            ),
+            color = Color(0xFF0F172A),
+            modifier = Modifier.weight(1f),
+            maxLines = 1
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+            text = stringResource(R.string.view_all),
+            style = MaterialTheme.typography.labelLarge.copy(
+                fontWeight = FontWeight.Bold,
+                fontSize = 14.sp
+            ),
+            color = Color(0xFF5C50F6),
+            softWrap = false,
+            maxLines = 1,
+            modifier = Modifier
+                .clip(RoundedCornerShape(8.dp))
+                .clickable { onViewAllClick() }
+                .padding(horizontal = 8.dp, vertical = 6.dp)
+        )
+    }
+
+    Spacer(modifier = Modifier.height(4.dp))
+
+    Text(
+        text = stringResource(R.string.recommended_lessons_subtitle),
+        style = MaterialTheme.typography.bodySmall.copy(
+            fontSize = 13.sp
+        ),
+        color = Color(0xFF64748B)
+    )
+
+    Spacer(modifier = Modifier.height(16.dp))
+
+    if (isLoading) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 24.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(32.dp),
+                color = Color(0xFF5538EE)
+            )
+        }
+    } else {
+        lessons.forEachIndexed { index, lessonDto ->
+            LessonCard(
+                data = lessonDto.toLessonCardData(),
+                onStartClick = {
+                    onStartLessonClick(lessonDto.id)
+                }
+            )
+            if (index < lessons.lastIndex) {
+                Spacer(modifier = Modifier.height(14.dp))
+            }
+        }
+    }
+}
+
+@Composable
+private fun MainLessonDetailDialog(
+    currentCard: ToneCardData,
+    slides: List<ToneCardData>,
+    onDismiss: () -> Unit,
+    onCardChange: (ToneCardData?) -> Unit,
+    onComplete: () -> Unit
+) {
+    LessonDetailDialog(
+        toneCardData = currentCard,
+        action = LessonAction(
+            onDismiss = onDismiss,
+            onNext = {
+                onCardChange(slides.getOrNull(currentCard.currentIndex))
+            },
+            onPrev = {
+                val prevIndex = currentCard.currentIndex - 2
+                if (prevIndex >= 0) {
+                    onCardChange(slides.getOrNull(prevIndex))
+                }
+            },
+            onComplete = onComplete
+        )
+    )
 }
 
 @androidx.compose.ui.tooling.preview.Preview(showBackground = true, showSystemUi = true)

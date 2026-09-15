@@ -302,7 +302,8 @@ internal fun HanVietAndMeaningBox(
 internal fun ToneMapExplanationCard(
     explanationTitle: String,
     explanationSubtitle: String,
-    rules: List<ToneRuleItem>
+    rules: List<ToneRuleItem>,
+    isToneType: Boolean = false
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
@@ -349,9 +350,9 @@ internal fun ToneMapExplanationCard(
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            // 4 Box quy tắc thanh điệu
+            // Các mục quy tắc / điểm ngữ pháp
             rules.forEach { rule ->
-                ToneRuleRowItem(rule = rule)
+                ToneRuleRowItem(rule = rule, isToneType = isToneType)
                 Spacer(modifier = Modifier.height(8.dp))
             }
         }
@@ -359,13 +360,20 @@ internal fun ToneMapExplanationCard(
 }
 
 @Composable
-internal fun ToneRuleRowItem(rule: ToneRuleItem) {
-    val symbol = when (rule.number) {
-        1 -> "—"
-        2 -> "↗"
-        3 -> "V"
-        4 -> "↘"
-        else -> "${rule.number}"
+internal fun ToneRuleRowItem(
+    rule: ToneRuleItem,
+    isToneType: Boolean = false
+) {
+    val symbol = if (isToneType) {
+        when (rule.number) {
+            1 -> "—"
+            2 -> "↗"
+            3 -> "V"
+            4 -> "↘"
+            else -> "${rule.number}"
+        }
+    } else {
+        "${rule.number}"
     }
 
     Surface(

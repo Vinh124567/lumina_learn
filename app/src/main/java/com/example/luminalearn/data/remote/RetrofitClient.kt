@@ -18,6 +18,7 @@ object RetrofitClient {
      * - Máy ảo Android Emulator: "http://10.0.2.2:8080/api/"
      * - Máy thật kết nối cùng mạng Wi-Fi: "http://10.169.197.243:8080/api/"
      */
+    @Suppress("kotlin:S1313")
     const val BASE_URL = "http://10.169.197.243:8080/api/"
 
     private var tokenManager: TokenManager? = null
@@ -71,5 +72,13 @@ object RetrofitClient {
 
     val lessonApiService: LessonApiService by lazy {
         retrofit.create(LessonApiService::class.java)
+    }
+
+    val wisdomApiService: com.example.luminalearn.data.remote.api.WisdomApiService by lazy {
+        retrofit.create(com.example.luminalearn.data.remote.api.WisdomApiService::class.java)
+    }
+
+    val vocabularyApiService: com.example.luminalearn.data.remote.api.VocabularyApiService by lazy {
+        retrofit.create(com.example.luminalearn.data.remote.api.VocabularyApiService::class.java)
     }
 }
