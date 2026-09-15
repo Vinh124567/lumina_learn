@@ -51,14 +51,14 @@ fun AppBottomBar(
     modifier: Modifier = Modifier,
     currentRoute: String = AppDestination.Main.route,
     onNavigate: (String) -> Unit = {},
-    onSparkAiClick: () -> Unit = { onNavigate(AppDestination.SparkAI.route) },
 ) {
     val navItems = remember {
         listOf(
-            BottomNavItem(R.drawable.ic_nav_home, R.string.nav_home, AppDestination.Main.route, 114.dp),
-            BottomNavItem(R.drawable.ic_nav_explore, R.string.nav_lessons, AppDestination.Lesson.route, 102.dp),
-            BottomNavItem(R.drawable.ic_nav_bulb, R.string.nav_spark_ai, AppDestination.SparkAI.route, 106.dp),
-            BottomNavItem(R.drawable.ic_nav_trophy, R.string.nav_rewards, AppDestination.Reward.route, 118.dp)
+            BottomNavItem(R.drawable.ic_nav_home, R.string.nav_home, AppDestination.Main.route, 104.dp),
+            BottomNavItem(R.drawable.ic_nav_vocabulary, R.string.nav_vocabulary, AppDestination.Vocabulary.route, 116.dp),
+            BottomNavItem(R.drawable.ic_nav_explore, R.string.nav_lessons, AppDestination.Lesson.route, 116.dp),
+            BottomNavItem(R.drawable.ic_nav_bulb, R.string.nav_spark_ai, AppDestination.SparkAI.route, 110.dp),
+            BottomNavItem(R.drawable.ic_nav_trophy, R.string.nav_rewards, AppDestination.Reward.route, 116.dp)
         )
     }
 
@@ -66,24 +66,24 @@ fun AppBottomBar(
         modifier = modifier
             .fillMaxWidth()
             .navigationBarsPadding()
-            .padding(horizontal = 20.dp, vertical = 12.dp)
+            .padding(horizontal = 12.dp, vertical = 10.dp)
             .height(64.dp)
             .shadow(
-                elevation = 16.dp,
+                elevation = 18.dp,
                 shape = RoundedCornerShape(32.dp),
-                spotColor = Color(0x261E293B),
-                ambientColor = Color(0x1A000000)
+                spotColor = Color(0x1F1E293B),
+                ambientColor = Color(0x12000000)
             ),
         shape = RoundedCornerShape(32.dp),
-        color = Color(0xFFE2E8F0),
-        border = BorderStroke(1.dp, Color(0xFFCBD5E1))
+        color = Color.White,
+        border = BorderStroke(1.dp, Color(0xFFF1F5F9))
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 12.dp),
+                .padding(horizontal = 6.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceAround
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             navItems.forEach { item ->
                 NavTabItem(
@@ -116,23 +116,23 @@ private fun NavTabItem(
 ) {
     val interactionSource = remember { MutableInteractionSource() }
 
-    // Chiều rộng hoạt ảnh: Tab không chọn = 44dp (tròn xoe), Tab chọn = activeWidth
+    // Chiều rộng hoạt ảnh: Tab không chọn = 42dp (tròn), Tab chọn = activeWidth
     val animatedWidth by animateDpAsState(
-        targetValue = if (isSelected) activeWidth else 44.dp,
+        targetValue = if (isSelected) activeWidth else 42.dp,
         animationSpec = tween(durationMillis = TAB_ANIM_DURATION, easing = FastOutSlowInEasing),
         label = "tabWidth"
     )
 
-    // Màu nền tím chuyển sắc mượt mà
+    // Màu nền chuyển sang màu tím thương hiệu thực tế của app Color(0xFF5C50F6)
     val backgroundColor by animateColorAsState(
         targetValue = if (isSelected) Color(0xFF5C50F6) else Color.Transparent,
         animationSpec = tween(durationMillis = TAB_ANIM_DURATION, easing = FastOutSlowInEasing),
         label = "tabBgColor"
     )
 
-    // Màu icon chuyển trắng / xám
+    // Màu icon chuyển trắng / slate đậm
     val contentColor by animateColorAsState(
-        targetValue = if (isSelected) Color.White else Color(0xFF475569),
+        targetValue = if (isSelected) Color.White else Color(0xFF334155),
         animationSpec = tween(durationMillis = TAB_ANIM_DURATION, easing = FastOutSlowInEasing),
         label = "tabContentColor"
     )
@@ -149,23 +149,23 @@ private fun NavTabItem(
     )
 
     val elevation by animateDpAsState(
-        targetValue = if (isSelected) 6.dp else 0.dp,
+        targetValue = if (isSelected) 4.dp else 0.dp,
         animationSpec = tween(durationMillis = TAB_ANIM_DURATION, easing = FastOutSlowInEasing),
         label = "tabElevation"
     )
 
     Box(
         modifier = modifier
-            .width(animatedWidth) // 👈 Điều khiển trực tiếp chiều rộng, triệt tiêu vết cắt chữ nhật
-            .height(44.dp)
+            .width(animatedWidth)
+            .height(42.dp)
             .shadow(
                 elevation = elevation,
                 shape = CircleShape,
-                spotColor = Color(0x665C50F6),
-                ambientColor = Color(0x335C50F6)
+                spotColor = Color(0x405C50F6),
+                ambientColor = Color(0x205C50F6)
             )
             .background(color = backgroundColor, shape = CircleShape)
-            .clip(CircleShape) // 👈 Luôn luôn là hình viên nang cong tròn 100%
+            .clip(CircleShape)
             .clickable(
                 interactionSource = interactionSource,
                 indication = ripple(color = if (isSelected) Color.White else Color(0xFF5C50F6)),
@@ -174,7 +174,7 @@ private fun NavTabItem(
         contentAlignment = Alignment.Center
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 12.dp),
+            modifier = Modifier.padding(horizontal = if (isSelected) 12.dp else 0.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
@@ -210,6 +210,8 @@ private fun AppBottomBarPreview() {
             .background(Color(0xFFF1F5F9))
             .padding(16.dp)
     ) {
-        AppBottomBar()
+        AppBottomBar(
+            currentRoute = AppDestination.Vocabulary.route
+        )
     }
 }

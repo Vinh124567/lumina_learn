@@ -26,6 +26,7 @@ import com.example.luminalearn.presentation.main.AppDestination
 import com.example.luminalearn.presentation.main.MainScreen
 import com.example.luminalearn.presentation.lesson.LessonScreen
 import com.example.luminalearn.presentation.spark_ai_lab.SparkAILab
+import com.example.luminalearn.presentation.vocabulary.VocabularyScreen
 
 /**
  * Màn hình cha (Container) sau khi đăng nhập thành công.
@@ -72,6 +73,14 @@ fun MainContainerScreen(
                 )
             }
 
+            composable(AppDestination.Roadmap.route) {
+                PlaceholderScreen(title = stringResource(R.string.nav_roadmap))
+            }
+
+            composable(AppDestination.Vocabulary.route) {
+                VocabularyScreen()
+            }
+
             composable(AppDestination.Lesson.route) {
                 LessonScreen()
             }
@@ -88,7 +97,6 @@ fun MainContainerScreen(
         AppBottomBar(
             currentRoute = currentRoute,
             onNavigate = { route -> navigateToTab(route) },
-            onSparkAiClick = { navigateToTab(AppDestination.SparkAI.route) },
             modifier = Modifier.align(Alignment.BottomCenter)
         )
     }

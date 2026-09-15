@@ -1,11 +1,13 @@
 package com.example.luminalearn.presentation.main.component
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -17,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -34,13 +37,12 @@ fun TopBar(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // App Name
-        Text(
-            text = stringResource(R.string.app_brand_name),
-            style = MaterialTheme.typography.titleLarge.copy(
-                fontWeight = FontWeight.ExtraBold
-            ),
-            color = Color(0xFF0F172A)
+        // Logo Header
+        Image(
+            painter = painterResource(id = R.drawable.ic_header),
+            contentDescription = stringResource(R.string.app_name),
+            modifier = Modifier.height(34.dp),
+            contentScale = ContentScale.Fit
         )
         Spacer(modifier = Modifier.weight(1f))
         Row(
