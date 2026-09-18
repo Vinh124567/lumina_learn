@@ -296,7 +296,7 @@ private fun PrevButton(
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(
-                text = "← Thẻ trước",
+                text = "Thẻ trước",
                 fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 13.5.sp,
@@ -313,7 +313,7 @@ private fun NextOrCompleteButton(
     onComplete: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val text = if (isLast) "Hoàn thành bài học ➔" else "Thẻ tiếp theo →"
+    val text = if (isLast) "Hoàn thành bài học" else "Thẻ tiếp theo"
     val onClickAction = if (isLast) onComplete else onNext
 
     Surface(

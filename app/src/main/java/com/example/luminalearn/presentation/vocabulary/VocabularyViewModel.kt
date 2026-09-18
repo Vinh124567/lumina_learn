@@ -34,6 +34,8 @@ class VocabularyViewModel : BaseViewModel<VocabularyUiState, VocabularyUiIntent,
             is VocabularyUiIntent.StartReflexQuiz -> startReflexQuiz()
             is VocabularyUiIntent.RestartReflexQuiz -> startReflexQuiz()
             is VocabularyUiIntent.SelectQuizOption -> handleSelectQuizOption(intent.option)
+            is VocabularyUiIntent.OpenWordDetail -> setState { copy(activeDetailWord = intent.word) }
+            is VocabularyUiIntent.DismissWordDetail -> setState { copy(activeDetailWord = null) }
         }
     }
 
@@ -99,7 +101,19 @@ class VocabularyViewModel : BaseViewModel<VocabularyUiState, VocabularyUiIntent,
         val updatedList = currentState.vocabList.map { item ->
             if (item.id == wordId) item.copy(isMastered = !item.isMastered) else item
         }
-        setState { copy(vocabList = updatedList) }
+        val updatedActive = if (currentState.activeDetailWord?.id == wordId) {
+            currentState.activeDetailWord?.let { it.copy(isMastered = !it.isMastered) }
+        } else {
+            currentState.activeDetailWord
+        }
+        setState { copy(vocabList = updatedList, activeDetailWord = updatedActive) }
+
+        viewModelScope.launch {
+            try {
+                RetrofitClient.vocabularyApiService.toggleMastered(wordId)
+            } catch (_: Exception) {
+            }
+        }
     }
 
     private fun handleNextFlashcard() {

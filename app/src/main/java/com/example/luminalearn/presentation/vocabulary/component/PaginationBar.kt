@@ -26,7 +26,8 @@ fun PaginationBar(
     totalItems: Int,
     pageSize: Int,
     onPageChange: (Int) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    itemUnit: String = "từ"
 ) {
     val startItem = if (totalItems > 0) (currentPage - 1) * pageSize + 1 else 0
     val endItem = minOf(currentPage * pageSize, totalItems)
@@ -75,7 +76,7 @@ fun PaginationBar(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Trang $currentPage / $totalPages · Hiển thị $startItem–$endItem trong số $totalItems từ",
+                text = "Trang $currentPage / $totalPages · Hiển thị $startItem–$endItem trong số $totalItems $itemUnit",
                 fontSize = 11.sp,
                 color = VocabColors.TextMuted
             )
@@ -112,22 +113,78 @@ private fun PageNavButton(
     }
 }
 
+private sealed interface PageNumberItem {
+    data class Page(val number: Int) : PageNumberItem
+    data object Ellipsis : PageNumberItem
+}
+
+private fun buildPageList(currentPage: Int, totalPages: Int): List<PageNumberItem> {
+    if (totalPages <= 7) {
+        return (1..totalPages).map { PageNumberItem.Page(it) }
+    }
+    val list = mutableListOf<PageNumberItem>()
+    list.add(PageNumberItem.Page(1))
+
+    if (currentPage <= 4) {
+        for (p in 2..5) {
+            list.add(PageNumberItem.Page(p))
+        }
+        list.add(PageNumberItem.Ellipsis)
+        list.add(PageNumberItem.Page(totalPages))
+    } else if (currentPage >= totalPages - 3) {
+        list.add(PageNumberItem.Ellipsis)
+        for (p in (totalPages - 4) until totalPages) {
+            list.add(PageNumberItem.Page(p))
+        }
+        list.add(PageNumberItem.Page(totalPages))
+    } else {
+        list.add(PageNumberItem.Ellipsis)
+        list.add(PageNumberItem.Page(currentPage - 1))
+        list.add(PageNumberItem.Page(currentPage))
+        list.add(PageNumberItem.Page(currentPage + 1))
+        list.add(PageNumberItem.Ellipsis)
+        list.add(PageNumberItem.Page(totalPages))
+    }
+    return list
+}
+
 @Composable
 private fun PageNumbersRow(
     currentPage: Int,
     totalPages: Int,
     onPageChange: (Int) -> Unit
 ) {
+    val items = androidx.compose.runtime.remember(currentPage, totalPages) {
+        buildPageList(currentPage, totalPages)
+    }
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(6.dp)
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        for (pageIndex in 1..totalPages) {
-            PageNumberButton(
-                pageIndex = pageIndex,
-                isCurrentPage = pageIndex == currentPage,
-                onClick = { onPageChange(pageIndex) }
-            )
+        items.forEach { item ->
+            when (item) {
+                is PageNumberItem.Page -> {
+                    PageNumberButton(
+                        pageIndex = item.number,
+                        isCurrentPage = item.number == currentPage,
+                        onClick = { onPageChange(item.number) }
+                    )
+                }
+                is PageNumberItem.Ellipsis -> {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier.size(width = 24.dp, height = 36.dp)
+                    ) {
+                        Text(
+                            text = "•••",
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = VocabColors.TextMuted
+                        )
+                    }
+                }
+            }
         }
     }
 }

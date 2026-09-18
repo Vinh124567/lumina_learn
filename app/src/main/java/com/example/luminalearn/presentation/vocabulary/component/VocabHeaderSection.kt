@@ -2,11 +2,13 @@ package com.example.luminalearn.presentation.vocabulary.component
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -33,13 +35,14 @@ fun VocabTopBar(
         modifier = modifier
             .fillMaxWidth()
             .statusBarsPadding()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(horizontal = 16.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Box(
             modifier = Modifier
-                .background(VocabColors.BrandLight, VocabShapes.Tab)
+                .clip(CircleShape)
+                .background(Color(0xFFEDE9FE))
                 .padding(horizontal = 10.dp, vertical = 5.dp)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -49,11 +52,11 @@ fun VocabTopBar(
                     tint = VocabColors.BrandPrimary,
                     modifier = Modifier.size(13.dp)
                 )
-                Spacer(modifier = Modifier.width(5.dp))
+                Spacer(modifier = Modifier.width(6.dp))
                 Text(
-                    text = "KHO TỪ VỰNG THEO THANG ĐIỂM",
+                    text = "THƯ VIỆN TỪ VỰNG",
                     fontSize = 11.sp,
-                    fontWeight = FontWeight.ExtraBold,
+                    fontWeight = FontWeight.Bold,
                     color = VocabColors.BrandPrimary,
                     letterSpacing = 0.4.sp
                 )
@@ -69,11 +72,33 @@ fun VocabTopBar(
         ) {
             Text(
                 text = "+ AI thêm từ",
-                fontSize = 12.sp,
+                fontSize = 11.5.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White
             )
         }
+    }
+}
+
+@Composable
+fun VocabHeaderTitle(
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier.padding(top = 2.dp)) {
+        Text(
+            text = "Từ vựng HSK 3.0",
+            fontSize = 20.sp,
+            fontWeight = FontWeight.ExtraBold,
+            color = Color(0xFF0F172A)
+        )
+
+        Spacer(modifier = Modifier.height(2.dp))
+
+        Text(
+            text = "3.249 từ phân cấp • Phát âm chuẩn & Hán Việt",
+            fontSize = 12.5.sp,
+            color = Color(0xFF64748B)
+        )
     }
 }
 
@@ -85,24 +110,9 @@ fun VocabHeaderSection(
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
-        Text(
-            text = "Từ vựng trọng tâm bám sát mục tiêu thi",
-            fontSize = 21.sp,
-            fontWeight = FontWeight.Bold,
-            color = VocabColors.TextDark,
-            lineHeight = 28.sp
-        )
+        VocabHeaderTitle()
 
-        Spacer(modifier = Modifier.height(4.dp))
-
-        Text(
-            text = "Học kèm âm Hán Việt độc quyền, phát âm bản xứ và chế độ Flashcard tương tác.",
-            fontSize = 13.sp,
-            color = VocabColors.TextMuted,
-            lineHeight = 18.sp
-        )
-
-        Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         HskLevelSelector(
             hskLevels = hskLevels,
@@ -118,26 +128,19 @@ private fun HskLevelSelector(
     selectedHskIndex: Int,
     onSelectHskLevel: (Int, HskLevelFilter) -> Unit
 ) {
-    Surface(
-        shape = VocabShapes.Card,
-        color = Color.White,
-        border = BorderStroke(1.dp, VocabColors.BorderLight),
-        modifier = Modifier.fillMaxWidth()
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .horizontalScroll(rememberScrollState()),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Row(
-            modifier = Modifier
-                .horizontalScroll(rememberScrollState())
-                .padding(horizontal = 6.dp, vertical = 5.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            hskLevels.forEachIndexed { index, level ->
-                HskLevelTabItem(
-                    level = level,
-                    isSelected = index == selectedHskIndex,
-                    onClick = { onSelectHskLevel(index, level) }
-                )
-            }
+        hskLevels.forEachIndexed { index, level ->
+            HskLevelTabItem(
+                level = level,
+                isSelected = index == selectedHskIndex,
+                onClick = { onSelectHskLevel(index, level) }
+            )
         }
     }
 }
@@ -148,12 +151,21 @@ private fun HskLevelTabItem(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
+    val chipShape = RoundedCornerShape(12.dp)
+    val backgroundModifier = if (isSelected) {
+        Modifier.background(VocabColors.BrandPrimary, chipShape)
+    } else {
+        Modifier
+            .background(Color.White, chipShape)
+            .border(1.dp, VocabColors.BorderLight, chipShape)
+    }
+
     Box(
         modifier = Modifier
-            .clip(VocabShapes.Tab)
-            .background(if (isSelected) VocabColors.BrandPrimary else Color.Transparent)
+            .clip(chipShape)
+            .then(backgroundModifier)
             .clickable(onClick = onClick)
-            .padding(horizontal = 12.dp, vertical = 7.dp)
+            .padding(horizontal = 14.dp, vertical = 8.dp)
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
@@ -182,7 +194,7 @@ private fun HskScoreTag(
                 if (isSelected) Color.White.copy(alpha = 0.22f) else VocabColors.BrandLight,
                 VocabShapes.Tag
             )
-            .padding(horizontal = 5.dp, vertical = 2.dp)
+            .padding(horizontal = 6.dp, vertical = 2.dp)
     ) {
         Text(
             text = score,

@@ -9,7 +9,7 @@ import com.example.luminalearn.presentation.vocabulary.model.VocabConstants
 import com.example.luminalearn.presentation.vocabulary.model.VocabStudyMode
 import com.example.luminalearn.presentation.vocabulary.model.VocabWordItem
 
-private const val PAGE_SIZE = 4
+private const val PAGE_SIZE = 15
 
 /**
  * State duy nhất cho màn hình Từ vựng (Unidirectional Data Flow)
@@ -35,7 +35,8 @@ data class VocabularyUiState(
     val isLoadingVocab: Boolean = false,
     val isLevelsLoading: Boolean = false,
     val isTopicsLoading: Boolean = false,
-    val quizState: ReflexQuizState = ReflexQuizState()
+    val quizState: ReflexQuizState = ReflexQuizState(),
+    val activeDetailWord: VocabWordItem? = null
 ) : UiState {
 
     val selectedHskTitle: String?
@@ -124,6 +125,8 @@ sealed interface VocabularyUiIntent : UiIntent {
     data object StartReflexQuiz : VocabularyUiIntent
     data class SelectQuizOption(val option: String) : VocabularyUiIntent
     data object RestartReflexQuiz : VocabularyUiIntent
+    data class OpenWordDetail(val word: VocabWordItem) : VocabularyUiIntent
+    data object DismissWordDetail : VocabularyUiIntent
 }
 
 /**

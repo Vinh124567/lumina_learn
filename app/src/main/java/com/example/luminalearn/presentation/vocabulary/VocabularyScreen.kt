@@ -20,6 +20,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -50,18 +51,20 @@ import com.example.luminalearn.presentation.vocabulary.component.PaginationBar
 import com.example.luminalearn.presentation.vocabulary.component.QuizActions
 import com.example.luminalearn.presentation.vocabulary.component.TopicSelectorBar
 import com.example.luminalearn.presentation.vocabulary.component.VocabDetailCard
+import com.example.luminalearn.presentation.vocabulary.component.VocabDetailDialog
+import com.example.luminalearn.presentation.vocabulary.component.VocabFilterCard
 import com.example.luminalearn.presentation.vocabulary.component.VocabHeaderSection
-import com.example.luminalearn.presentation.vocabulary.component.VocabProgressAndModeBar
-import com.example.luminalearn.presentation.vocabulary.component.VocabProgressData
+import com.example.luminalearn.presentation.vocabulary.component.VocabHeaderTitle
+import com.example.luminalearn.presentation.vocabulary.component.VocabProgressBar
 import com.example.luminalearn.presentation.vocabulary.component.VocabReflexQuizSection
+import com.example.luminalearn.presentation.vocabulary.component.VocabStudyModeTabs
 import com.example.luminalearn.presentation.vocabulary.component.VocabTopBar
 import com.example.luminalearn.presentation.vocabulary.model.VocabColors
-import com.example.luminalearn.presentation.vocabulary.model.VocabShapes
 import com.example.luminalearn.presentation.vocabulary.model.VocabStudyMode
 import kotlinx.coroutines.launch
 import java.util.Locale
 
-private const val PAGE_SIZE = 4
+private const val PAGE_SIZE = 15
 
 @Composable
 fun VocabularyScreen(
@@ -89,8 +92,17 @@ fun VocabularyScreen(
 
     val onSpeakWord: (String) -> Unit = remember(tts) {
         { text: String ->
+            tts?.setSpeechRate(1.0f)
             tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, text)
                 ?: Toast.makeText(context, "Phát âm: $text", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    val onSpeakWordSlow: (String) -> Unit = remember(tts) {
+        { text: String ->
+            tts?.setSpeechRate(0.6f)
+            tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, text)
+            tts?.setSpeechRate(1.0f)
         }
     }
 
@@ -105,55 +117,55 @@ fun VocabularyScreen(
             }
         )
 
+        // ── 1. Chọn 3 chế độ học (Ghim ngay dưới TopBar chuẩn UX) ──
+        VocabStudyModeTabs(
+            selectedMode = uiState.selectedMode,
+            filteredCount = uiState.filteredList.size,
+            onSelectMode = { mode ->
+                viewModel.processIntent(VocabularyUiIntent.SelectMode(mode))
+            },
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+        )
+
         LazyColumn(
             state = listState,
             contentPadding = PaddingValues(
                 start = 16.dp,
                 end = 16.dp,
-                top = 4.dp,
+                top = 8.dp,
                 bottom = 110.dp
             ),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp),
             modifier = Modifier.fillMaxSize()
         ) {
             item(key = "vocab_header", contentType = "header") {
                 Column {
-                    // 1. Header & Bộ lọc cấp độ HSK
-                    VocabHeaderSection(
+                    // 1. Tiêu đề màn hình
+                    VocabHeaderTitle()
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // 2. Card Bộ lọc: Cấp độ HSK + Chủ đề từ vựng
+                    VocabFilterCard(
                         hskLevels = uiState.hskLevels,
                         selectedHskIndex = uiState.selectedHskIndex,
                         onSelectHskLevel = { index, _ ->
                             viewModel.processIntent(VocabularyUiIntent.SelectHskLevel(index))
-                        }
-                    )
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    // 2. Thanh Tiến độ & Chọn 3 chế độ học (Danh sách, Flashcard, Luyện phản xạ)
-                    VocabProgressAndModeBar(
-                        data = VocabProgressData(
-                            progressPercent = uiState.progressPercent,
-                            masteredCount = uiState.masteredCount,
-                            totalCount = uiState.totalCount,
-                            selectedTopic = uiState.selectedTopic,
-                            currentHskTitle = uiState.hskLevels.getOrNull(uiState.selectedHskIndex)?.title ?: "Mọi cấp độ",
-                            filteredCount = uiState.filteredList.size,
-                            selectedMode = uiState.selectedMode
-                        ),
-                        onSelectMode = { mode ->
-                            viewModel.processIntent(VocabularyUiIntent.SelectMode(mode))
-                        }
-                    )
-
-                    Spacer(modifier = Modifier.height(14.dp))
-
-                    // 3. Thanh Cuộn Ngang Chọn Chủ Đề
-                    TopicSelectorBar(
+                        },
                         topicsList = uiState.topics,
                         selectedTopic = uiState.selectedTopic,
                         onSelectTopic = { topicName ->
                             viewModel.processIntent(VocabularyUiIntent.SelectTopic(topicName))
                         }
+                    )
+
+                    Spacer(modifier = Modifier.height(14.dp))
+
+                    // 3. Thanh Tiến độ học
+                    VocabProgressBar(
+                        masteredCount = uiState.masteredCount,
+                        totalCount = uiState.totalCount,
+                        progressPercent = uiState.progressPercent
                     )
 
                     // 4. Thanh Tìm kiếm từ vựng (Chỉ hiển thị khi ở chế độ Danh sách)
@@ -179,6 +191,21 @@ fun VocabularyScreen(
                 }
             )
         }
+
+        // ── Dialog Chi tiết Từ vựng khi người dùng ấn vào 1 từ ──
+        if (uiState.activeDetailWord != null) {
+            VocabDetailDialog(
+                word = uiState.activeDetailWord!!,
+                onDismiss = {
+                    viewModel.processIntent(VocabularyUiIntent.DismissWordDetail)
+                },
+                onSpeak = onSpeakWord,
+                onSpeakSlow = onSpeakWordSlow,
+                onToggleMastered = { wordId ->
+                    viewModel.processIntent(VocabularyUiIntent.ToggleMastered(wordId))
+                }
+            )
+        }
     }
 }
 
@@ -187,29 +214,30 @@ private fun VocabSearchField(
     searchQuery: String,
     onSearchQueryChange: (String) -> Unit
 ) {
-    Spacer(modifier = Modifier.height(12.dp))
+    val searchShape = RoundedCornerShape(16.dp)
+    Spacer(modifier = Modifier.height(14.dp))
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(44.dp)
-            .background(Color.White, VocabShapes.Checkbox)
-            .border(1.dp, VocabColors.BorderLight, VocabShapes.Checkbox)
-            .padding(horizontal = 12.dp),
+            .height(48.dp)
+            .background(Color.White, searchShape)
+            .border(1.dp, Color(0xFFF1F5F9), searchShape)
+            .padding(horizontal = 16.dp),
         contentAlignment = Alignment.CenterStart
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_search),
                 contentDescription = "Search",
-                tint = Color(0xFF94A3B8),
-                modifier = Modifier.size(16.dp)
+                tint = VocabColors.BrandPrimary,
+                modifier = Modifier.size(18.dp)
             )
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(10.dp))
             Box(modifier = Modifier.weight(1f)) {
                 if (searchQuery.isEmpty()) {
                     Text(
                         text = "Tìm kiếm Hán tự, Pinyin, Hán Việt hoặc nghĩa...",
-                        fontSize = 12.sp,
+                        fontSize = 13.sp,
                         color = Color(0xFF94A3B8),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
@@ -219,11 +247,12 @@ private fun VocabSearchField(
                     value = searchQuery,
                     onValueChange = onSearchQueryChange,
                     textStyle = TextStyle(
-                        fontSize = 13.sp,
-                        color = VocabColors.TextDark
+                        fontSize = 13.5.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color(0xFF0F172A)
                     ),
-                    cursorBrush = SolidColor(VocabColors.BrandPrimary),
                     singleLine = true,
+                    cursorBrush = SolidColor(VocabColors.BrandPrimary),
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -347,6 +376,9 @@ private fun LazyListScope.listModeContent(
             onSpeak = onSpeakWord,
             onToggleMastered = { wordId ->
                 viewModel.processIntent(VocabularyUiIntent.ToggleMastered(wordId))
+            },
+            onClick = {
+                viewModel.processIntent(VocabularyUiIntent.OpenWordDetail(wordItem))
             }
         )
     }

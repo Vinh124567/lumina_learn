@@ -23,4 +23,14 @@ interface VocabularyApiService {
         @Query("topic") topic: String? = null,
         @Query("hskLevel") hskLevel: String? = null
     ): Response<ApiResponse<List<VocabularyDto>>>
+
+    @retrofit2.http.GET("vocabularies/{id}")
+    suspend fun getVocabularyById(
+        @retrofit2.http.Path("id") id: String
+    ): Response<ApiResponse<VocabularyDto>>
+
+    @retrofit2.http.PUT("vocabularies/{id}/toggle-mastered")
+    suspend fun toggleMastered(
+        @retrofit2.http.Path("id") id: String
+    ): Response<ApiResponse<VocabularyDto>>
 }

@@ -17,6 +17,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -30,19 +31,22 @@ fun VocabDetailCard(
     item: VocabWordItem,
     onSpeak: (String) -> Unit,
     onToggleMastered: (String) -> Unit,
+    onClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    Box(
+    androidx.compose.material3.Surface(
         modifier = modifier
             .fillMaxWidth()
-            .background(Color.White, VocabShapes.Card)
-            .border(1.dp, Color(0xFFF1F5F9), VocabShapes.Card)
-            .padding(14.dp)
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(22.dp),
+        color = Color.White,
+        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFF1F5F9)),
+        shadowElevation = 1.5.dp
     ) {
-        Column {
+        Column(modifier = Modifier.padding(16.dp)) {
             VocabCardHeader(item = item, onToggleMastered = onToggleMastered)
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             VocabCardMainRow(item = item, onSpeak = onSpeak)
 
@@ -50,16 +54,16 @@ fun VocabDetailCard(
 
             Text(
                 text = item.meaning,
-                fontSize = 14.sp,
+                fontSize = 14.5.sp,
                 fontWeight = FontWeight.Bold,
-                color = VocabColors.TextDark
+                color = Color(0xFF0F172A)
             )
 
             Spacer(modifier = Modifier.height(10.dp))
 
             VocabExampleBox(item = item, onSpeak = onSpeak)
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             VocabCardFooter(item = item, onToggleMastered = onToggleMastered)
         }
@@ -139,6 +143,15 @@ private fun VocabCardMainRow(
         "${item.radical}\n${item.strokes}"
     }
 
+    val (hanziFontSize, boxWidth) = remember(item.hanzi) {
+        when {
+            item.hanzi.length <= 1 -> Pair(28.sp, 62.dp)
+            item.hanzi.length == 2 -> Pair(22.sp, 62.dp)
+            item.hanzi.length == 3 -> Pair(17.sp, 74.dp)
+            else -> Pair(14.sp, 86.dp)
+        }
+    }
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
@@ -146,30 +159,38 @@ private fun VocabCardMainRow(
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
-                .size(62.dp)
+                .height(62.dp)
+                .width(boxWidth)
+                .clip(VocabShapes.Hanzi)
                 .background(Color(0xFFF8FAFC), VocabShapes.Hanzi)
                 .border(1.dp, Color(0xFFEEF2F6), VocabShapes.Hanzi)
                 .clickable { onSpeak(item.hanzi) }
+                .padding(horizontal = 4.dp)
         ) {
             Text(
                 text = item.hanzi,
-                fontSize = 30.sp,
+                fontSize = hanziFontSize,
                 fontWeight = FontWeight.Bold,
-                color = VocabColors.TextDark
+                color = VocabColors.TextDark,
+                maxLines = 1,
+                softWrap = false,
+                textAlign = TextAlign.Center
             )
         }
 
         Spacer(modifier = Modifier.width(12.dp))
 
         Column(modifier = Modifier.weight(1f)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
                 Text(
                     text = item.pinyin,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
                     color = VocabColors.BrandDark
                 )
-                Spacer(modifier = Modifier.width(6.dp))
                 Icon(
                     painter = painterResource(id = R.drawable.ic_speaker),
                     contentDescription = "Speak",
@@ -178,42 +199,40 @@ private fun VocabCardMainRow(
                         .size(16.dp)
                         .clickable { onSpeak(item.hanzi) }
                 )
+                Text(
+                    text = "(${item.partOfSpeech})",
+                    fontSize = 11.sp,
+                    color = VocabColors.TextMuted,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
             }
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(6.dp))
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(6.dp))
+                    .background(Color(0xFFF1F5F9))
+                    .padding(horizontal = 7.dp, vertical = 2.5.dp)
             ) {
-                Box(
-                    modifier = Modifier
-                        .background(VocabColors.HanVietBg, VocabShapes.Badge)
-                        .border(1.dp, Color(0xFFFDE68A), VocabShapes.Badge)
-                        .padding(horizontal = 6.dp, vertical = 2.dp)
-                ) {
-                    Text(
-                        text = "Hán Việt: ${item.hanViet}",
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = VocabColors.HanVietAmber
-                    )
-                }
-
                 Text(
-                    text = item.partOfSpeech,
+                    text = "HV: ${item.hanViet}",
                     fontSize = 11.sp,
-                    color = VocabColors.TextMuted
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF475569),
+                    maxLines = 1,
+                    softWrap = false
                 )
             }
         }
 
         Text(
             text = radicalAndStrokesText,
-            fontSize = 10.sp,
-            color = VocabColors.TextMuted,
+            fontSize = 10.5.sp,
+            color = Color(0xFF94A3B8),
             textAlign = TextAlign.End,
-            lineHeight = 14.sp
+            lineHeight = 15.sp
         )
     }
 }
@@ -225,15 +244,15 @@ private fun VocabExampleBox(
 ) {
     val exampleAnnotatedText = remember(item.exampleHanzi, item.examplePinyin, item.exampleMeaning) {
         buildAnnotatedString {
-            withStyle(SpanStyle(fontWeight = FontWeight.Bold, color = VocabColors.TextDark, fontSize = 13.sp)) {
+            withStyle(SpanStyle(fontWeight = FontWeight.SemiBold, color = Color(0xFF1E293B), fontSize = 13.sp)) {
                 append(item.exampleHanzi)
             }
             append("\n")
-            withStyle(SpanStyle(color = VocabColors.BrandDark, fontSize = 11.sp)) {
+            withStyle(SpanStyle(color = Color(0xFF5C50F6), fontSize = 11.sp, fontWeight = FontWeight.Medium)) {
                 append(item.examplePinyin)
             }
             append("\n")
-            withStyle(SpanStyle(color = VocabColors.TextMuted, fontSize = 11.sp)) {
+            withStyle(SpanStyle(color = Color(0xFF64748B), fontSize = 11.5.sp)) {
                 append(item.exampleMeaning)
             }
         }
@@ -242,9 +261,10 @@ private fun VocabExampleBox(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color(0xFFF8FAFC), VocabShapes.Example)
-            .border(1.dp, Color(0xFFF1F5F9), VocabShapes.Example)
-            .padding(10.dp)
+            .clip(RoundedCornerShape(14.dp))
+            .background(Color(0xFFF8FAFC))
+            .border(1.dp, Color(0xFFF1F5F9), RoundedCornerShape(14.dp))
+            .padding(12.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -253,7 +273,7 @@ private fun VocabExampleBox(
         ) {
             Text(
                 text = exampleAnnotatedText,
-                lineHeight = 17.sp,
+                lineHeight = 18.sp,
                 modifier = Modifier.weight(1f)
             )
             Spacer(modifier = Modifier.width(8.dp))
@@ -262,7 +282,7 @@ private fun VocabExampleBox(
                 contentDescription = "Speak example",
                 tint = Color(0xFF94A3B8),
                 modifier = Modifier
-                    .size(15.dp)
+                    .size(16.dp)
                     .clickable { onSpeak(item.exampleHanzi) }
             )
         }

@@ -34,26 +34,19 @@ fun TopicSelectorBar(
     Column(modifier = modifier.fillMaxWidth()) {
         TopicHeader(topicsList.size)
 
-        Surface(
-            shape = RoundedCornerShape(20.dp),
-            color = Color.White,
-            border = BorderStroke(1.dp, Color(0xFFEEF2F6)),
-            modifier = Modifier.fillMaxWidth()
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState()),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Row(
-                modifier = Modifier
-                    .horizontalScroll(rememberScrollState())
-                    .padding(horizontal = 8.dp, vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                topicsList.forEach { topic ->
-                    TopicChip(
-                        topic = topic,
-                        isSelected = topic.name == selectedTopic,
-                        onSelect = { onSelectTopic(topic.name) }
-                    )
-                }
+            topicsList.forEach { topic ->
+                TopicChip(
+                    topic = topic,
+                    isSelected = topic.name == selectedTopic,
+                    onSelect = { onSelectTopic(topic.name) }
+                )
             }
         }
     }
@@ -73,7 +66,7 @@ private fun TopicHeader(count: Int) {
         )
         Spacer(modifier = Modifier.width(6.dp))
         Text(
-            text = "CHỌN TỪ VỰNG THEO CHỦ ĐỀ ($count CHỦ ĐỀ)",
+            text = "CHỦ ĐỀ TỪ VỰNG ($count)",
             fontSize = 12.sp,
             fontWeight = FontWeight.ExtraBold,
             color = Color(0xFF334155),
@@ -88,26 +81,25 @@ private fun TopicChip(
     isSelected: Boolean,
     onSelect: () -> Unit
 ) {
-    val chipShape = RoundedCornerShape(14.dp)
-    val bgColor = if (isSelected) Color(0xFF181829) else Color(0xFFF8FAFC)
-    val textColor = if (isSelected) Color.White else Color(0xFF334155)
-    val countBgColor = if (isSelected) Color(0xFF374151) else Color(0xFFEEF2FF)
-    val countTextColor = if (isSelected) Color(0xFFF1F5F9) else Color(0xFF6366F1)
-    val fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
-
-    val borderModifier = if (!isSelected) {
-        Modifier.border(1.dp, Color(0xFFE2E8F0), chipShape)
+    val chipShape = RoundedCornerShape(12.dp)
+    val backgroundModifier = if (isSelected) {
+        Modifier.background(VocabColors.BrandPrimary, chipShape)
     } else {
         Modifier
+            .background(Color.White, chipShape)
+            .border(1.dp, VocabColors.BorderLight, chipShape)
     }
+    val textColor = if (isSelected) Color.White else VocabColors.TextSecondary
+    val countBgColor = if (isSelected) Color.White.copy(alpha = 0.22f) else VocabColors.BrandLight
+    val countTextColor = if (isSelected) Color.White else VocabColors.BrandPrimary
+    val fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
 
     Box(
         modifier = Modifier
             .clip(chipShape)
-            .background(bgColor)
-            .then(borderModifier)
+            .then(backgroundModifier)
             .clickable(onClick = onSelect)
-            .padding(horizontal = 14.dp, vertical = 7.dp)
+            .padding(horizontal = 14.dp, vertical = 8.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -122,9 +114,9 @@ private fun TopicChip(
             )
             Box(
                 modifier = Modifier
-                    .clip(RoundedCornerShape(12.dp))
+                    .clip(RoundedCornerShape(10.dp))
                     .background(countBgColor)
-                    .padding(horizontal = 7.dp, vertical = 2.dp)
+                    .padding(horizontal = 6.dp, vertical = 1.5.dp)
             ) {
                 Text(
                     text = topic.count.toString(),
@@ -136,3 +128,4 @@ private fun TopicChip(
         }
     }
 }
+

@@ -5,6 +5,7 @@ import com.example.luminalearn.data.remote.RetrofitClient
 import com.example.luminalearn.data.remote.api.LessonApiService
 
 interface LessonRepository {
+    suspend fun getAllLessons(level: String? = null, category: String? = null): Result<List<LessonDto>>
     suspend fun getRecommendedLessons(): Result<List<LessonDto>>
     suspend fun getLessonById(id: String): Result<LessonDto>
 }
@@ -12,6 +13,20 @@ interface LessonRepository {
 class LessonRepositoryImpl(
     private val lessonApiService: LessonApiService = RetrofitClient.lessonApiService
 ) : LessonRepository {
+
+    override suspend fun getAllLessons(level: String?, category: String?): Result<List<LessonDto>> {
+        return try {
+            val response = lessonApiService.getAllLessons(level, category)
+            if (response.isSuccessful && response.body()?.data != null) {
+                Result.success(response.body()!!.data!!)
+            } else {
+                val errorMsg = response.body()?.message ?: "Không thể tải danh sách bài học"
+                Result.failure(Exception(errorMsg))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 
     override suspend fun getRecommendedLessons(): Result<List<LessonDto>> {
         return try {

@@ -55,7 +55,6 @@ fun VocabReflexQuizSection(
     onSpeak: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // Tự động phát âm khi chuyển sang câu hỏi mới
     LaunchedEffect(quizState.currentIndex, quizState.isFinished) {
         val q = quizState.currentQuestion
         if (!quizState.isFinished && q != null) {

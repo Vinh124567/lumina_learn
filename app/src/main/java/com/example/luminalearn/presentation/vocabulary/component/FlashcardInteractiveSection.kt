@@ -10,6 +10,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -204,12 +205,23 @@ private fun FlashcardHeader(
 
 @Composable
 private fun FlashcardFront(word: VocabWordItem) {
+    val hanziFontSize = remember(word.hanzi) {
+        when {
+            word.hanzi.length <= 1 -> 54.sp
+            word.hanzi.length == 2 -> 46.sp
+            word.hanzi.length == 3 -> 36.sp
+            else -> 30.sp
+        }
+    }
+
     Text(
         text = word.hanzi,
-        fontSize = 54.sp,
+        fontSize = hanziFontSize,
         fontWeight = FontWeight.Bold,
         color = VocabColors.TextDark,
-        textAlign = TextAlign.Center
+        textAlign = TextAlign.Center,
+        maxLines = 1,
+        softWrap = false
     )
 
     Spacer(modifier = Modifier.height(14.dp))
