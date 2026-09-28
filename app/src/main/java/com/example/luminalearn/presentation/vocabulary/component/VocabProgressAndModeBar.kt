@@ -97,7 +97,7 @@ fun VocabProgressBar(
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(8.dp))
-                        .background(Color(0xFFEDE9FE))
+                        .background(VocabColors.BrandLight)
                         .padding(horizontal = 9.dp, vertical = 4.dp)
                 ) {
                     Text(

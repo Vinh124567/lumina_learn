@@ -7,7 +7,9 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -27,6 +29,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.luminalearn.R
+import com.example.luminalearn.presentation.vocabulary.model.VocabColors
 import com.example.luminalearn.presentation.vocabulary.model.VocabWordItem
 
 @Composable
@@ -36,10 +39,11 @@ fun VocabDetailDialog(
     onSpeak: (String) -> Unit,
     onSpeakSlow: (String) -> Unit,
     onToggleMastered: (String) -> Unit,
+    initialTab: Int = 0,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    var selectedTab by remember { mutableIntStateOf(0) } // 0: Chi tiết, 1: Luyện viết
+    var selectedTab by remember(initialTab) { mutableIntStateOf(initialTab) } // 0: Chi tiết, 1: Luyện viết, 2: Chấm điểm giọng nói
 
     Dialog(
         onDismissRequest = onDismiss,
@@ -64,7 +68,7 @@ fun VocabDetailDialog(
                     onDismiss = onDismiss
                 )
 
-                // ── 2. Tab Navigation (Chi tiết Từ vựng vs Luyện viết Hán tự) ──
+                // ── 2. Tab Navigation (Chi tiết vs Luyện viết vs Chấm điểm giọng nói) ──
                 DialogTabRow(
                     selectedTab = selectedTab,
                     onSelectTab = { selectedTab = it }
@@ -76,20 +80,29 @@ fun VocabDetailDialog(
                         .weight(1f)
                         .fillMaxWidth()
                 ) {
-                    if (selectedTab == 0) {
-                        VocabDetailTabContent(
-                            word = word,
-                            onSpeak = onSpeak,
-                            onSpeakSlow = onSpeakSlow,
-                            onCopy = { text ->
-                                val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                                val clip = ClipData.newPlainText("Chinese Word", text)
-                                clipboard.setPrimaryClip(clip)
-                                Toast.makeText(context, "Đã sao chép: $text", Toast.LENGTH_SHORT).show()
-                            }
-                        )
-                    } else {
-                        VocabWritingPracticeTabContent(word = word)
+                    when (selectedTab) {
+                        0 -> {
+                            VocabDetailTabContent(
+                                word = word,
+                                onSpeak = onSpeak,
+                                onSpeakSlow = onSpeakSlow,
+                                onCopy = { text ->
+                                    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                    val clip = ClipData.newPlainText("Chinese Word", text)
+                                    clipboard.setPrimaryClip(clip)
+                                    Toast.makeText(context, "Đã sao chép: $text", Toast.LENGTH_SHORT).show()
+                                }
+                            )
+                        }
+                        1 -> {
+                            VocabWritingPracticeTabContent(word = word)
+                        }
+                        else -> {
+                            VocabPronunciationTabContent(
+                                word = word,
+                                onSpeakSample = onSpeak
+                            )
+                        }
                     }
                 }
 
@@ -156,15 +169,15 @@ private fun DialogTopHeader(
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(8.dp))
-                        .background(Color(0xFFEDE9FE))
-                        .border(1.dp, Color(0xFFDDD6FE), RoundedCornerShape(8.dp))
+                        .background(VocabColors.AccentCoralBg)
+                        .border(1.dp, Color(0xFFFFD7C9), RoundedCornerShape(8.dp))
                         .padding(horizontal = 8.dp, vertical = 3.dp)
                 ) {
                     Text(
                         text = "Tự thêm",
                         fontSize = 11.5.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF5538EE)
+                        color = VocabColors.AccentCoral
                     )
                 }
             }
@@ -197,10 +210,11 @@ private fun DialogTabRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.spacedBy(24.dp)
+            .padding(horizontal = 16.dp)
+            .horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        // Tab 1: Chi tiết Từ vựng
+        // Tab 0: Chi tiết Từ vựng
         Column(
             modifier = Modifier
                 .clickable { onSelectTab(0) }
@@ -208,20 +222,20 @@ private fun DialogTabRow(
         ) {
             Text(
                 text = "📖 Chi tiết Từ vựng",
-                fontSize = 13.5.sp,
+                fontSize = 13.sp,
                 fontWeight = if (selectedTab == 0) FontWeight.Bold else FontWeight.Medium,
-                color = if (selectedTab == 0) Color(0xFF5C50F6) else Color(0xFF64748B)
+                color = if (selectedTab == 0) VocabColors.BrandPrimary else Color(0xFF64748B)
             )
             Spacer(modifier = Modifier.height(6.dp))
             Box(
                 modifier = Modifier
                     .height(2.5.dp)
-                    .width(110.dp)
-                    .background(if (selectedTab == 0) Color(0xFF5C50F6) else Color.Transparent)
+                    .width(100.dp)
+                    .background(if (selectedTab == 0) VocabColors.BrandPrimary else Color.Transparent)
             )
         }
 
-        // Tab 2: Luyện viết Hán tự
+        // Tab 1: Luyện viết Hán tự
         Column(
             modifier = Modifier
                 .clickable { onSelectTab(1) }
@@ -229,16 +243,37 @@ private fun DialogTabRow(
         ) {
             Text(
                 text = "✏️ Luyện viết Hán tự",
-                fontSize = 13.5.sp,
+                fontSize = 13.sp,
                 fontWeight = if (selectedTab == 1) FontWeight.Bold else FontWeight.Medium,
-                color = if (selectedTab == 1) Color(0xFF5C50F6) else Color(0xFF64748B)
+                color = if (selectedTab == 1) VocabColors.BrandPrimary else Color(0xFF64748B)
             )
             Spacer(modifier = Modifier.height(6.dp))
             Box(
                 modifier = Modifier
                     .height(2.5.dp)
-                    .width(110.dp)
-                    .background(if (selectedTab == 1) Color(0xFF5C50F6) else Color.Transparent)
+                    .width(100.dp)
+                    .background(if (selectedTab == 1) VocabColors.BrandPrimary else Color.Transparent)
+            )
+        }
+
+        // Tab 2: Chấm điểm giọng nói
+        Column(
+            modifier = Modifier
+                .clickable { onSelectTab(2) }
+                .padding(vertical = 8.dp)
+        ) {
+            Text(
+                text = "🎙️ Chấm điểm giọng nói",
+                fontSize = 13.sp,
+                fontWeight = if (selectedTab == 2) FontWeight.Bold else FontWeight.Medium,
+                color = if (selectedTab == 2) VocabColors.BrandPrimary else Color(0xFF64748B)
+            )
+            Spacer(modifier = Modifier.height(6.dp))
+            Box(
+                modifier = Modifier
+                    .height(2.5.dp)
+                    .width(120.dp)
+                    .background(if (selectedTab == 2) VocabColors.BrandPrimary else Color.Transparent)
             )
         }
     }
@@ -276,22 +311,22 @@ private fun DialogBottomBar(
                 Icon(
                     painter = painterResource(id = R.drawable.ic_speaker),
                     contentDescription = null,
-                    tint = Color(0xFF4F46E5),
+                    tint = VocabColors.BrandPrimary,
                     modifier = Modifier.size(14.dp)
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
-                    text = "Nghe lại",
-                    fontSize = 12.5.sp,
+                    text = "Nghe lại (${word.pinyin})",
+                    fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF4F46E5)
+                    color = VocabColors.BrandPrimary
                 )
             }
         }
 
         // Nút Thuộc từ này (+5 Tia Sáng)
         val isMastered = word.isMastered
-        val btnBgColor = if (isMastered) Color(0xFF059669) else Color(0xFF5538EE)
+        val btnBgColor = if (isMastered) Color(0xFF059669) else VocabColors.BrandPrimary
         val btnText = if (isMastered) "✓ Đã thuộc từ này" else "✓ Thuộc từ này (+5 Tia Sáng)"
 
         Surface(

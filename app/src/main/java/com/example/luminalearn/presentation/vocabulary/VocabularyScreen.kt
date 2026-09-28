@@ -2,6 +2,7 @@ package com.example.luminalearn.presentation.vocabulary
 
 import android.speech.tts.TextToSpeech
 import android.widget.Toast
+import com.example.luminalearn.core.util.TextToSpeechHelper
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -32,6 +33,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -59,6 +61,7 @@ import com.example.luminalearn.presentation.vocabulary.component.TopicSelectorBa
 import com.example.luminalearn.presentation.vocabulary.component.VocabDetailCard
 import com.example.luminalearn.presentation.vocabulary.component.VocabDetailDialog
 import com.example.luminalearn.presentation.vocabulary.component.VocabFilterCard
+import com.example.luminalearn.presentation.vocabulary.component.VocabFilterCounts
 import com.example.luminalearn.presentation.vocabulary.component.VocabHeaderSection
 import com.example.luminalearn.presentation.vocabulary.component.VocabHeaderTitle
 import com.example.luminalearn.presentation.vocabulary.component.VocabProgressBar
@@ -66,6 +69,7 @@ import com.example.luminalearn.presentation.vocabulary.component.VocabReflexQuiz
 import com.example.luminalearn.presentation.vocabulary.component.VocabStudyModeTabs
 import com.example.luminalearn.presentation.vocabulary.component.VocabTopBar
 import com.example.luminalearn.presentation.vocabulary.model.VocabColors
+import com.example.luminalearn.presentation.vocabulary.model.VocabSourceFilter
 import com.example.luminalearn.presentation.vocabulary.model.VocabStudyMode
 import com.example.luminalearn.ui.theme.PlusJakartaSans
 import kotlinx.coroutines.launch
@@ -83,34 +87,33 @@ fun VocabularyScreen(
     val coroutineScope = rememberCoroutineScope()
     val uiState by viewModel.uiState.collectAsState()
 
-    // ── TextToSpeech phát âm tiếng Trung (View-only concern) ──
-    var tts by remember { mutableStateOf<TextToSpeech?>(null) }
-    DisposableEffect(Unit) {
-        tts = TextToSpeech(context) { status ->
-            if (status == TextToSpeech.SUCCESS) {
-                tts?.language = Locale.SIMPLIFIED_CHINESE
+    LaunchedEffect(Unit) {
+        viewModel.initSrs(context)
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.uiEffect.collect { effect ->
+            when (effect) {
+                is VocabularyUiEffect.ShowToast -> {
+                    Toast.makeText(context, effect.message, Toast.LENGTH_SHORT).show()
+                }
             }
         }
+    }
+
+    val ttsHelper = remember { TextToSpeechHelper(context) }
+    DisposableEffect(Unit) {
         onDispose {
-            tts?.stop()
-            tts?.shutdown()
+            ttsHelper.shutdown()
         }
     }
 
-    val onSpeakWord: (String) -> Unit = remember(tts) {
-        { text: String ->
-            tts?.setSpeechRate(1.0f)
-            tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, text)
-                ?: Toast.makeText(context, "Phát âm: $text", Toast.LENGTH_SHORT).show()
-        }
+    val onSpeakWord: (String) -> Unit = remember(ttsHelper) {
+        { text: String -> ttsHelper.speak(text) }
     }
 
-    val onSpeakWordSlow: (String) -> Unit = remember(tts) {
-        { text: String ->
-            tts?.setSpeechRate(0.6f)
-            tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, text)
-            tts?.setSpeechRate(1.0f)
-        }
+    val onSpeakWordSlow: (String) -> Unit = remember(ttsHelper) {
+        { text: String -> ttsHelper.speakSlow(text) }
     }
 
     Column(
@@ -161,9 +164,12 @@ fun VocabularyScreen(
                         onSelectSource = { source ->
                             viewModel.processIntent(VocabularyUiIntent.SelectSource(source))
                         },
-                        allCount = uiState.vocabList.size,
-                        customCount = uiState.vocabList.count { it.isCustom },
-                        masteredCount = uiState.masteredCount,
+                        counts = VocabFilterCounts(
+                            allCount = uiState.vocabList.size,
+                            dueTodayCount = uiState.dueTodayCount,
+                            customCount = uiState.vocabList.count { it.isCustom },
+                            masteredCount = uiState.masteredCount
+                        ),
                         hskLevels = uiState.hskLevels,
                         selectedHskIndex = uiState.selectedHskIndex,
                         onSelectHskLevel = { index, _ ->
@@ -207,6 +213,7 @@ fun VocabularyScreen(
                 uiState = uiState,
                 viewModel = viewModel,
                 onSpeakWord = onSpeakWord,
+                onSpeakWordSlow = onSpeakWordSlow,
                 onScrollToTop = {
                     coroutineScope.launch {
                         listState.animateScrollToItem(0)
@@ -226,7 +233,8 @@ fun VocabularyScreen(
                 onSpeakSlow = onSpeakWordSlow,
                 onToggleMastered = { wordId ->
                     viewModel.processIntent(VocabularyUiIntent.ToggleMastered(wordId))
-                }
+                },
+                initialTab = uiState.activeDetailTab
             )
         }
 
@@ -320,7 +328,7 @@ private fun VocabSearchField(
                 .clickable(onClick = onAskAiClick),
             shape = RoundedCornerShape(16.dp),
             color = Color.White,
-            border = BorderStroke(1.dp, Color(0xFFDDD6FE)),
+            border = BorderStroke(1.dp, Color(0xFFD6E0FF)),
             shadowElevation = 2.dp
         ) {
             Row(
@@ -333,7 +341,7 @@ private fun VocabSearchField(
                 Icon(
                     painter = painterResource(id = R.drawable.ic_sparkle),
                     contentDescription = null,
-                    tint = Color(0xFF5538EE),
+                    tint = VocabColors.BrandPrimary,
                     modifier = Modifier.size(13.dp)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
@@ -342,7 +350,7 @@ private fun VocabSearchField(
                     fontFamily = PlusJakartaSans,
                     fontSize = 11.5.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF5538EE),
+                    color = VocabColors.BrandPrimary,
                     maxLines = 1
                 )
             }
@@ -354,7 +362,7 @@ private fun VocabSearchField(
                 .height(44.dp)
                 .clickable(onClick = onAddVocabClick),
             shape = RoundedCornerShape(16.dp),
-            color = Color(0xFF5538EE),
+            color = VocabColors.BrandPrimary,
             shadowElevation = 2.dp
         ) {
             Row(
@@ -388,6 +396,7 @@ private fun LazyListScope.vocabStudyModeContent(
     uiState: VocabularyUiState,
     viewModel: VocabularyViewModel,
     onSpeakWord: (String) -> Unit,
+    onSpeakWordSlow: (String) -> Unit,
     onScrollToTop: () -> Unit
 ) {
     if (uiState.isLoadingVocab) {
@@ -418,7 +427,11 @@ private fun LazyListScope.vocabStudyModeContent(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Chưa có từ vựng nào phù hợp",
+                    text = if (uiState.selectedSource == VocabSourceFilter.DUE_TODAY) {
+                        "🎉 Bạn đã ôn tập xong tất cả từ cần ôn hôm nay!"
+                    } else {
+                        "Chưa có từ vựng nào phù hợp"
+                    },
                     fontSize = 14.sp,
                     color = VocabColors.TextMuted
                 )
@@ -428,7 +441,7 @@ private fun LazyListScope.vocabStudyModeContent(
     }
 
     when (uiState.selectedMode) {
-        VocabStudyMode.FLASHCARD -> flashcardModeContent(uiState, viewModel, onSpeakWord)
+        VocabStudyMode.FLASHCARD -> flashcardModeContent(uiState, viewModel, onSpeakWord, onSpeakWordSlow)
         VocabStudyMode.REFLEX -> reflexModeContent(uiState, viewModel, onSpeakWord)
         VocabStudyMode.LIST -> listModeContent(uiState, viewModel, onSpeakWord, onScrollToTop)
     }
@@ -437,7 +450,8 @@ private fun LazyListScope.vocabStudyModeContent(
 private fun LazyListScope.flashcardModeContent(
     uiState: VocabularyUiState,
     viewModel: VocabularyViewModel,
-    onSpeakWord: (String) -> Unit
+    onSpeakWord: (String) -> Unit,
+    onSpeakWordSlow: (String) -> Unit
 ) {
     uiState.currentFlashcardWord?.let { word ->
         item(key = "flashcard_card_item") {
@@ -451,8 +465,18 @@ private fun LazyListScope.flashcardModeContent(
                     onPrevious = { viewModel.processIntent(VocabularyUiIntent.PreviousFlashcard) },
                     onNext = { viewModel.processIntent(VocabularyUiIntent.NextFlashcard) },
                     onSpeak = onSpeakWord,
+                    onSpeakSlow = onSpeakWordSlow,
                     onToggleMastered = { wordId ->
                         viewModel.processIntent(VocabularyUiIntent.ToggleMastered(wordId))
+                    },
+                    onOpenDetail = {
+                        viewModel.processIntent(VocabularyUiIntent.OpenWordDetail(word))
+                    },
+                    onVoiceTest = { voiceWord ->
+                        viewModel.processIntent(VocabularyUiIntent.OpenWordDetail(voiceWord, initialTab = 2))
+                    },
+                    onRateSrs = { rating ->
+                        viewModel.processIntent(VocabularyUiIntent.RateWordSrs(word.id, rating))
                     }
                 )
             )
@@ -503,6 +527,9 @@ private fun LazyListScope.listModeContent(
             },
             onClick = {
                 viewModel.processIntent(VocabularyUiIntent.OpenWordDetail(wordItem))
+            },
+            onQuickVoiceTest = {
+                viewModel.processIntent(VocabularyUiIntent.OpenWordDetail(wordItem, initialTab = 2))
             }
         )
     }

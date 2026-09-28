@@ -34,6 +34,12 @@ interface VocabularyApiService {
         @retrofit2.http.Path("id") id: String
     ): Response<ApiResponse<VocabularyDto>>
 
+    @retrofit2.http.PUT("vocabularies/{id}/srs-rating")
+    suspend fun updateSrsRating(
+        @retrofit2.http.Path("id") id: String,
+        @retrofit2.http.Body request: com.example.luminalearn.data.model.UpdateSrsRatingRequest
+    ): Response<ApiResponse<VocabularyDto>>
+
     @retrofit2.http.POST("vocabularies")
     suspend fun createVocabulary(
         @retrofit2.http.Body request: com.example.luminalearn.data.model.CreateVocabularyRequest

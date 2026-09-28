@@ -19,10 +19,14 @@ data class VocabWordItem(
     val hskLevel: String,
     val targetScore: String = "HSK 1 (Mục tiêu 180–200/200 điểm)",
     val isMastered: Boolean = true,
-    val userId: Long? = null
+    val userId: Long? = null,
+    val srsState: SrsWordState = SrsWordState(id)
 ) {
     val isCustom: Boolean
         get() = userId != null
+
+    val isDueToday: Boolean
+        get() = srsState.isDue
 
     fun matchesCategory(category: String): Boolean {
         if (category.isBlank() ||
@@ -74,8 +78,93 @@ data class HskLevelFilter(
     val scoreRange: String? = null
 )
 
+enum class SrsRating(val title: String, val subtitle: String) {
+    AGAIN("Quên", "1 ngày"),
+    HARD("Khó", "2 ngày"),
+    GOOD("Tốt", "5 ngày"),
+    EASY("Dễ", "8 ngày+")
+}
+
+@Immutable
+data class SrsWordState(
+    val wordId: String = "",
+    val repetition: Int = 0,
+    val intervalDays: Int = 0,
+    val easeFactor: Float = 2.5f,
+    val nextReviewTimeMillis: Long = 0L,
+    val lastReviewTimeMillis: Long = 0L
+) {
+    val isDue: Boolean
+        get() {
+            if (nextReviewTimeMillis == 0L) return true
+            return System.currentTimeMillis() >= nextReviewTimeMillis
+        }
+}
+
+object SrsScheduler {
+    private const val ONE_DAY_MILLIS = 24 * 60 * 60 * 1000L
+
+    fun getNextIntervalDays(currentState: SrsWordState, rating: SrsRating): Int {
+        return when (rating) {
+            SrsRating.AGAIN -> 1
+            SrsRating.HARD -> {
+                when (currentState.repetition) {
+                    0 -> 2
+                    1 -> 3
+                    2 -> 5
+                    else -> maxOf(2, (currentState.intervalDays * 1.2f).toInt().coerceAtMost(20))
+                }
+            }
+            SrsRating.GOOD -> {
+                when (currentState.repetition) {
+                    0 -> 5
+                    1 -> 7
+                    2 -> 14
+                    else -> 30
+                }
+            }
+            SrsRating.EASY -> {
+                when (currentState.repetition) {
+                    0 -> 8
+                    1 -> 14
+                    else -> 30
+                }
+            }
+        }
+    }
+
+    fun getRatingSubtitle(currentState: SrsWordState, rating: SrsRating): String {
+        val days = getNextIntervalDays(currentState, rating)
+        return if (rating == SrsRating.EASY && currentState.repetition == 0) "8 ngày+" else "$days ngày"
+    }
+
+    fun calculateNextState(
+        currentState: SrsWordState,
+        rating: SrsRating,
+        now: Long = System.currentTimeMillis()
+    ): SrsWordState {
+        val nextInterval = getNextIntervalDays(currentState, rating)
+        val nextRepetition = if (rating == SrsRating.AGAIN) 0 else currentState.repetition + 1
+        val newEaseFactor = when (rating) {
+            SrsRating.AGAIN -> maxOf(1.3f, currentState.easeFactor - 0.2f)
+            SrsRating.HARD -> maxOf(1.3f, currentState.easeFactor - 0.15f)
+            SrsRating.GOOD -> currentState.easeFactor
+            SrsRating.EASY -> minOf(3.0f, currentState.easeFactor + 0.15f)
+        }
+        val nextReview = now + (nextInterval * ONE_DAY_MILLIS)
+        return currentState.copy(
+            repetition = nextRepetition,
+            intervalDays = nextInterval,
+            easeFactor = newEaseFactor,
+            nextReviewTimeMillis = nextReview,
+            lastReviewTimeMillis = now
+        )
+    }
+}
+
 enum class VocabSourceFilter(val title: String) {
     ALL("Tất cả kho từ"),
+    DUE_TODAY("Cần ôn hôm nay"),
     CUSTOM("Từ tôi đã thêm"),
     MASTERED("Đã thuộc")
 }

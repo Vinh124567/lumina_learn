@@ -33,6 +33,7 @@ fun VocabDetailCard(
     onSpeak: (String) -> Unit,
     onToggleMastered: (String) -> Unit,
     onClick: () -> Unit = {},
+    onQuickVoiceTest: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     androidx.compose.material3.Card(
@@ -48,7 +49,11 @@ fun VocabDetailCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            VocabCardMainRow(item = item, onSpeak = onSpeak)
+            VocabCardMainRow(
+                item = item,
+                onSpeak = onSpeak,
+                onQuickVoiceTest = onQuickVoiceTest
+            )
 
             Spacer(modifier = Modifier.height(10.dp))
 
@@ -112,14 +117,14 @@ private fun VocabCardHeader(
             if (item.isCustom) {
                 Box(
                     modifier = Modifier
-                        .background(Color(0xFFEDE9FE), VocabShapes.Tag)
+                        .background(VocabColors.AccentCoralBg, VocabShapes.Tag)
                         .padding(horizontal = 7.dp, vertical = 3.dp)
                 ) {
                     Text(
                         text = "Tự thêm",
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF5538EE)
+                        color = VocabColors.AccentCoral
                     )
                 }
             }
@@ -152,7 +157,8 @@ private fun VocabCardHeader(
 @Composable
 private fun VocabCardMainRow(
     item: VocabWordItem,
-    onSpeak: (String) -> Unit
+    onSpeak: (String) -> Unit,
+    onQuickVoiceTest: () -> Unit
 ) {
     val radicalAndStrokesText = remember(item.radical, item.strokes) {
         "${item.radical}\n${item.strokes}"
@@ -213,6 +219,14 @@ private fun VocabCardMainRow(
                         .size(16.dp)
                         .clickable { onSpeak(item.hanzi) }
                 )
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_mic),
+                    contentDescription = "Thử giọng nhanh",
+                    tint = VocabColors.BrandPrimary,
+                    modifier = Modifier
+                        .size(16.dp)
+                        .clickable(onClick = onQuickVoiceTest)
+                )
                 Text(
                     text = "(${item.partOfSpeech})",
                     fontSize = 11.sp,
@@ -262,7 +276,7 @@ private fun VocabExampleBox(
                 append(item.exampleHanzi)
             }
             append("\n")
-            withStyle(SpanStyle(color = Color(0xFF5C50F6), fontSize = 11.sp, fontWeight = FontWeight.Medium)) {
+            withStyle(SpanStyle(color = VocabColors.BrandPrimary, fontSize = 11.sp, fontWeight = FontWeight.Medium)) {
                 append(item.examplePinyin)
             }
             append("\n")

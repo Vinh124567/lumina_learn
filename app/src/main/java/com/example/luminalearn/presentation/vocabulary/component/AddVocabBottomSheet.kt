@@ -34,6 +34,7 @@ import androidx.compose.ui.window.DialogProperties
 import com.example.luminalearn.R
 import com.example.luminalearn.data.model.CreateVocabularyRequest
 import com.example.luminalearn.data.model.VocabularyDto
+import com.example.luminalearn.presentation.vocabulary.model.VocabColors
 import com.example.luminalearn.ui.theme.PlusJakartaSans
 
 @Composable
@@ -131,7 +132,7 @@ fun AddVocabBottomSheet(
                                     fontFamily = PlusJakartaSans,
                                     fontSize = 10.5.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color(0xFF4F46E5)
+                                    color = VocabColors.BrandPrimary
                                 )
                             }
 
@@ -139,7 +140,7 @@ fun AddVocabBottomSheet(
                             Box(
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(6.dp))
-                                    .background(Color(0xFFEDE9FE))
+                                    .background(VocabColors.BrandLight)
                                     .padding(horizontal = 7.dp, vertical = 3.dp)
                             ) {
                                 Text(
@@ -147,7 +148,7 @@ fun AddVocabBottomSheet(
                                     fontFamily = PlusJakartaSans,
                                     fontSize = 10.5.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color(0xFF5538EE)
+                                    color = VocabColors.BrandPrimary
                                 )
                             }
                         }
@@ -467,7 +468,7 @@ fun AddVocabBottomSheet(
                                 Icon(
                                     painter = painterResource(id = R.drawable.ic_nav_vocabulary),
                                     contentDescription = null,
-                                    tint = Color(0xFF5538EE),
+                                    tint = VocabColors.BrandPrimary,
                                     modifier = Modifier.size(15.dp)
                                 )
                                 Spacer(modifier = Modifier.width(6.dp))
@@ -515,7 +516,7 @@ fun AddVocabBottomSheet(
                             colors = OutlinedTextFieldDefaults.colors(
                                 focusedContainerColor = Color(0xFFF8FAFC),
                                 unfocusedContainerColor = Color(0xFFF8FAFC),
-                                focusedBorderColor = Color(0xFF5538EE),
+                                focusedBorderColor = VocabColors.BrandPrimary,
                                 unfocusedBorderColor = Color(0xFFE2E8F0)
                             )
                         )
@@ -606,7 +607,7 @@ fun AddVocabBottomSheet(
                                 onSubmit(request)
                             },
                         shape = RoundedCornerShape(12.dp),
-                        color = Color(0xFF5538EE)
+                        color = VocabColors.BrandPrimary
                     ) {
                         Box(
                             modifier = Modifier.fillMaxSize(),
@@ -689,7 +690,7 @@ private fun FormTextField(
         colors = OutlinedTextFieldDefaults.colors(
             focusedContainerColor = Color(0xFFF8FAFC),
             unfocusedContainerColor = Color(0xFFF8FAFC),
-            focusedBorderColor = Color(0xFF5538EE),
+            focusedBorderColor = VocabColors.BrandPrimary,
             unfocusedBorderColor = Color(0xFFE2E8F0)
         )
     )

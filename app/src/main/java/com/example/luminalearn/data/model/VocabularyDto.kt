@@ -45,7 +45,25 @@ data class VocabularyDto(
     @SerializedName("isMastered")
     val isMastered: Boolean = false,
     @SerializedName("userId")
-    val userId: Long? = null
+    val userId: Long? = null,
+    @SerializedName("srsRepetition")
+    val srsRepetition: Int = 0,
+    @SerializedName("srsIntervalDays")
+    val srsIntervalDays: Int = 0,
+    @SerializedName("srsEaseFactor")
+    val srsEaseFactor: Float = 2.5f,
+    @SerializedName("nextReviewTimeMillis")
+    val nextReviewTimeMillis: Long = 0L,
+    @SerializedName("lastReviewTimeMillis")
+    val lastReviewTimeMillis: Long = 0L
+)
+
+data class UpdateSrsRatingRequest(
+    @SerializedName("repetition") val repetition: Int,
+    @SerializedName("intervalDays") val intervalDays: Int,
+    @SerializedName("easeFactor") val easeFactor: Float,
+    @SerializedName("nextReviewTimeMillis") val nextReviewTimeMillis: Long,
+    @SerializedName("lastReviewTimeMillis") val lastReviewTimeMillis: Long
 )
 
 data class HskLevelDto(

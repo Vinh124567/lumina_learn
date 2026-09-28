@@ -45,7 +45,7 @@ fun VocabTopBar(
         Box(
             modifier = Modifier
                 .clip(CircleShape)
-                .background(Color(0xFFEDE9FE))
+                .background(VocabColors.BrandLight)
                 .padding(horizontal = 10.dp, vertical = 5.dp)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {

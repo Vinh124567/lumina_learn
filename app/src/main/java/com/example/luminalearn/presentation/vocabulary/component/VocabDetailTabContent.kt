@@ -23,6 +23,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.luminalearn.R
+import com.example.luminalearn.presentation.vocabulary.model.VocabColors
 import com.example.luminalearn.presentation.vocabulary.model.VocabWordItem
 
 data class CompoundWordItem(
@@ -113,7 +114,7 @@ private fun VocabMainInfoCard(
                         .height(64.dp)
                         .width(dialogBoxWidth)
                         .clip(RoundedCornerShape(16.dp))
-                        .background(Color(0xFF5538EE))
+                        .background(VocabColors.BrandPrimary)
                         .padding(horizontal = 4.dp),
                     contentAlignment = Alignment.Center
                 ) {
@@ -140,7 +141,7 @@ private fun VocabMainInfoCard(
                             text = word.pinyin,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.ExtraBold,
-                            color = Color(0xFF4338CA)
+                            color = VocabColors.BrandDark
                         )
 
                         Box(
@@ -207,7 +208,7 @@ private fun VocabMainInfoCard(
                 MetricSmallCard(
                     label = "Mục tiêu",
                     value = word.hskLevel,
-                    valueColor = Color(0xFF5C50F6),
+                    valueColor = VocabColors.BrandPrimary,
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -227,7 +228,7 @@ private fun VocabMainInfoCard(
                         .height(36.dp)
                         .clickable(onClick = onSpeak),
                     shape = RoundedCornerShape(10.dp),
-                    color = Color(0xFF5538EE)
+                    color = VocabColors.BrandPrimary
                 ) {
                     Row(
                         modifier = Modifier.fillMaxSize(),
@@ -436,7 +437,7 @@ private fun VocabExampleCard(
                     Icon(
                         painter = painterResource(id = R.drawable.ic_slides),
                         contentDescription = null,
-                        tint = Color(0xFF4F46E5),
+                        tint = VocabColors.BrandPrimary,
                         modifier = Modifier.size(13.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
@@ -460,7 +461,7 @@ private fun VocabExampleCard(
                         Icon(
                             painter = painterResource(id = R.drawable.ic_speaker),
                             contentDescription = null,
-                            tint = Color(0xFF4F46E5),
+                            tint = VocabColors.BrandPrimary,
                             modifier = Modifier.size(11.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
@@ -468,7 +469,7 @@ private fun VocabExampleCard(
                             text = "Nghe câu",
                             fontSize = 10.5.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF4F46E5)
+                            color = VocabColors.BrandPrimary
                         )
                     }
                 }
@@ -488,7 +489,7 @@ private fun VocabExampleCard(
             Text(
                 text = word.examplePinyin,
                 fontSize = 12.sp,
-                color = Color(0xFF6366F1),
+                color = VocabColors.BrandPrimary,
                 fontWeight = FontWeight.Medium
             )
 
@@ -599,7 +600,7 @@ private fun VocabCompoundsCard(
                             Text(
                                 text = item.pinyin,
                                 fontSize = 12.sp,
-                                color = Color(0xFF6366F1)
+                                color = VocabColors.BrandPrimary
                             )
                         }
                         Spacer(modifier = Modifier.height(2.dp))
@@ -622,7 +623,7 @@ private fun VocabCompoundsCard(
                         Icon(
                             painter = painterResource(id = R.drawable.ic_speaker),
                             contentDescription = "Phát âm",
-                            tint = Color(0xFF6366F1),
+                            tint = VocabColors.BrandPrimary,
                             modifier = Modifier.size(12.dp)
                         )
                     }

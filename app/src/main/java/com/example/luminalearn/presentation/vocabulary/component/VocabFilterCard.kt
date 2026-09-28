@@ -27,9 +27,16 @@ import com.example.luminalearn.presentation.vocabulary.model.VocabColors
 import com.example.luminalearn.presentation.vocabulary.model.VocabSourceFilter
 import com.example.luminalearn.ui.theme.PlusJakartaSans
 
+data class VocabFilterCounts(
+    val allCount: Int,
+    val dueTodayCount: Int,
+    val customCount: Int,
+    val masteredCount: Int
+)
+
 /**
  * Card Bộ lọc đa tầng chuyên nghiệp cho màn hình Từ vựng:
- * - Tầng 1: NGUỒN TỪ (Tất cả kho từ, Từ tôi đã thêm, Đã thuộc)
+ * - Tầng 1: NGUỒN TỪ (Tất cả kho từ, Cần ôn hôm nay, Từ tôi đã thêm, Đã thuộc)
  * - Tầng 2: CẤP ĐỘ HSK (Tất cả cấp độ, HSK 1, HSK 2...)
  * - Tầng 3: CHỦ ĐỀ TỪ VỰNG (Phân loại: Động từ, Danh từ...)
  */
@@ -37,9 +44,7 @@ import com.example.luminalearn.ui.theme.PlusJakartaSans
 fun VocabFilterCard(
     selectedSource: VocabSourceFilter,
     onSelectSource: (VocabSourceFilter) -> Unit,
-    allCount: Int,
-    customCount: Int,
-    masteredCount: Int,
+    counts: VocabFilterCounts,
     hskLevels: List<HskLevelFilter>,
     selectedHskIndex: Int,
     onSelectHskLevel: (Int, HskLevelFilter) -> Unit,
@@ -59,7 +64,7 @@ fun VocabFilterCard(
                 .fillMaxWidth()
                 .padding(vertical = 12.dp)
         ) {
-            // ── TẦNG 1: NGUỒN TỪ (Tất cả kho từ, Từ tôi đã thêm, Đã thuộc) ──
+            // ── TẦNG 1: NGUỒN TỪ (Tất cả kho từ, Cần ôn hôm nay, Từ tôi đã thêm, Đã thuộc) ──
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -98,24 +103,33 @@ fun VocabFilterCard(
                     // Chip 1: Tất cả kho từ
                     SourceChip(
                         title = "Tất cả kho từ",
-                        count = allCount,
+                        count = counts.allCount,
                         isSelected = selectedSource == VocabSourceFilter.ALL,
                         onClick = { onSelectSource(VocabSourceFilter.ALL) }
                     )
 
-                    // Chip 2: Từ tôi đã thêm (kèm icon bút ✍️)
+                    // Chip 2: Cần ôn hôm nay (SRS Due)
+                    SourceChip(
+                        title = "Cần ôn hôm nay",
+                        count = counts.dueTodayCount,
+                        drawableIconId = R.drawable.ic_clock,
+                        isSelected = selectedSource == VocabSourceFilter.DUE_TODAY,
+                        onClick = { onSelectSource(VocabSourceFilter.DUE_TODAY) }
+                    )
+
+                    // Chip 3: Từ tôi đã thêm (kèm icon bút ✍️)
                     SourceChip(
                         title = "Từ tôi đã thêm",
-                        count = customCount,
+                        count = counts.customCount,
                         icon = "✍️",
                         isSelected = selectedSource == VocabSourceFilter.CUSTOM,
                         onClick = { onSelectSource(VocabSourceFilter.CUSTOM) }
                     )
 
-                    // Chip 3: Đã thuộc (kèm icon check circle)
+                    // Chip 4: Đã thuộc (kèm icon check circle)
                     SourceChip(
                         title = "Đã thuộc",
-                        count = masteredCount,
+                        count = counts.masteredCount,
                         drawableIconId = R.drawable.ic_check_circle,
                         isSelected = selectedSource == VocabSourceFilter.MASTERED,
                         onClick = { onSelectSource(VocabSourceFilter.MASTERED) }
@@ -245,16 +259,16 @@ private fun SourceChip(
 ) {
     val chipShape = RoundedCornerShape(14.dp)
     val backgroundModifier = if (isSelected) {
-        Modifier.background(Color(0xFF5538EE), chipShape)
+        Modifier.background(VocabColors.BrandPrimary, chipShape)
     } else {
         Modifier
             .background(Color(0xFFF8FAFC), chipShape)
-            .border(1.dp, Color(0xFFE2E8F0), chipShape)
+            .border(1.dp, VocabColors.BorderLight, chipShape)
     }
 
-    val textColor = if (isSelected) Color.White else Color(0xFF334155)
-    val countBgColor = if (isSelected) Color.White.copy(alpha = 0.22f) else Color(0xFFEDE9FE)
-    val countTextColor = if (isSelected) Color.White else Color(0xFF5538EE)
+    val textColor = if (isSelected) Color.White else VocabColors.TextSecondary
+    val countBgColor = if (isSelected) Color.White.copy(alpha = 0.22f) else VocabColors.BrandLight
+    val countTextColor = if (isSelected) Color.White else VocabColors.BrandPrimary
 
     Box(
         modifier = Modifier
@@ -273,7 +287,7 @@ private fun SourceChip(
                 Icon(
                     painter = painterResource(id = drawableIconId),
                     contentDescription = null,
-                    tint = if (isSelected) Color.White else Color(0xFF64748B),
+                    tint = if (isSelected) Color.White else VocabColors.TextMuted,
                     modifier = Modifier.size(13.dp)
                 )
             }
@@ -314,12 +328,12 @@ private fun HskChip(
     val isAllLevels = level.title.contains("Tất cả")
 
     val backgroundModifier = if (isSelected) {
-        val selectedColor = if (isAllLevels) Color(0xFF0F172A) else Color(0xFF5538EE)
+        val selectedColor = if (isAllLevels) VocabColors.TextDark else VocabColors.BrandPrimary
         Modifier.background(selectedColor, chipShape)
     } else {
         Modifier
             .background(Color(0xFFF8FAFC), chipShape)
-            .border(1.dp, Color(0xFFE2E8F0), chipShape)
+            .border(1.dp, VocabColors.BorderLight, chipShape)
     }
 
     Box(
@@ -335,7 +349,7 @@ private fun HskChip(
                 fontFamily = PlusJakartaSans,
                 fontSize = 12.5.sp,
                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold,
-                color = if (isSelected) Color.White else Color(0xFF334155)
+                color = if (isSelected) Color.White else VocabColors.TextSecondary
             )
 
             level.scoreRange?.let { score ->
@@ -343,7 +357,7 @@ private fun HskChip(
                 Box(
                     modifier = Modifier
                         .background(
-                            if (isSelected) Color.White.copy(alpha = 0.22f) else Color(0xFFEEF2FF),
+                            if (isSelected) Color.White.copy(alpha = 0.22f) else VocabColors.BrandLight,
                             RoundedCornerShape(8.dp)
                         )
                         .padding(horizontal = 6.dp, vertical = 2.dp)
@@ -353,7 +367,7 @@ private fun HskChip(
                         fontFamily = PlusJakartaSans,
                         fontSize = 10.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color = if (isSelected) Color.White else Color(0xFF6366F1)
+                        color = if (isSelected) Color.White else VocabColors.BrandPrimary
                     )
                 }
             }

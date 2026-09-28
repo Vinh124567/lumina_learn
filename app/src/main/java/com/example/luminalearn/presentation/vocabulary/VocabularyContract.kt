@@ -45,6 +45,7 @@ data class VocabularyUiState(
     val isTopicsLoading: Boolean = false,
     val quizState: ReflexQuizState = ReflexQuizState(),
     val activeDetailWord: VocabWordItem? = null,
+    val activeDetailTab: Int = 0,
     val isAddVocabSheetOpen: Boolean = false,
     val isSubmittingVocab: Boolean = false,
     val isAiLookingUp: Boolean = false
@@ -68,6 +69,7 @@ data class VocabularyUiState(
                     item.matchesCategory(selectedTopic)
             val matchSource = when (selectedSource) {
                 VocabSourceFilter.ALL -> true
+                VocabSourceFilter.DUE_TODAY -> item.isDueToday
                 VocabSourceFilter.CUSTOM -> item.isCustom
                 VocabSourceFilter.MASTERED -> item.isMastered
             }
@@ -76,6 +78,9 @@ data class VocabularyUiState(
 
     val totalCount: Int
         get() = vocabList.size
+
+    val dueTodayCount: Int
+        get() = vocabList.count { it.isDueToday }
 
     val masteredCount: Int
         get() = vocabList.count { it.isMastered }
@@ -145,10 +150,11 @@ sealed interface VocabularyUiIntent : UiIntent {
     data object StartReflexQuiz : VocabularyUiIntent
     data class SelectQuizOption(val option: String) : VocabularyUiIntent
     data object RestartReflexQuiz : VocabularyUiIntent
-    data class OpenWordDetail(val word: VocabWordItem) : VocabularyUiIntent
+    data class OpenWordDetail(val word: VocabWordItem, val initialTab: Int = 0) : VocabularyUiIntent
     data object DismissWordDetail : VocabularyUiIntent
     data class SetAddVocabSheetVisible(val visible: Boolean) : VocabularyUiIntent
     data class AddNewVocabulary(val request: com.example.luminalearn.data.model.CreateVocabularyRequest, val onSuccess: () -> Unit) : VocabularyUiIntent
+    data class RateWordSrs(val wordId: String, val rating: com.example.luminalearn.presentation.vocabulary.model.SrsRating) : VocabularyUiIntent
 }
 
 /**

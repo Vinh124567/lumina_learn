@@ -1,9 +1,13 @@
 package com.example.luminalearn.presentation.vocabulary
 
+import android.content.Context
 import androidx.lifecycle.viewModelScope
 import com.example.luminalearn.core.base.BaseViewModel
+import com.example.luminalearn.data.local.SrsManager
 import com.example.luminalearn.data.remote.RetrofitClient
 import com.example.luminalearn.presentation.vocabulary.model.HskLevelFilter
+import com.example.luminalearn.presentation.vocabulary.model.SrsRating
+import com.example.luminalearn.presentation.vocabulary.model.SrsWordState
 import com.example.luminalearn.presentation.vocabulary.model.TopicItem
 import com.example.luminalearn.presentation.vocabulary.model.VocabConstants
 import com.example.luminalearn.presentation.vocabulary.model.VocabStudyMode
@@ -14,6 +18,21 @@ import kotlinx.coroutines.launch
 class VocabularyViewModel : BaseViewModel<VocabularyUiState, VocabularyUiIntent, VocabularyUiEffect>(
     VocabularyUiState()
 ) {
+
+    private var srsManager: SrsManager? = null
+
+    fun initSrs(context: Context) {
+        if (srsManager == null) {
+            srsManager = SrsManager(context.applicationContext)
+            val current = currentState.vocabList
+            if (current.isNotEmpty()) {
+                val updated = current.map { word ->
+                    word.copy(srsState = srsManager?.getSrsState(word.id) ?: word.srsState)
+                }
+                setState { copy(vocabList = updated) }
+            }
+        }
+    }
 
     init {
         processIntent(VocabularyUiIntent.LoadInitialData)
@@ -34,11 +53,17 @@ class VocabularyViewModel : BaseViewModel<VocabularyUiState, VocabularyUiIntent,
             is VocabularyUiIntent.StartReflexQuiz -> startReflexQuiz()
             is VocabularyUiIntent.RestartReflexQuiz -> startReflexQuiz()
             is VocabularyUiIntent.SelectQuizOption -> handleSelectQuizOption(intent.option)
-            is VocabularyUiIntent.OpenWordDetail -> setState { copy(activeDetailWord = intent.word) }
+            is VocabularyUiIntent.OpenWordDetail -> setState {
+                copy(
+                    activeDetailWord = intent.word,
+                    activeDetailTab = intent.initialTab
+                )
+            }
             is VocabularyUiIntent.DismissWordDetail -> setState { copy(activeDetailWord = null) }
             is VocabularyUiIntent.SetAddVocabSheetVisible -> setState { copy(isAddVocabSheetOpen = intent.visible) }
             is VocabularyUiIntent.SelectSource -> handleSelectSource(intent.source)
             is VocabularyUiIntent.AddNewVocabulary -> handleAddNewVocabulary(intent.request, intent.onSuccess)
+            is VocabularyUiIntent.RateWordSrs -> handleRateWordSrs(intent.wordId, intent.rating)
         }
     }
 
@@ -153,6 +178,55 @@ class VocabularyViewModel : BaseViewModel<VocabularyUiState, VocabularyUiIntent,
         setState { copy(currentFlashcardIndex = prevIndex, isCardFlipped = false) }
     }
 
+    private fun handleRateWordSrs(wordId: String, rating: SrsRating) {
+        val nextSrs = srsManager?.rateWord(wordId, rating)
+        val updatedList = currentState.vocabList.map { word ->
+            if (word.id == wordId && nextSrs != null) word.copy(srsState = nextSrs) else word
+        }
+        val active = currentState.activeDetailWord
+        val updatedActive = if (active != null && active.id == wordId && nextSrs != null) {
+            active.copy(srsState = nextSrs)
+        } else {
+            active
+        }
+        setState { copy(vocabList = updatedList, activeDetailWord = updatedActive) }
+
+        if (nextSrs != null) {
+            viewModelScope.launch {
+                try {
+                    val req = com.example.luminalearn.data.model.UpdateSrsRatingRequest(
+                        repetition = nextSrs.repetition,
+                        intervalDays = nextSrs.intervalDays,
+                        easeFactor = nextSrs.easeFactor,
+                        nextReviewTimeMillis = nextSrs.nextReviewTimeMillis,
+                        lastReviewTimeMillis = nextSrs.lastReviewTimeMillis
+                    )
+                    RetrofitClient.vocabularyApiService.updateSrsRating(wordId, req)
+                } catch (_: Exception) {
+                    // Local state is already persisted as fallback
+                }
+            }
+        }
+
+        advanceFlashcardAfterRating(wordId)
+    }
+
+    private fun advanceFlashcardAfterRating(targetWordId: String) {
+        val remainingList = currentState.filteredList
+        val size = remainingList.size
+        if (size == 0) {
+            setState { copy(currentFlashcardIndex = 0, isCardFlipped = false) }
+            return
+        }
+        val stillPresent = remainingList.any { it.id == targetWordId }
+        val nextIndex = if (stillPresent) {
+            (currentState.currentFlashcardIndex + 1) % size
+        } else {
+            if (currentState.currentFlashcardIndex >= size) 0 else currentState.currentFlashcardIndex
+        }
+        setState { copy(currentFlashcardIndex = nextIndex, isCardFlipped = false) }
+    }
+
     private fun fetchLevels() {
         viewModelScope.launch {
             setState { copy(isLevelsLoading = true) }
@@ -249,7 +323,15 @@ class VocabularyViewModel : BaseViewModel<VocabularyUiState, VocabularyUiIntent,
                             hskLevel = dto.hskLevel,
                             targetScore = dto.targetScore,
                             isMastered = dto.isMastered,
-                            userId = dto.userId
+                            userId = dto.userId,
+                            srsState = srsManager?.syncWithBackend(
+                                wordId = dto.id,
+                                beRep = dto.srsRepetition,
+                                beInterval = dto.srsIntervalDays,
+                                beEase = dto.srsEaseFactor,
+                                beNextReview = dto.nextReviewTimeMillis,
+                                beLastReview = dto.lastReviewTimeMillis
+                            ) ?: SrsWordState(dto.id)
                         )
                     }
                     val customCount = remoteList.count { it.isCustom }
@@ -384,7 +466,8 @@ class VocabularyViewModel : BaseViewModel<VocabularyUiState, VocabularyUiIntent,
                         hskLevel = dto.hskLevel,
                         targetScore = dto.targetScore,
                         isMastered = dto.isMastered,
-                        userId = dto.userId
+                        userId = dto.userId,
+                        srsState = srsManager?.getSrsState(dto.id) ?: SrsWordState(dto.id)
                     )
                     val updatedList = listOf(newWord) + currentState.vocabList
                     setState {
