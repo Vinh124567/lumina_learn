@@ -60,15 +60,15 @@ private fun FilterChipItem(
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val bgColor = if (isSelected) Color(0xFF5C50F6) else Color.White
-    val textColor = if (isSelected) Color.White else Color(0xFF475569)
-    val borderColor = if (isSelected) Color.Transparent else Color(0xFFE2E8F0)
+    val textColor = if (isSelected) Color.White else Color(0xFF64748B)
+    val borderColor = if (isSelected) Color.Transparent else Color(0xFFF1F5F9)
 
     Box(
         modifier = modifier
             .height(36.dp)
-            .clip(RoundedCornerShape(18.dp))
+            .clip(RoundedCornerShape(14.dp))
             .background(bgColor)
-            .border(1.dp, borderColor, RoundedCornerShape(18.dp))
+            .border(1.dp, borderColor, RoundedCornerShape(14.dp))
             .clickable(
                 interactionSource = interactionSource,
                 indication = ripple(color = if (isSelected) Color.White else Color(0xFF5C50F6)),
@@ -80,7 +80,7 @@ private fun FilterChipItem(
         Text(
             text = text,
             color = textColor,
-            fontSize = 13.sp,
+            fontSize = 12.5.sp,
             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
         )
     }

@@ -151,6 +151,23 @@ private fun DialogTopHeader(
                     color = Color(0xFF7E22CE)
                 )
             }
+
+            if (word.isCustom) {
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color(0xFFEDE9FE))
+                        .border(1.dp, Color(0xFFDDD6FE), RoundedCornerShape(8.dp))
+                        .padding(horizontal = 8.dp, vertical = 3.dp)
+                ) {
+                    Text(
+                        text = "Tự thêm",
+                        fontSize = 11.5.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF5538EE)
+                    )
+                }
+            }
         }
 
         // Nút đóng Dialog tròn

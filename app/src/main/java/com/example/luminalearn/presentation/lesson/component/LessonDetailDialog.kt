@@ -184,8 +184,12 @@ fun LessonDetailDialog(
                                                     Toast.makeText(context, "Phát âm hội thoại: $text", Toast.LENGTH_SHORT).show()
                                                 }
                                             )
-                                            3 -> LessonWritingTabContent()
-                                            4 -> LessonQuizTabContent()
+                                            3 -> LessonWritingTabContent(
+                                                vocabList = effectiveLesson.coreVocabularies
+                                            )
+                                            4 -> LessonQuizTabContent(
+                                                vocabList = effectiveLesson.coreVocabularies
+                                            )
                                         }
                                     }
                                 } else {

@@ -5,7 +5,6 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -34,6 +33,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -52,6 +53,16 @@ import com.example.luminalearn.presentation.lesson.component.ToneCardData
 import com.example.luminalearn.presentation.vocabulary.component.PaginationBar
 import kotlinx.coroutines.launch
 import java.util.Locale
+
+private data class LessonActionCallbacks(
+    val onSelectHskLevel: (String) -> Unit,
+    val onSearchQueryChange: (String) -> Unit,
+    val onSelectCategory: (String) -> Unit,
+    val onPageChange: (Int) -> Unit,
+    val onRetry: () -> Unit,
+    val onSpeak: (String) -> Unit,
+    val onStartLesson: (ChineseLessonData) -> Unit
+)
 
 private val FILTER_CATEGORIES = listOf(
     "Tất cả",
@@ -97,24 +108,26 @@ fun LessonScreen(
     ) {
         LessonMainContent(
             uiState = uiState,
-            onSelectHskLevel = lessonViewModel::selectHskLevel,
-            onSearchQueryChange = lessonViewModel::updateSearchQuery,
-            onSelectCategory = lessonViewModel::selectCategory,
-            onPageChange = lessonViewModel::changePage,
-            onRetry = lessonViewModel::loadLessons,
-            onSpeak = speakText,
-            onStartLesson = { lesson ->
-                if (lesson.slides.isNotEmpty()) {
-                    activeLesson = lesson
-                    currentSlideCard = lesson.slides.first()
-                } else {
-                    Toast.makeText(
-                        context,
-                        "Bài học \"${lesson.title}\" đang cập nhật slide tương tác",
-                        Toast.LENGTH_SHORT
-                    ).show()
+            actions = LessonActionCallbacks(
+                onSelectHskLevel = lessonViewModel::selectHskLevel,
+                onSearchQueryChange = lessonViewModel::updateSearchQuery,
+                onSelectCategory = lessonViewModel::selectCategory,
+                onPageChange = lessonViewModel::changePage,
+                onRetry = lessonViewModel::loadLessons,
+                onSpeak = speakText,
+                onStartLesson = { lesson ->
+                    if (lesson.slides.isNotEmpty()) {
+                        activeLesson = lesson
+                        currentSlideCard = lesson.slides.first()
+                    } else {
+                        Toast.makeText(
+                            context,
+                            "Bài học \"${lesson.title}\" đang cập nhật slide tương tác",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
-            }
+            )
         )
 
         // Dialog học bài tương tác khi người dùng bấm vào bài học
@@ -140,13 +153,7 @@ fun LessonScreen(
 @Composable
 private fun LessonMainContent(
     uiState: LessonUiState,
-    onSelectHskLevel: (String) -> Unit,
-    onSearchQueryChange: (String) -> Unit,
-    onSelectCategory: (String) -> Unit,
-    onPageChange: (Int) -> Unit,
-    onRetry: () -> Unit,
-    onSpeak: (String) -> Unit,
-    onStartLesson: (ChineseLessonData) -> Unit
+    actions: LessonActionCallbacks
 ) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
@@ -162,7 +169,7 @@ private fun LessonMainContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Color(0xFFF8FAFC))
-                .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp)
+                .padding(start = 12.dp, end = 12.dp, top = 16.dp, bottom = 8.dp)
         )
 
         // 2. Nội dung bên dưới được scroll
@@ -170,7 +177,7 @@ private fun LessonMainContent(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(scrollState)
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = 12.dp)
         ) {
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -178,25 +185,15 @@ private fun LessonMainContent(
             HskLevelFilterBar(
                 hskLevels = uiState.hskLevels,
                 selectedHskId = uiState.selectedHskLevel,
-                totalLessonCount = uiState.allLessons.size,
-                matchedLessonCount = uiState.filteredLessons.size,
-                onSelectHskLevel = onSelectHskLevel
+                onSelectHskLevel = actions.onSelectHskLevel
             )
 
         // Banner Tiêu chuẩn Thang điểm HSK chi tiết khi chọn 1 cấp độ (HSK 1, HSK 2, ...)
         if (uiState.selectedHskLevel != "all") {
-            val levelLessons = uiState.allLessons.filter {
-                it.level.equals(uiState.selectedHskLevel, ignoreCase = true)
-            }
-            val completed = levelLessons.count { it.isCompleted }
-            val total = levelLessons.size.coerceAtLeast(1)
-
             Spacer(modifier = Modifier.height(16.dp))
 
             HskLevelDetailBanner(
                 level = uiState.selectedHskLevel,
-                completedCount = completed,
-                totalCount = total,
                 onViewVocabClick = { level ->
                     Toast.makeText(context, "Mở danh sách từ vựng $level", Toast.LENGTH_SHORT).show()
                 }
@@ -204,11 +201,9 @@ private fun LessonMainContent(
         }
 
         Spacer(modifier = Modifier.height(18.dp))
-
-        // 3. Thanh tìm kiếm bài học
-        LessonSearchBar(
+            LessonSearchBar(
             query = uiState.searchQuery,
-            onQueryChange = onSearchQueryChange
+            onQueryChange = actions.onSearchQueryChange
         )
 
         Spacer(modifier = Modifier.height(14.dp))
@@ -217,7 +212,7 @@ private fun LessonMainContent(
         LessonFilterRow(
             filters = FILTER_CATEGORIES,
             selectedFilter = uiState.selectedCategory,
-            onFilterSelect = onSelectCategory
+            onFilterSelect = actions.onSelectCategory
         )
 
         Spacer(modifier = Modifier.height(18.dp))
@@ -240,7 +235,7 @@ private fun LessonMainContent(
                 text = "${uiState.filteredLessons.size} bài",
                 fontSize = 12.5.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF6366F1)
+                color = Color(0xFF5C50F6)
             )
         }
 
@@ -249,11 +244,11 @@ private fun LessonMainContent(
         // 5. Trạng thái tải / lỗi / Danh sách các thẻ bài học
         LessonCardsSection(
             uiState = uiState,
-            onRetry = onRetry,
-            onSpeak = onSpeak,
-            onStartLesson = onStartLesson,
+            onRetry = actions.onRetry,
+            onSpeak = actions.onSpeak,
+            onStartLesson = actions.onStartLesson,
             onPageChange = { targetPage ->
-                onPageChange(targetPage)
+                actions.onPageChange(targetPage)
                 coroutineScope.launch {
                     scrollState.animateScrollTo(0)
                 }
@@ -327,8 +322,11 @@ private fun LessonCardsSection(
             }
         }
         else -> {
-            BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
-                val isWideScreen = maxWidth >= 540.dp
+            val containerWidth = with(LocalDensity.current) {
+                LocalWindowInfo.current.containerSize.width.toDp()
+            }
+            val isWideScreen = containerWidth >= 540.dp
+            Box(modifier = Modifier.fillMaxWidth()) {
                 if (isWideScreen) {
                     val chunked = uiState.pagedLessons.chunked(2)
                     Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {

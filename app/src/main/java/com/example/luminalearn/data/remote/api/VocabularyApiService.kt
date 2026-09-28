@@ -33,4 +33,14 @@ interface VocabularyApiService {
     suspend fun toggleMastered(
         @retrofit2.http.Path("id") id: String
     ): Response<ApiResponse<VocabularyDto>>
+
+    @retrofit2.http.POST("vocabularies")
+    suspend fun createVocabulary(
+        @retrofit2.http.Body request: com.example.luminalearn.data.model.CreateVocabularyRequest
+    ): Response<ApiResponse<VocabularyDto>>
+
+    @GET("vocabularies/ai-lookup")
+    suspend fun aiLookup(
+        @Query("query") query: String
+    ): Response<ApiResponse<VocabularyDto>>
 }

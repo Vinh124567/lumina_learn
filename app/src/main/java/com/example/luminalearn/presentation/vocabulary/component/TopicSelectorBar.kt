@@ -66,7 +66,7 @@ private fun TopicHeader(count: Int) {
         )
         Spacer(modifier = Modifier.width(6.dp))
         Text(
-            text = "CHỦ ĐỀ TỪ VỰNG ($count)",
+            text = "PHÂN LOẠI TỪ VỰNG ($count)",
             fontSize = 12.sp,
             fontWeight = FontWeight.ExtraBold,
             color = Color(0xFF334155),

@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,14 +35,13 @@ fun VocabDetailCard(
     onClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    androidx.compose.material3.Surface(
+    androidx.compose.material3.Card(
         modifier = modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        shape = RoundedCornerShape(22.dp),
-        color = Color.White,
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFF1F5F9)),
-        shadowElevation = 1.5.dp
+        shape = RoundedCornerShape(20.dp),
+        colors = androidx.compose.material3.CardDefaults.cardColors(containerColor = Color.White),
+        elevation = androidx.compose.material3.CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             VocabCardHeader(item = item, onToggleMastered = onToggleMastered)
@@ -108,6 +108,21 @@ private fun VocabCardHeader(
                     color = VocabColors.TextSecondary
                 )
             }
+
+            if (item.isCustom) {
+                Box(
+                    modifier = Modifier
+                        .background(Color(0xFFEDE9FE), VocabShapes.Tag)
+                        .padding(horizontal = 7.dp, vertical = 3.dp)
+                ) {
+                    Text(
+                        text = "Tự thêm",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF5538EE)
+                    )
+                }
+            }
         }
 
         val checkboxBorder = if (item.isMastered) VocabColors.BrandPrimary else Color(0xFFCBD5E1)
@@ -163,7 +178,6 @@ private fun VocabCardMainRow(
                 .width(boxWidth)
                 .clip(VocabShapes.Hanzi)
                 .background(Color(0xFFF8FAFC), VocabShapes.Hanzi)
-                .border(1.dp, Color(0xFFEEF2F6), VocabShapes.Hanzi)
                 .clickable { onSpeak(item.hanzi) }
                 .padding(horizontal = 4.dp)
         ) {
@@ -263,7 +277,6 @@ private fun VocabExampleBox(
             .fillMaxWidth()
             .clip(RoundedCornerShape(14.dp))
             .background(Color(0xFFF8FAFC))
-            .border(1.dp, Color(0xFFF1F5F9), RoundedCornerShape(14.dp))
             .padding(12.dp)
     ) {
         Row(

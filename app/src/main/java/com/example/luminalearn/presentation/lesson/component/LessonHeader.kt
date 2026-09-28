@@ -35,7 +35,7 @@ fun LessonHeader(
         // 1. Tag pill phía trên
         Surface(
             shape = RoundedCornerShape(50.dp),
-            color = Color(0xFFF3E8FF)
+            color = Color(0xFFEDE9FE)
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -44,32 +44,40 @@ fun LessonHeader(
                 Icon(
                     painter = painterResource(id = R.drawable.ic_nav_explore),
                     contentDescription = null,
-                    tint = Color(0xFF6366F1),
+                    tint = Color(0xFF5C50F6),
                     modifier = Modifier.size(13.dp)
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
-                    text = "THƯ VIỆN BÀI HỌC & LUYỆN THI HSK",
+                    text = "LỘ TRÌNH BÀI HỌC HSK",
                     fontFamily = PlusJakartaSans,
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF6366F1),
-                    letterSpacing = 0.3.sp
+                    color = Color(0xFF5C50F6),
+                    letterSpacing = 0.4.sp
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         // 2. Main Title
         Text(
             text = stringResource(R.string.library_title),
             fontFamily = PlusJakartaSans,
-            fontSize = 21.sp,
+            fontSize = 20.sp,
             fontWeight = FontWeight.ExtraBold,
             color = Color(0xFF0F172A),
-            letterSpacing = (-0.2).sp,
-            lineHeight = 28.sp
+            letterSpacing = (-0.2).sp
+        )
+
+        Spacer(modifier = Modifier.height(2.dp))
+
+        Text(
+            text = "Khóa học tương tác & luyện phản xạ theo cấp độ",
+            fontFamily = PlusJakartaSans,
+            fontSize = 12.5.sp,
+            color = Color(0xFF64748B)
         )
     }
 }

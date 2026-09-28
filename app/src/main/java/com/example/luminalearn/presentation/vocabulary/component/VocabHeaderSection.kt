@@ -21,6 +21,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import com.example.luminalearn.R
 import com.example.luminalearn.presentation.vocabulary.model.HskLevelFilter
 import com.example.luminalearn.presentation.vocabulary.model.VocabColors
@@ -28,6 +30,7 @@ import com.example.luminalearn.presentation.vocabulary.model.VocabShapes
 
 @Composable
 fun VocabTopBar(
+    onAddVocabClick: () -> Unit,
     onAskAiClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -35,7 +38,7 @@ fun VocabTopBar(
         modifier = modifier
             .fillMaxWidth()
             .statusBarsPadding()
-            .padding(horizontal = 16.dp, vertical = 6.dp),
+            .padding(horizontal = 12.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -62,21 +65,6 @@ fun VocabTopBar(
                 )
             }
         }
-
-        Box(
-            modifier = Modifier
-                .clip(CircleShape)
-                .background(VocabColors.BrandPrimary)
-                .clickable(onClick = onAskAiClick)
-                .padding(horizontal = 12.dp, vertical = 6.dp)
-        ) {
-            Text(
-                text = "+ AI thêm từ",
-                fontSize = 11.5.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
-        }
     }
 }
 
@@ -84,9 +72,9 @@ fun VocabTopBar(
 fun VocabHeaderTitle(
     modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier.padding(top = 2.dp)) {
+    Column(modifier = modifier) {
         Text(
-            text = "Từ vựng HSK 3.0",
+            text = "Kho Từ vựng HSK",
             fontSize = 20.sp,
             fontWeight = FontWeight.ExtraBold,
             color = Color(0xFF0F172A)
@@ -95,7 +83,7 @@ fun VocabHeaderTitle(
         Spacer(modifier = Modifier.height(2.dp))
 
         Text(
-            text = "3.249 từ phân cấp • Phát âm chuẩn & Hán Việt",
+            text = "4.320 từ phân cấp • Phát âm chuẩn & Hán Việt",
             fontSize = 12.5.sp,
             color = Color(0xFF64748B)
         )

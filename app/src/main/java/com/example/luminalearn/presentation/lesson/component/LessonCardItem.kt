@@ -103,23 +103,16 @@ fun LessonCardItem(
     modifier: Modifier = Modifier,
     onSpeakClick: ((String) -> Unit)? = null
 ) {
-    Surface(
-        modifier = modifier
-            .fillMaxWidth()
-            .shadow(
-                elevation = 6.dp,
-                shape = RoundedCornerShape(20.dp),
-                spotColor = Color(0x141E293B),
-                ambientColor = Color(0x08000000)
-            ),
+    androidx.compose.material3.Card(
+        modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
-        color = Color.White,
-        border = BorderStroke(1.dp, Color(0xFFF1F5F9))
+        colors = androidx.compose.material3.CardDefaults.cardColors(containerColor = Color.White),
+        elevation = androidx.compose.material3.CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(18.dp)
         ) {
             // 1. Hàng trên cùng: Badges và Trạng thái hoàn thành / Thời lượng
             CardTopHeader(

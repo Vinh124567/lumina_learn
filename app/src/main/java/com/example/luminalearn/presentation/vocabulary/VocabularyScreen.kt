@@ -2,14 +2,17 @@ package com.example.luminalearn.presentation.vocabulary
 
 import android.speech.tts.TextToSpeech
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -22,7 +25,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -61,6 +67,7 @@ import com.example.luminalearn.presentation.vocabulary.component.VocabStudyModeT
 import com.example.luminalearn.presentation.vocabulary.component.VocabTopBar
 import com.example.luminalearn.presentation.vocabulary.model.VocabColors
 import com.example.luminalearn.presentation.vocabulary.model.VocabStudyMode
+import com.example.luminalearn.ui.theme.PlusJakartaSans
 import kotlinx.coroutines.launch
 import java.util.Locale
 
@@ -112,8 +119,11 @@ fun VocabularyScreen(
             .background(VocabColors.ScreenBg)
     ) {
         VocabTopBar(
+            onAddVocabClick = {
+                viewModel.processIntent(VocabularyUiIntent.SetAddVocabSheetVisible(true))
+            },
             onAskAiClick = {
-                Toast.makeText(context, "Mở AI tạo bộ từ vựng theo chủ đề...", Toast.LENGTH_SHORT).show()
+                viewModel.processIntent(VocabularyUiIntent.SetAddVocabSheetVisible(true))
             }
         )
 
@@ -124,14 +134,14 @@ fun VocabularyScreen(
             onSelectMode = { mode ->
                 viewModel.processIntent(VocabularyUiIntent.SelectMode(mode))
             },
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
         )
 
         LazyColumn(
             state = listState,
             contentPadding = PaddingValues(
-                start = 16.dp,
-                end = 16.dp,
+                start = 12.dp,
+                end = 12.dp,
                 top = 8.dp,
                 bottom = 110.dp
             ),
@@ -145,8 +155,15 @@ fun VocabularyScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    // 2. Card Bộ lọc: Cấp độ HSK + Chủ đề từ vựng
+                    // 2. Card Bộ lọc đa tầng: Nguồn từ + Cấp độ HSK + Chủ đề từ vựng
                     VocabFilterCard(
+                        selectedSource = uiState.selectedSource,
+                        onSelectSource = { source ->
+                            viewModel.processIntent(VocabularyUiIntent.SelectSource(source))
+                        },
+                        allCount = uiState.vocabList.size,
+                        customCount = uiState.vocabList.count { it.isCustom },
+                        masteredCount = uiState.masteredCount,
                         hskLevels = uiState.hskLevels,
                         selectedHskIndex = uiState.selectedHskIndex,
                         onSelectHskLevel = { index, _ ->
@@ -168,12 +185,18 @@ fun VocabularyScreen(
                         progressPercent = uiState.progressPercent
                     )
 
-                    // 4. Thanh Tìm kiếm từ vựng (Chỉ hiển thị khi ở chế độ Danh sách)
+                    // 4. Thanh Tìm kiếm từ vựng & Nút Thêm từ mới (Chỉ hiển thị khi ở chế độ Danh sách)
                     if (uiState.selectedMode == VocabStudyMode.LIST) {
                         VocabSearchField(
                             searchQuery = uiState.searchQuery,
                             onSearchQueryChange = { query ->
                                 viewModel.processIntent(VocabularyUiIntent.UpdateSearchQuery(query))
+                            },
+                            onAddVocabClick = {
+                                viewModel.processIntent(VocabularyUiIntent.SetAddVocabSheetVisible(true))
+                            },
+                            onAskAiClick = {
+                                viewModel.processIntent(VocabularyUiIntent.SetAddVocabSheetVisible(true))
                             }
                         )
                     }
@@ -206,54 +229,155 @@ fun VocabularyScreen(
                 }
             )
         }
+
+        if (uiState.isAddVocabSheetOpen) {
+            com.example.luminalearn.presentation.vocabulary.component.AddVocabBottomSheet(
+                isOpen = uiState.isAddVocabSheetOpen,
+                isSubmitting = uiState.isSubmittingVocab,
+                isAiLookingUp = uiState.isAiLookingUp,
+                onDismiss = {
+                    viewModel.processIntent(VocabularyUiIntent.SetAddVocabSheetVisible(false))
+                },
+                onLookupAi = { query, callback ->
+                    viewModel.lookupAi(query, callback)
+                },
+                onSubmit = { request ->
+                    viewModel.processIntent(VocabularyUiIntent.AddNewVocabulary(request) {})
+                }
+            )
+        }
     }
 }
 
 @Composable
 private fun VocabSearchField(
     searchQuery: String,
-    onSearchQueryChange: (String) -> Unit
+    onSearchQueryChange: (String) -> Unit,
+    onAddVocabClick: () -> Unit,
+    onAskAiClick: () -> Unit
 ) {
     val searchShape = RoundedCornerShape(16.dp)
     Spacer(modifier = Modifier.height(14.dp))
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(48.dp)
-            .background(Color.White, searchShape)
-            .border(1.dp, Color(0xFFF1F5F9), searchShape)
-            .padding(horizontal = 16.dp),
-        contentAlignment = Alignment.CenterStart
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_search),
-                contentDescription = "Search",
-                tint = VocabColors.BrandPrimary,
-                modifier = Modifier.size(18.dp)
-            )
-            Spacer(modifier = Modifier.width(10.dp))
-            Box(modifier = Modifier.weight(1f)) {
-                if (searchQuery.isEmpty()) {
-                    Text(
-                        text = "Tìm kiếm Hán tự, Pinyin, Hán Việt hoặc nghĩa...",
-                        fontSize = 13.sp,
-                        color = Color(0xFF94A3B8),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+        // Khung tìm kiếm từ vựng
+        androidx.compose.material3.Card(
+            modifier = Modifier
+                .weight(1f)
+                .height(44.dp),
+            shape = searchShape,
+            colors = androidx.compose.material3.CardDefaults.cardColors(containerColor = Color.White),
+            elevation = androidx.compose.material3.CardDefaults.cardElevation(defaultElevation = 2.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_search),
+                    contentDescription = "Search",
+                    tint = VocabColors.BrandPrimary,
+                    modifier = Modifier.size(17.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Box(modifier = Modifier.weight(1f)) {
+                    if (searchQuery.isEmpty()) {
+                        Text(
+                            text = "Tìm kiếm từ vựng...",
+                            fontFamily = PlusJakartaSans,
+                            fontSize = 12.sp,
+                            color = Color(0xFF94A3B8),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                    BasicTextField(
+                        value = searchQuery,
+                        onValueChange = onSearchQueryChange,
+                        textStyle = TextStyle(
+                            fontFamily = PlusJakartaSans,
+                            fontSize = 12.5.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = Color(0xFF0F172A)
+                        ),
+                        singleLine = true,
+                        cursorBrush = SolidColor(VocabColors.BrandPrimary),
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
-                BasicTextField(
-                    value = searchQuery,
-                    onValueChange = onSearchQueryChange,
-                    textStyle = TextStyle(
-                        fontSize = 13.5.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color(0xFF0F172A)
-                    ),
-                    singleLine = true,
-                    cursorBrush = SolidColor(VocabColors.BrandPrimary),
-                    modifier = Modifier.fillMaxWidth()
+            }
+        }
+
+        // Nút [✦ Tạo bộ từ AI]
+        Surface(
+            modifier = Modifier
+                .height(44.dp)
+                .clickable(onClick = onAskAiClick),
+            shape = RoundedCornerShape(16.dp),
+            color = Color.White,
+            border = BorderStroke(1.dp, Color(0xFFDDD6FE)),
+            shadowElevation = 2.dp
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .padding(horizontal = 10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_sparkle),
+                    contentDescription = null,
+                    tint = Color(0xFF5538EE),
+                    modifier = Modifier.size(13.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = "AI gợi ý",
+                    fontFamily = PlusJakartaSans,
+                    fontSize = 11.5.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF5538EE),
+                    maxLines = 1
+                )
+            }
+        }
+
+        // Nút [+ Thêm từ]
+        Surface(
+            modifier = Modifier
+                .height(44.dp)
+                .clickable(onClick = onAddVocabClick),
+            shape = RoundedCornerShape(16.dp),
+            color = Color(0xFF5538EE),
+            shadowElevation = 2.dp
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .padding(horizontal = 10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(15.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = "Thêm từ",
+                    fontFamily = PlusJakartaSans,
+                    fontSize = 11.5.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White,
+                    maxLines = 1
                 )
             }
         }

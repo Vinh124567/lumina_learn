@@ -11,15 +11,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -30,92 +27,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.luminalearn.R
 import com.example.luminalearn.ui.theme.PlusJakartaSans
-
-@Composable
-internal fun TopHeaderBar(
-    onDismiss: () -> Unit,
-    onAskAi: () -> Unit
-) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        // Drag handle bar
-        Box(
-            modifier = Modifier
-                .size(width = 38.dp, height = 4.dp)
-                .clip(CircleShape)
-                .background(Color(0xFFE2E8F0))
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            // Nút đóng X ở góc trái với vùng bấm chuẩn 40dp
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .clickable(onClick = onDismiss),
-                contentAlignment = Alignment.Center
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(32.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFFF1F5F9)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_close),
-                        contentDescription = "Đóng dialog",
-                        tint = Color(0xFF64748B),
-                        modifier = Modifier.size(14.dp)
-                    )
-                }
-            }
-
-            // Nút Hỏi Gia sư AI ở góc phải
-            Surface(
-                onClick = onAskAi,
-                shape = RoundedCornerShape(50),
-                color = Color(0xFFF8FAFC),
-                border = BorderStroke(1.dp, Color(0xFFE2E8F0))
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(5.dp),
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_ai_chat),
-                        contentDescription = null,
-                        tint = Color(0xFF4F46E5),
-                        modifier = Modifier.size(13.dp)
-                    )
-                    Text(
-                        text = "Hỏi Gia sư AI",
-                        fontFamily = PlusJakartaSans,
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 11.5.sp,
-                        color = Color(0xFF4F46E5)
-                    )
-                }
-            }
-        }
-    }
-}
 
 @Composable
 internal fun CategoryAndTopicRow(

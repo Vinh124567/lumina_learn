@@ -118,11 +118,10 @@ private fun FlashcardCardSurface(
     onSpeak: (String) -> Unit,
     onToggleMastered: (String) -> Unit
 ) {
-    Surface(
+    androidx.compose.material3.Card(
         shape = VocabShapes.BigCard,
-        color = Color.White,
-        border = BorderStroke(1.dp, VocabColors.BorderLight),
-        shadowElevation = 2.dp,
+        colors = androidx.compose.material3.CardDefaults.cardColors(containerColor = Color.White),
+        elevation = androidx.compose.material3.CardDefaults.cardElevation(defaultElevation = 2.dp),
         modifier = Modifier
             .fillMaxWidth()
             .clip(VocabShapes.BigCard)

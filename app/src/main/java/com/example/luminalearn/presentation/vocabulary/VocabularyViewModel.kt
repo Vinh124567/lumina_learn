@@ -36,6 +36,21 @@ class VocabularyViewModel : BaseViewModel<VocabularyUiState, VocabularyUiIntent,
             is VocabularyUiIntent.SelectQuizOption -> handleSelectQuizOption(intent.option)
             is VocabularyUiIntent.OpenWordDetail -> setState { copy(activeDetailWord = intent.word) }
             is VocabularyUiIntent.DismissWordDetail -> setState { copy(activeDetailWord = null) }
+            is VocabularyUiIntent.SetAddVocabSheetVisible -> setState { copy(isAddVocabSheetOpen = intent.visible) }
+            is VocabularyUiIntent.SelectSource -> handleSelectSource(intent.source)
+            is VocabularyUiIntent.AddNewVocabulary -> handleAddNewVocabulary(intent.request, intent.onSuccess)
+        }
+    }
+
+    private fun handleSelectSource(source: com.example.luminalearn.presentation.vocabulary.model.VocabSourceFilter) {
+        if (currentState.selectedSource == source) return
+        setState {
+            copy(
+                selectedSource = source,
+                currentPage = 1,
+                currentFlashcardIndex = 0,
+                isCardFlipped = false
+            )
         }
     }
 
@@ -170,7 +185,28 @@ class VocabularyViewModel : BaseViewModel<VocabularyUiState, VocabularyUiIntent,
                         TopicItem(id = dto.id, name = dto.name, icon = dto.icon, count = dto.count)
                     }
                     if (remoteTopics.isNotEmpty()) {
-                        setState { copy(topics = remoteTopics) }
+                        val customCount = currentState.vocabList.count { it.isCustom }
+                        val hasCustom = remoteTopics.any { it.id == "custom" || it.name.contains("tự thêm") }
+                        val finalTopics = if (!hasCustom) {
+                            val allIdx = remoteTopics.indexOfFirst { it.id == "all" }
+                            val customItem = TopicItem(id = "custom", name = "Từ tôi tự thêm", icon = "✍️", count = customCount)
+                            if (allIdx != -1) {
+                                remoteTopics.toMutableList().apply { add(allIdx + 1, customItem) }
+                            } else {
+                                listOf(customItem) + remoteTopics
+                            }
+                        } else {
+                            remoteTopics
+                        }
+
+                        val topicStillExists = finalTopics.any { it.name == currentState.selectedTopic }
+                        val activeTopic = if (topicStillExists) currentState.selectedTopic else finalTopics.first().name
+                        setState {
+                            copy(
+                                topics = finalTopics,
+                                selectedTopic = activeTopic
+                            )
+                        }
                     }
                 }
             } catch (e: Exception) {
@@ -185,7 +221,11 @@ class VocabularyViewModel : BaseViewModel<VocabularyUiState, VocabularyUiIntent,
         viewModelScope.launch {
             setState { copy(isLoadingVocab = true) }
             try {
-                val queryTopic = if (topicName == VocabConstants.ALL_TOPICS) null else topicName
+                val isAllTopic = topicName == VocabConstants.ALL_TOPICS ||
+                        topicName == "Tất cả chủ đề" ||
+                        topicName.equals("all", ignoreCase = true)
+                val isCustomTopic = topicName.contains("tự thêm") || topicName.contains("tôi tự thêm") || topicName.contains("từ của tôi") || topicName == "custom"
+                val queryTopic = if (isAllTopic || isCustomTopic) null else topicName
                 val queryHsk = if (hskLevel == VocabConstants.ALL_LEVELS) null else hskLevel
                 val response = RetrofitClient.vocabularyApiService.getVocabularies(
                     topic = queryTopic,
@@ -208,10 +248,19 @@ class VocabularyViewModel : BaseViewModel<VocabularyUiState, VocabularyUiIntent,
                             exampleMeaning = dto.exampleMeaning,
                             hskLevel = dto.hskLevel,
                             targetScore = dto.targetScore,
-                            isMastered = dto.isMastered
+                            isMastered = dto.isMastered,
+                            userId = dto.userId
                         )
                     }
-                    setState { copy(vocabList = remoteList) }
+                    val customCount = remoteList.count { it.isCustom }
+                    val updatedTopics = currentState.topics.map { topic ->
+                        if (topic.id == "custom" || topic.name.contains("tự thêm")) {
+                            topic.copy(count = customCount)
+                        } else {
+                            topic
+                        }
+                    }
+                    setState { copy(vocabList = remoteList, topics = updatedTopics) }
                     if (currentState.selectedMode == VocabStudyMode.REFLEX) {
                         startReflexQuiz()
                     }
@@ -305,6 +354,75 @@ class VocabularyViewModel : BaseViewModel<VocabularyUiState, VocabularyUiIntent,
                         )
                     )
                 }
+            }
+        }
+    }
+
+    private fun handleAddNewVocabulary(
+        request: com.example.luminalearn.data.model.CreateVocabularyRequest,
+        onSuccess: () -> Unit
+    ) {
+        viewModelScope.launch {
+            setState { copy(isSubmittingVocab = true) }
+            try {
+                val response = RetrofitClient.vocabularyApiService.createVocabulary(request)
+                if (response.isSuccessful && response.body()?.data != null) {
+                    val dto = response.body()!!.data!!
+                    val newWord = VocabWordItem(
+                        id = dto.id,
+                        hanzi = dto.hanzi,
+                        pinyin = dto.pinyin,
+                        hanViet = dto.hanViet,
+                        meaning = dto.meaning,
+                        partOfSpeech = dto.partOfSpeech,
+                        topic = dto.topic,
+                        radical = dto.radical,
+                        strokes = dto.strokes,
+                        exampleHanzi = dto.exampleHanzi,
+                        examplePinyin = dto.examplePinyin,
+                        exampleMeaning = dto.exampleMeaning,
+                        hskLevel = dto.hskLevel,
+                        targetScore = dto.targetScore,
+                        isMastered = dto.isMastered,
+                        userId = dto.userId
+                    )
+                    val updatedList = listOf(newWord) + currentState.vocabList
+                    setState {
+                        copy(
+                            vocabList = updatedList,
+                            isAddVocabSheetOpen = false
+                        )
+                    }
+                    setEffect(VocabularyUiEffect.ShowToast("Thêm từ '${dto.hanzi}' thành công!"))
+                    fetchTopics(currentState.selectedHskTitle)
+                    onSuccess()
+                } else {
+                    setEffect(VocabularyUiEffect.ShowToast("Không thể thêm từ: ${response.message()}"))
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                setEffect(VocabularyUiEffect.ShowToast("Lỗi kết nối máy chủ: ${e.localizedMessage}"))
+            } finally {
+                setState { copy(isSubmittingVocab = false) }
+            }
+        }
+    }
+
+    fun lookupAi(query: String, onResult: (com.example.luminalearn.data.model.VocabularyDto?) -> Unit) {
+        viewModelScope.launch {
+            setState { copy(isAiLookingUp = true) }
+            try {
+                val response = RetrofitClient.vocabularyApiService.aiLookup(query)
+                if (response.isSuccessful && response.body()?.data != null) {
+                    onResult(response.body()!!.data)
+                } else {
+                    onResult(null)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                onResult(null)
+            } finally {
+                setState { copy(isAiLookingUp = false) }
             }
         }
     }

@@ -97,10 +97,10 @@ fun VocabReflexQuizSection(
 private fun QuizEmptyView(
     onBackToList: () -> Unit
 ) {
-    Surface(
+    androidx.compose.material3.Card(
         shape = VocabShapes.BigCard,
-        color = Color.White,
-        border = BorderStroke(1.dp, VocabColors.BorderLight),
+        colors = androidx.compose.material3.CardDefaults.cardColors(containerColor = Color.White),
+        elevation = androidx.compose.material3.CardDefaults.cardElevation(defaultElevation = 2.dp),
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 20.dp)
@@ -132,11 +132,10 @@ private fun QuizFinishedView(
     onRestart: () -> Unit,
     onBackToList: () -> Unit
 ) {
-    Surface(
+    androidx.compose.material3.Card(
         shape = VocabShapes.BigCard,
-        color = Color.White,
-        border = BorderStroke(1.dp, VocabColors.BorderLight),
-        shadowElevation = 2.dp,
+        colors = androidx.compose.material3.CardDefaults.cardColors(containerColor = Color.White),
+        elevation = androidx.compose.material3.CardDefaults.cardElevation(defaultElevation = 2.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(
@@ -289,11 +288,10 @@ private fun QuizQuestionView(
     onSelectOption: (String) -> Unit,
     onSpeak: (String) -> Unit
 ) {
-    Surface(
+    androidx.compose.material3.Card(
         shape = VocabShapes.BigCard,
-        color = Color.White,
-        border = BorderStroke(1.dp, VocabColors.BorderLight),
-        shadowElevation = 2.dp,
+        colors = androidx.compose.material3.CardDefaults.cardColors(containerColor = Color.White),
+        elevation = androidx.compose.material3.CardDefaults.cardElevation(defaultElevation = 2.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(

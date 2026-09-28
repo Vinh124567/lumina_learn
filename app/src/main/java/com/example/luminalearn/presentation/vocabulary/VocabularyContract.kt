@@ -6,6 +6,7 @@ import com.example.luminalearn.core.base.UiState
 import com.example.luminalearn.presentation.vocabulary.model.HskLevelFilter
 import com.example.luminalearn.presentation.vocabulary.model.TopicItem
 import com.example.luminalearn.presentation.vocabulary.model.VocabConstants
+import com.example.luminalearn.presentation.vocabulary.model.VocabSourceFilter
 import com.example.luminalearn.presentation.vocabulary.model.VocabStudyMode
 import com.example.luminalearn.presentation.vocabulary.model.VocabWordItem
 
@@ -17,11 +18,18 @@ private const val PAGE_SIZE = 15
 data class VocabularyUiState(
     val hskLevels: List<HskLevelFilter> = listOf(HskLevelFilter(VocabConstants.ALL_LEVELS)),
     val selectedHskIndex: Int = 0,
+    val selectedSource: VocabSourceFilter = VocabSourceFilter.ALL,
     val topics: List<TopicItem> = listOf(
         TopicItem(
             id = VocabConstants.TOPIC_ALL_ID,
             name = VocabConstants.ALL_TOPICS,
             icon = "🌐",
+            count = 0
+        ),
+        TopicItem(
+            id = "custom",
+            name = "Từ tôi tự thêm",
+            icon = "✍️",
             count = 0
         )
     ),
@@ -36,7 +44,10 @@ data class VocabularyUiState(
     val isLevelsLoading: Boolean = false,
     val isTopicsLoading: Boolean = false,
     val quizState: ReflexQuizState = ReflexQuizState(),
-    val activeDetailWord: VocabWordItem? = null
+    val activeDetailWord: VocabWordItem? = null,
+    val isAddVocabSheetOpen: Boolean = false,
+    val isSubmittingVocab: Boolean = false,
+    val isAiLookingUp: Boolean = false
 ) : UiState {
 
     val selectedHskTitle: String?
@@ -51,8 +62,16 @@ data class VocabularyUiState(
                     item.pinyin.contains(searchQuery, ignoreCase = true) ||
                     item.hanViet.contains(searchQuery, ignoreCase = true) ||
                     item.meaning.contains(searchQuery, ignoreCase = true)
-            val matchTopic = selectedTopic == VocabConstants.ALL_TOPICS || item.topic == selectedTopic
-            matchQuery && matchTopic
+            val matchTopic = selectedTopic == VocabConstants.ALL_TOPICS ||
+                    selectedTopic == "Tất cả chủ đề" ||
+                    selectedTopic.equals("all", ignoreCase = true) ||
+                    item.matchesCategory(selectedTopic)
+            val matchSource = when (selectedSource) {
+                VocabSourceFilter.ALL -> true
+                VocabSourceFilter.CUSTOM -> item.isCustom
+                VocabSourceFilter.MASTERED -> item.isMastered
+            }
+            matchQuery && matchTopic && matchSource
         }
 
     val totalCount: Int
@@ -113,6 +132,7 @@ data class ReflexQuizState(
  */
 sealed interface VocabularyUiIntent : UiIntent {
     data object LoadInitialData : VocabularyUiIntent
+    data class SelectSource(val source: VocabSourceFilter) : VocabularyUiIntent
     data class SelectHskLevel(val index: Int) : VocabularyUiIntent
     data class SelectTopic(val topicName: String) : VocabularyUiIntent
     data class SelectMode(val mode: VocabStudyMode) : VocabularyUiIntent
@@ -127,6 +147,8 @@ sealed interface VocabularyUiIntent : UiIntent {
     data object RestartReflexQuiz : VocabularyUiIntent
     data class OpenWordDetail(val word: VocabWordItem) : VocabularyUiIntent
     data object DismissWordDetail : VocabularyUiIntent
+    data class SetAddVocabSheetVisible(val visible: Boolean) : VocabularyUiIntent
+    data class AddNewVocabulary(val request: com.example.luminalearn.data.model.CreateVocabularyRequest, val onSuccess: () -> Unit) : VocabularyUiIntent
 }
 
 /**

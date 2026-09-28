@@ -71,12 +71,11 @@ fun VocabProgressBar(
     progressPercent: Int,
     modifier: Modifier = Modifier
 ) {
-    androidx.compose.material3.Surface(
+    androidx.compose.material3.Card(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(22.dp),
-        color = Color.White,
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFF1F5F9)),
-        shadowElevation = 1.5.dp
+        shape = RoundedCornerShape(20.dp),
+        colors = androidx.compose.material3.CardDefaults.cardColors(containerColor = Color.White),
+        elevation = androidx.compose.material3.CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
             modifier = Modifier
