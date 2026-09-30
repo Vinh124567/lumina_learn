@@ -1,6 +1,7 @@
 package com.example.luminalearn.presentation.spark_ai_lab.component
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -23,13 +25,19 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.luminalearn.R
+import com.example.luminalearn.core.ui.component.DuoButton
+import com.example.luminalearn.core.ui.effect.CosmicStarfield
+import com.example.luminalearn.core.ui.effect.bounceClick
 
 data class RoleplayScenarioData(
     val id: String,
@@ -107,21 +115,61 @@ fun RoleplayScenarioCard(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(18.dp),
+        shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = BorderStroke(1.dp, CardBorderColor),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        border = BorderStroke(0.5.dp, Color(0xFFDDE3EC)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .background(
+                    Brush.linearGradient(
+                        colors = listOf(
+                            Color.White,
+                            Color.White,
+                            Color(0xFFFAF9FF)
+                        )
+                    )
+                )
         ) {
-            ScenarioHeader(scenario = scenario)
-            Spacer(modifier = Modifier.height(10.dp))
-            ScenarioContent(scenario = scenario)
-            Spacer(modifier = Modifier.height(14.dp))
-            ScenarioFooter(scenario = scenario, onStartClick = onStartClick)
+            Canvas(modifier = Modifier.matchParentSize()) {
+                drawCircle(
+                    brush = Brush.radialGradient(
+                        colors = listOf(Color(0xFF5C50F6).copy(alpha = 0.045f), Color.Transparent),
+                        center = Offset(size.width, 0f),
+                        radius = size.width * 0.55f
+                    )
+                )
+            }
+
+            CosmicStarfield(
+                modifier = Modifier.matchParentSize(),
+                particleCount = 28,
+                focusCenterXRatio = 0.88f,
+                focusCenterYRatio = 0.35f
+            )
+
+            Text(
+                text = scenario.iconEmoji,
+                fontSize = 70.sp,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .offset(x = 8.dp, y = 10.dp)
+                    .alpha(0.11f)
+            )
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                ScenarioHeader(scenario = scenario)
+                Spacer(modifier = Modifier.height(10.dp))
+                ScenarioContent(scenario = scenario)
+                Spacer(modifier = Modifier.height(14.dp))
+                ScenarioFooter(scenario = scenario, onStartClick = onStartClick)
+            }
         }
     }
 }
@@ -241,10 +289,12 @@ private fun ScenarioFooter(
             )
         }
 
-        Surface(
-            shape = CircleShape,
-            color = PrimaryIndigo,
-            modifier = Modifier.clickable(onClick = onStartClick)
+        DuoButton(
+            onClick = onStartClick,
+            backgroundColor = PrimaryIndigo,
+            shadowColor = Color(0xFF312E81),
+            shape = RoundedCornerShape(50.dp),
+            depth = 3.dp
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,

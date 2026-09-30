@@ -44,6 +44,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
@@ -66,8 +67,7 @@ import com.example.luminalearn.presentation.vocabulary.component.VocabDetailDial
 import com.example.luminalearn.presentation.vocabulary.component.VocabFilterCard
 import com.example.luminalearn.presentation.vocabulary.component.VocabFilterCounts
 import com.example.luminalearn.presentation.vocabulary.component.VocabHeaderSection
-import com.example.luminalearn.presentation.vocabulary.component.VocabHeaderTitle
-import com.example.luminalearn.presentation.vocabulary.component.VocabProgressBar
+import com.example.luminalearn.presentation.vocabulary.component.VocabHeroBanner
 import com.example.luminalearn.presentation.vocabulary.component.VocabReflexQuizSection
 import com.example.luminalearn.presentation.vocabulary.component.VocabStudyModeTabs
 import com.example.luminalearn.presentation.vocabulary.component.VocabTopBar
@@ -123,7 +123,7 @@ fun VocabularyScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(VocabColors.ScreenBg)
+            .background(Color(0xFFF6F8FB))
     ) {
         VocabTopBar(
             onAddVocabClick = {
@@ -173,10 +173,14 @@ fun VocabularyScreen(
             ) {
                 item(key = "vocab_header", contentType = "header") {
                     Column {
-                        // 1. Tiêu đề màn hình
-                        VocabHeaderTitle()
+                        // 1. Hero Banner với dải màu Midnight chuyển động & tích hợp tiến độ SRS
+                        VocabHeroBanner(
+                            masteredCount = uiState.masteredCount,
+                            totalCount = uiState.totalCount,
+                            progressPercent = uiState.progressPercent
+                        )
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(14.dp))
 
                         // 2. Card Bộ lọc đa tầng: Nguồn từ + Cấp độ HSK + Chủ đề từ vựng
                         VocabFilterCard(
@@ -203,13 +207,6 @@ fun VocabularyScreen(
                         )
 
                         Spacer(modifier = Modifier.height(14.dp))
-
-                        // 3. Thanh Tiến độ học
-                        VocabProgressBar(
-                            masteredCount = uiState.masteredCount,
-                            totalCount = uiState.totalCount,
-                            progressPercent = uiState.progressPercent
-                        )
 
                         // 4. Thanh Tìm kiếm từ vựng & Nút Thêm từ mới (Chỉ hiển thị khi ở chế độ Danh sách)
                         if (uiState.selectedMode == VocabStudyMode.LIST) {

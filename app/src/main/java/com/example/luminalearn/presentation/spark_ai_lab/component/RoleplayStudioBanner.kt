@@ -30,6 +30,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+import com.example.luminalearn.core.ui.effect.CosmicStarfield
+import com.example.luminalearn.core.ui.effect.VoiceWaveformVisualizer
+import com.example.luminalearn.core.ui.effect.animatedMidnightGradient
+
 private val BannerGradient = Brush.linearGradient(
     colors = listOf(
         Color(0xFF14123E),
@@ -56,19 +60,32 @@ fun RoleplayStudioBanner(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+        border = BorderStroke(1.dp, Color(0xFF5C50F6).copy(alpha = 0.35f)),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(BannerGradient)
-                .padding(horizontal = 18.dp, vertical = 15.dp)
+                .animatedMidnightGradient()
         ) {
-            BannerHeaderBadges()
-            Spacer(modifier = Modifier.height(10.dp))
-            BannerTitleAndDescription()
-            Spacer(modifier = Modifier.height(12.dp))
-            BannerMiniChips()
+            CosmicStarfield(
+                modifier = Modifier.matchParentSize(),
+                particleCount = 45,
+                focusCenterXRatio = 0.85f,
+                focusCenterYRatio = 0.35f
+            )
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 18.dp, vertical = 15.dp)
+            ) {
+                BannerHeaderBadges()
+                Spacer(modifier = Modifier.height(10.dp))
+                BannerTitleAndDescription()
+                Spacer(modifier = Modifier.height(12.dp))
+                BannerMiniChips()
+            }
         }
     }
 }
@@ -115,13 +132,18 @@ private fun BannerHeaderBadges() {
                 .padding(horizontal = 8.dp, vertical = 3.dp)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(
-                    modifier = Modifier
-                        .size(6.dp)
-                        .clip(CircleShape)
-                        .background(GreenDotColor)
+                VoiceWaveformVisualizer(
+                    isSpeaking = true,
+                    barCount = 4,
+                    maxHeight = 12.dp,
+                    minHeight = 4.dp,
+                    barWidth = 2.5.dp,
+                    barSpacing = 2.dp,
+                    gradient = Brush.verticalGradient(
+                        listOf(Color(0xFF22C55E), Color(0xFF6EE7B7))
+                    )
                 )
-                Spacer(modifier = Modifier.width(5.dp))
+                Spacer(modifier = Modifier.width(6.dp))
                 Text(
                     text = BADGE_VOICE,
                     color = MintTextColor,

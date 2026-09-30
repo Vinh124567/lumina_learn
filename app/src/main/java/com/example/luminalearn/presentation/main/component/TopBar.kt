@@ -1,7 +1,9 @@
 package com.example.luminalearn.presentation.main.component
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -22,10 +24,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.luminalearn.R
-
+import com.example.luminalearn.core.ui.effect.AnimatedRollingCounter
+import com.example.luminalearn.core.ui.effect.bounceClick
 
 @Composable
 fun TopBar(
@@ -44,55 +49,75 @@ fun TopBar(
             modifier = Modifier.height(34.dp),
             contentScale = ContentScale.Fit
         )
+
         Spacer(modifier = Modifier.weight(1f))
+
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            // Streak Badge
+            // Glassmorphic Streak Capsule
             Row(
                 modifier = Modifier
                     .clip(CircleShape)
-                    .background(Color(0xFFFEF3C7))
-                    .padding(horizontal = 10.dp, vertical = 6.dp),
+                    .background(Color(0xFFFEF3C7).copy(alpha = 0.9f))
+                    .border(
+                        BorderStroke(1.dp, Color(0xFFF59E0B).copy(alpha = 0.35f)),
+                        shape = CircleShape
+                    )
+                    .bounceClick(scaleDown = 0.92f)
+                    .padding(horizontal = 10.dp, vertical = 5.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_streak),
-                    contentDescription = stringResource(R.string.cd_streak),
-                    tint = Color(0xFFB45309),
+                    contentDescription = null,
+                    tint = Color(0xFFD97706),
                     modifier = Modifier.size(14.dp)
                 )
-                Text(
-                    text = stringResource(R.string.stat_days_format, streakDays),
-                    color = Color(0xFFB45309),
-                    style = MaterialTheme.typography.labelMedium.copy(
-                        fontWeight = FontWeight.Bold
+                AnimatedRollingCounter(
+                    count = streakDays,
+                    textStyle = TextStyle(
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFFB45309)
                     )
+                )
+                Text(
+                    text = "Ngày",
+                    color = Color(0xFFB45309),
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold
                 )
             }
 
-            // Points/Energy Badge
+            // Glassmorphic Points/Energy Capsule
             Row(
                 modifier = Modifier
                     .clip(CircleShape)
-                    .background(Color(0xFFEDE9FE))
-                    .padding(horizontal = 10.dp, vertical = 6.dp),
+                    .background(Color(0xFFEDE9FE).copy(alpha = 0.9f))
+                    .border(
+                        BorderStroke(1.dp, Color(0xFF818CF8).copy(alpha = 0.35f)),
+                        shape = CircleShape
+                    )
+                    .bounceClick(scaleDown = 0.92f)
+                    .padding(horizontal = 10.dp, vertical = 5.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_bolt),
-                    contentDescription = stringResource(R.string.cd_energy),
-                    tint = Color(0xFF7C3AED),
+                    contentDescription = null,
+                    tint = Color(0xFF6366F1),
                     modifier = Modifier.size(14.dp)
                 )
-                Text(
-                    text = stringResource(R.string.stat_points_format, points),
-                    color = Color(0xFF7C3AED),
-                    style = MaterialTheme.typography.labelMedium.copy(
-                        fontWeight = FontWeight.Bold
+                AnimatedRollingCounter(
+                    count = points,
+                    textStyle = TextStyle(
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF6366F1)
                     )
                 )
             }
@@ -102,7 +127,12 @@ fun TopBar(
                 modifier = Modifier
                     .size(36.dp)
                     .clip(CircleShape)
-                    .background(Color(0xFFF1F5F9)),
+                    .background(Color(0xFFF8FAFC))
+                    .border(
+                        BorderStroke(1.dp, Color(0xFFE2E8F0)),
+                        shape = CircleShape
+                    )
+                    .bounceClick(scaleDown = 0.90f),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
@@ -112,11 +142,18 @@ fun TopBar(
                     modifier = Modifier.size(16.dp)
                 )
             }
+
+            // Avatar Button
             Box(
                 modifier = Modifier
                     .size(36.dp)
                     .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primaryContainer),
+                    .background(MaterialTheme.colorScheme.primaryContainer)
+                    .border(
+                        BorderStroke(1.dp, Color(0xFF818CF8).copy(alpha = 0.3f)),
+                        shape = CircleShape
+                    )
+                    .bounceClick(scaleDown = 0.90f),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(

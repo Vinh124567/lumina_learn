@@ -27,6 +27,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.luminalearn.R
+import com.example.luminalearn.core.ui.effect.bounceClick
 
 enum class SparkAiMode(val title: String, val shortTitle: String) {
     ROLEPLAY("Hội Thoại", "Hội Thoại"),
@@ -92,7 +93,7 @@ private fun SegmentedPillItem(
                 if (isSelected) Modifier.background(ActiveGradient)
                 else Modifier.background(Color.Transparent)
             )
-            .clickable(onClick = onClick)
+            .bounceClick(scaleDown = 0.94f, onClick = onClick)
             .padding(vertical = 10.dp),
         contentAlignment = Alignment.Center
     ) {

@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.luminalearn.R
+import com.example.luminalearn.core.ui.effect.bounceClick
 import com.example.luminalearn.presentation.main.AppDestination
 
 private const val TAB_ANIM_DURATION = 280
@@ -166,9 +167,8 @@ private fun NavTabItem(
             )
             .background(color = backgroundColor, shape = CircleShape)
             .clip(CircleShape)
-            .clickable(
-                interactionSource = interactionSource,
-                indication = ripple(color = if (isSelected) Color.White else Color(0xFF5C50F6)),
+            .bounceClick(
+                scaleDown = 0.88f,
                 onClick = onClick
             ),
         contentAlignment = Alignment.Center

@@ -1,5 +1,7 @@
 package com.example.luminalearn.presentation.vocabulary.component
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -12,7 +14,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import com.example.luminalearn.core.ui.effect.CosmicStarfield
+import com.example.luminalearn.core.ui.effect.bounceClick
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -39,38 +45,82 @@ fun VocabDetailCard(
     androidx.compose.material3.Card(
         modifier = modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick),
+            .bounceClick(scaleDown = 0.98f, onClick = onClick),
         shape = RoundedCornerShape(20.dp),
         colors = androidx.compose.material3.CardDefaults.cardColors(containerColor = Color.White),
+        border = BorderStroke(0.5.dp, Color(0xFFDDE3EC)),
         elevation = androidx.compose.material3.CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            VocabCardHeader(item = item, onToggleMastered = onToggleMastered)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    Brush.linearGradient(
+                        colors = listOf(
+                            Color.White,
+                            Color.White,
+                            Color(0xFFFAF9FF)
+                        )
+                    )
+                )
+        ) {
+            Canvas(modifier = Modifier.matchParentSize()) {
+                drawCircle(
+                    brush = Brush.radialGradient(
+                        colors = listOf(Color(0xFF5C50F6).copy(alpha = 0.045f), Color.Transparent),
+                        center = Offset(size.width, 0f),
+                        radius = size.width * 0.55f
+                    )
+                )
+            }
 
-            Spacer(modifier = Modifier.height(12.dp))
-
-            VocabCardMainRow(
-                item = item,
-                onSpeak = onSpeak,
-                onQuickVoiceTest = onQuickVoiceTest
+            CosmicStarfield(
+                modifier = Modifier.matchParentSize(),
+                particleCount = 28,
+                focusCenterXRatio = 0.88f,
+                focusCenterYRatio = 0.35f
             )
-
-            Spacer(modifier = Modifier.height(10.dp))
 
             Text(
-                text = item.meaning,
-                fontSize = 14.5.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF0F172A)
+                text = item.hanzi,
+                fontSize = 80.sp,
+                fontWeight = FontWeight.Black,
+                color = Color(0xFF5C50F6).copy(alpha = 0.10f),
+                maxLines = 1,
+                softWrap = false,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .offset(x = 8.dp, y = 14.dp)
             )
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Column(modifier = Modifier.padding(16.dp)) {
+                VocabCardHeader(item = item, onToggleMastered = onToggleMastered)
 
-            VocabExampleBox(item = item, onSpeak = onSpeak)
+                Spacer(modifier = Modifier.height(12.dp))
 
-            Spacer(modifier = Modifier.height(12.dp))
+                VocabCardMainRow(
+                    item = item,
+                    onSpeak = onSpeak,
+                    onQuickVoiceTest = onQuickVoiceTest
+                )
 
-            VocabCardFooter(item = item, onToggleMastered = onToggleMastered)
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Text(
+                    text = item.meaning,
+                    fontSize = 14.5.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF0F172A)
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                VocabExampleBox(item = item, onSpeak = onSpeak)
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                VocabCardFooter(item = item, onToggleMastered = onToggleMastered)
+            }
         }
     }
 }
@@ -183,15 +233,21 @@ private fun VocabCardMainRow(
                 .height(62.dp)
                 .width(boxWidth)
                 .clip(VocabShapes.Hanzi)
-                .background(Color(0xFFF8FAFC), VocabShapes.Hanzi)
-                .clickable { onSpeak(item.hanzi) }
+                .background(
+                    Brush.linearGradient(
+                        listOf(Color(0xFFF5F3FF), Color(0xFFEEF2FF))
+                    ),
+                    VocabShapes.Hanzi
+                )
+                .border(1.dp, Color(0xFFDDD6FE), VocabShapes.Hanzi)
+                .bounceClick(scaleDown = 0.92f) { onSpeak(item.hanzi) }
                 .padding(horizontal = 4.dp)
         ) {
             Text(
                 text = item.hanzi,
                 fontSize = hanziFontSize,
                 fontWeight = FontWeight.Bold,
-                color = VocabColors.TextDark,
+                color = Color(0xFF312E81),
                 maxLines = 1,
                 softWrap = false,
                 textAlign = TextAlign.Center
@@ -209,7 +265,7 @@ private fun VocabCardMainRow(
                     text = item.pinyin,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
-                    color = VocabColors.BrandDark
+                    color = VocabColors.BrandPrimary
                 )
                 Icon(
                     painter = painterResource(id = R.drawable.ic_speaker),
@@ -217,7 +273,7 @@ private fun VocabCardMainRow(
                     tint = VocabColors.BrandPrimary,
                     modifier = Modifier
                         .size(16.dp)
-                        .clickable { onSpeak(item.hanzi) }
+                        .bounceClick(scaleDown = 0.88f) { onSpeak(item.hanzi) }
                 )
                 Icon(
                     painter = painterResource(id = R.drawable.ic_waveform),
@@ -225,7 +281,7 @@ private fun VocabCardMainRow(
                     tint = VocabColors.BrandPrimary,
                     modifier = Modifier
                         .size(16.dp)
-                        .clickable(onClick = onQuickVoiceTest)
+                        .bounceClick(scaleDown = 0.88f, onClick = onQuickVoiceTest)
                 )
                 Text(
                     text = "(${item.partOfSpeech})",
@@ -291,6 +347,7 @@ private fun VocabExampleBox(
             .fillMaxWidth()
             .clip(RoundedCornerShape(14.dp))
             .background(Color(0xFFF8FAFC))
+            .border(1.dp, Color(0xFFF1F5F9), RoundedCornerShape(14.dp))
             .padding(12.dp)
     ) {
         Row(
@@ -307,10 +364,10 @@ private fun VocabExampleBox(
             Icon(
                 painter = painterResource(id = R.drawable.ic_speaker),
                 contentDescription = "Speak example",
-                tint = Color(0xFF94A3B8),
+                tint = VocabColors.BrandPrimary,
                 modifier = Modifier
                     .size(16.dp)
-                    .clickable { onSpeak(item.exampleHanzi) }
+                    .bounceClick(scaleDown = 0.88f) { onSpeak(item.exampleHanzi) }
             )
         }
     }

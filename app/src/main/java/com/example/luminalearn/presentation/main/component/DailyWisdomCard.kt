@@ -2,7 +2,9 @@ package com.example.luminalearn.presentation.main.component
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,9 +39,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.luminalearn.R
+import com.example.luminalearn.core.ui.effect.ZenCalligraphyAura
+import com.example.luminalearn.core.ui.effect.animatedMidnightGradient
+import com.example.luminalearn.core.ui.effect.bounceClick
 import com.example.luminalearn.data.model.DailyWisdomDto
 import com.example.luminalearn.ui.theme.PlusJakartaSans
 
+private val GoldBadgeText = Color(0xFFFEF08A)
+private val MintTextColor = Color(0xFF6EE7B7)
+private val AccentBorder = Color(0xFF6366F1)
+
+/**
+ * Thẻ Danh Ngôn / Châm Ngôn Hán Ngữ thiết kế tinh gọn (Compact & Poetic).
+ * Tối ưu chiều cao vừa vặn, không bị chiếm diện tích màn hình mà vẫn đầy đủ chữ Hán, Pinyin và bản dịch.
+ */
 @Composable
 fun DailyWisdomCard(
     modifier: Modifier = Modifier,
@@ -57,181 +70,161 @@ fun DailyWisdomCard(
 
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        shape = RoundedCornerShape(18.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+        border = BorderStroke(1.dp, AccentBorder.copy(alpha = 0.35f)),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(18.dp)
-        ) {
-            WisdomHeader(
-                animatedRotation = animatedRotation,
-                onRefreshClick = {
-                    rotationAngle += 360f
-                    onRefreshClick()
-                }
-            )
-
-            Spacer(modifier = Modifier.height(14.dp))
-
-            WisdomBody(
-                wisdom = wisdom,
-                quote = quote,
-                author = author
-            )
-        }
-    }
-}
-
-@Composable
-private fun WisdomBody(
-    wisdom: DailyWisdomDto?,
-    quote: String,
-    author: String
-) {
-    if (wisdom != null && wisdom.chinese.isNotBlank()) {
-        WisdomDetailContent(wisdom)
-    } else {
-        WisdomFallbackContent(quote, author)
-    }
-}
-
-@Composable
-private fun WisdomHeader(
-    animatedRotation: Float,
-    onRefreshClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(6.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(8.dp)
-                    .clip(CircleShape)
-                    .background(Color(0xFF6366F1))
-            )
-            Text(
-                text = stringResource(R.string.daily_wisdom_label),
-                style = MaterialTheme.typography.labelSmall.copy(
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 0.5.sp
-                ),
-                color = Color(0xFF64748B)
-            )
-        }
-
-        Surface(
-            shape = CircleShape,
-            color = Color(0xFFF1F5F9),
-            modifier = Modifier
-                .size(30.dp)
-                .clip(CircleShape)
-                .clickable(onClick = onRefreshClick)
-        ) {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_refresh),
-                    contentDescription = stringResource(R.string.cd_refresh),
-                    tint = Color(0xFF4F46E5),
-                    modifier = Modifier
-                        .size(15.dp)
-                        .rotate(animatedRotation)
+                .animatedMidnightGradient(
+                    colors = listOf(
+                        Color(0xFF0B101D),
+                        Color(0xFF151C30),
+                        Color(0xFF1E2640),
+                        Color(0xFF151C30),
+                        Color(0xFF0B101D)
+                    ),
+                    durationMillis = 8000
                 )
+        ) {
+            ZenCalligraphyAura(
+                modifier = Modifier.matchParentSize(),
+                moteCount = 14
+            )
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 13.dp)
+            ) {
+                // Header Row: Badge bên trái + Tác giả & Nút đổi bên phải
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(Color.White.copy(alpha = 0.12f))
+                            .border(
+                                BorderStroke(1.dp, GoldBadgeText.copy(alpha = 0.35f)),
+                                shape = RoundedCornerShape(6.dp)
+                            )
+                            .padding(horizontal = 7.dp, vertical = 2.5.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.daily_wisdom_badge),
+                            color = GoldBadgeText,
+                            fontSize = 10.5.sp,
+                            fontWeight = FontWeight.Bold,
+                            letterSpacing = 0.3.sp
+                        )
+                    }
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        val authorName = wisdom?.author ?: author
+                        Text(
+                            text = formatAuthor(authorName),
+                            fontFamily = PlusJakartaSans,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 11.5.sp,
+                            color = GoldBadgeText
+                        )
+
+                        Surface(
+                            shape = CircleShape,
+                            color = Color.White.copy(alpha = 0.12f),
+                            modifier = Modifier
+                                .size(28.dp)
+                                .clip(CircleShape)
+                                .border(
+                                    BorderStroke(0.8.dp, Color.White.copy(alpha = 0.2f)),
+                                    shape = CircleShape
+                                )
+                                .bounceClick(scaleDown = 0.9f) {
+                                    rotationAngle += 360f
+                                    onRefreshClick()
+                                }
+                        ) {
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_refresh),
+                                    contentDescription = stringResource(R.string.cd_refresh),
+                                    tint = Color.White,
+                                    modifier = Modifier
+                                        .size(13.dp)
+                                        .rotate(animatedRotation)
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                // Content: Chữ Hán nổi bật
+                if (wisdom != null && wisdom.chinese.isNotBlank()) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = wisdom.chinese,
+                            fontFamily = PlusJakartaSans,
+                            fontWeight = FontWeight.ExtraBold,
+                            fontSize = 17.5.sp,
+                            color = Color.White
+                        )
+
+                        if (wisdom.pinyin.isNotBlank()) {
+                            Text(
+                                text = wisdom.pinyin,
+                                fontFamily = PlusJakartaSans,
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 11.5.sp,
+                                color = MintTextColor
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    val meaningText = wisdom.vietnamese.ifBlank { wisdom.meaning }
+                    if (meaningText.isNotBlank()) {
+                        Text(
+                            text = "“$meaningText”",
+                            fontFamily = PlusJakartaSans,
+                            fontWeight = FontWeight.Normal,
+                            fontSize = 12.5.sp,
+                            lineHeight = 17.sp,
+                            color = Color(0xFFE0E7FF)
+                        )
+                    }
+                } else {
+                    Text(
+                        text = quote,
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 13.5.sp,
+                            lineHeight = 19.sp
+                        ),
+                        color = Color.White
+                    )
+                }
             }
         }
     }
 }
 
-@Composable
-private fun WisdomDetailContent(wisdom: DailyWisdomDto) {
-    Text(
-        text = wisdom.chinese,
-        fontFamily = PlusJakartaSans,
-        fontWeight = FontWeight.ExtraBold,
-        fontSize = 18.sp,
-        lineHeight = 26.sp,
-        color = Color(0xFF0F172A)
-    )
-
-    if (wisdom.pinyin.isNotBlank()) {
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            text = wisdom.pinyin,
-            fontFamily = PlusJakartaSans,
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 12.5.sp,
-            color = Color(0xFF4F46E5)
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-    }
-
-    if (wisdom.vietnamese.isNotBlank()) {
-        Text(
-            text = "“${wisdom.vietnamese}”",
-            fontFamily = PlusJakartaSans,
-            fontWeight = FontWeight.Medium,
-            fontSize = 13.5.sp,
-            lineHeight = 20.sp,
-            color = Color(0xFF334155)
-        )
-    }
-
-    if (wisdom.meaning.isNotBlank()) {
-        Spacer(modifier = Modifier.height(6.dp))
-        Text(
-            text = wisdom.meaning,
-            fontFamily = PlusJakartaSans,
-            fontWeight = FontWeight.Normal,
-            fontSize = 12.sp,
-            lineHeight = 17.sp,
-            color = Color(0xFF64748B)
-        )
-    }
-
-    Spacer(modifier = Modifier.height(10.dp))
-
-    Text(
-        text = formatAuthor(wisdom.author),
-        fontFamily = PlusJakartaSans,
-        fontWeight = FontWeight.Bold,
-        fontSize = 12.5.sp,
-        color = Color(0xFF6366F1)
-    )
-}
-
 private fun formatAuthor(author: String): String =
     if (author.startsWith("—")) author else "— $author"
-
-@Composable
-private fun WisdomFallbackContent(quote: String, author: String) {
-    Text(
-        text = quote,
-        style = MaterialTheme.typography.bodyLarge.copy(
-            fontWeight = FontWeight.Bold,
-            fontSize = 15.sp,
-            lineHeight = 22.sp
-        ),
-        color = Color(0xFF0F172A)
-    )
-
-    Spacer(modifier = Modifier.height(8.dp))
-
-    Text(
-        text = author,
-        style = MaterialTheme.typography.bodySmall.copy(
-            fontSize = 13.sp
-        ),
-        color = Color(0xFF64748B)
-    )
-}

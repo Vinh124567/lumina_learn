@@ -8,10 +8,10 @@ import androidx.compose.ui.unit.dp
  * Bảng màu dùng chung cho toàn bộ module Từ vựng (tránh duplicate definitions)
  */
 object VocabColors {
-    // ── Primary Brand (Đồng bộ 100% với LuminaLearn Primary #224BDD) ──
-    val BrandPrimary  = Color(0xFF224BDD)
-    val BrandLight    = Color(0xFFEEF2FF)
-    val BrandDark     = Color(0xFF1738B5)
+    // ── Primary Brand (Đồng bộ với LuminaLearn Primary #5C50F6) ──
+    val BrandPrimary  = Color(0xFF5C50F6)
+    val BrandLight    = Color(0xFFF5F3FF)
+    val BrandDark     = Color(0xFF4338CA)
 
     // ── Neutral & Surface (Đồng bộ với Theme app) ──
     val TextDark      = Color(0xFF151A2F)

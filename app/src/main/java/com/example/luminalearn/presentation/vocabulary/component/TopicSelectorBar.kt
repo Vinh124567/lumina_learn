@@ -21,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.luminalearn.R
+import com.example.luminalearn.core.ui.effect.bounceClick
 import com.example.luminalearn.presentation.vocabulary.model.TopicItem
 import com.example.luminalearn.presentation.vocabulary.model.VocabColors
 
@@ -98,7 +99,7 @@ private fun TopicChip(
         modifier = Modifier
             .clip(chipShape)
             .then(backgroundModifier)
-            .clickable(onClick = onSelect)
+            .bounceClick(scaleDown = 0.94f, onClick = onSelect)
             .padding(horizontal = 14.dp, vertical = 8.dp)
     ) {
         Row(

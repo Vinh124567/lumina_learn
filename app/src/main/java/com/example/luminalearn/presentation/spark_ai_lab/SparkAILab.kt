@@ -18,12 +18,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
 import com.example.luminalearn.presentation.main.component.TopBar
 import com.example.luminalearn.presentation.spark_ai_lab.component.DEFAULT_SCENARIOS
+import com.example.luminalearn.presentation.spark_ai_lab.component.MicroPromptStudioBanner
+import com.example.luminalearn.presentation.spark_ai_lab.component.ReflexQuizStudioBanner
 import com.example.luminalearn.presentation.spark_ai_lab.component.RoleplayFilterAndSearchBar
 import com.example.luminalearn.presentation.spark_ai_lab.component.RoleplayPracticeDialog
 import com.example.luminalearn.presentation.spark_ai_lab.component.RoleplayScenarioCard
@@ -39,16 +43,18 @@ fun SparkAILab(
     modifier: Modifier = Modifier
 ) {
     val scrollState = rememberScrollState()
+    val coroutineScope = androidx.compose.runtime.rememberCoroutineScope()
     var selectedMode by remember { mutableStateOf(SparkAiMode.ROLEPLAY) }
     var selectedFilterId by remember { mutableStateOf("all") }
     var searchQuery by remember { mutableStateOf("") }
     var promptText by remember { mutableStateOf("") }
+    var isGenerating by remember { mutableStateOf(false) }
     var activeScenario by remember { mutableStateOf<RoleplayScenarioData?>(null) }
 
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(Color(0xFFF8FAFC))
+            .background(Color(0xFFF6F8FB))
             .statusBarsPadding()
     ) {
         TopBar(
@@ -87,11 +93,24 @@ fun SparkAILab(
                     )
                 }
                 SparkAiMode.MICRO_PROMPT -> {
-                    SparkPromptCard(
-                        prompt = promptText,
-                        onPromptChange = { promptText = it },
-                        onGenerateClick = { /* Handle generate */ }
-                    )
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(14.dp)
+                    ) {
+                        MicroPromptStudioBanner()
+                        SparkPromptCard(
+                            prompt = promptText,
+                            onPromptChange = { promptText = it },
+                            isLoading = isGenerating,
+                            onGenerateClick = {
+                                coroutineScope.launch {
+                                    isGenerating = true
+                                    kotlinx.coroutines.delay(2500)
+                                    isGenerating = false
+                                }
+                            }
+                        )
+                    }
                 }
                 SparkAiMode.REFLEX_QUIZ -> {
                     ReflexQuizSection()
@@ -162,21 +181,9 @@ private fun RoleplaySection(
 @Composable
 private fun ReflexQuizSection() {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 24.dp)
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
-        Text(
-            text = "Thử thách trắc nghiệm phản xạ tiếng Trung",
-            fontSize = 17.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFF1E293B)
-        )
-        Spacer(modifier = Modifier.height(6.dp))
-        Text(
-            text = "Luyện phản xạ nhanh trong 5 giây cho mỗi câu hỏi giao tiếp đời sống.",
-            fontSize = 13.sp,
-            color = Color(0xFF64748B)
-        )
+        ReflexQuizStudioBanner()
     }
 }

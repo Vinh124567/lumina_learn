@@ -1,6 +1,8 @@
 package com.example.luminalearn.presentation.main.component
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,22 +10,21 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -31,7 +32,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.luminalearn.R
+import com.example.luminalearn.core.ui.effect.CosmicStarfield
+import com.example.luminalearn.core.ui.effect.animatedMidnightGradient
+import com.example.luminalearn.core.ui.effect.bounceClick
 
+private val GoldBadgeText = Color(0xFFFEF08A)
+private val MintTextColor = Color(0xFF6EE7B7)
+private val AccentBorder = Color(0xFF818CF8)
+
+private val ChallengeBtnGradient = Brush.horizontalGradient(
+    listOf(Color(0xFFF59E0B), Color(0xFFEA580C))
+)
+
+/**
+ * Thẻ Thử Thách Hằng Ngày (Spark Challenge) chuẩn Midnight Cosmic Gradient đồng bộ theo VocabHeroBanner.
+ */
 @Composable
 fun SparkChallengeCard(
     modifier: Modifier = Modifier,
@@ -42,99 +57,153 @@ fun SparkChallengeCard(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF5C50F6)
-        ),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+        border = BorderStroke(1.dp, AccentBorder.copy(alpha = 0.35f)),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Box(modifier = Modifier.fillMaxWidth()) {
-            // Decorative background circle in top-right
-            Box(
-                modifier = Modifier
-                    .size(120.dp)
-                    .offset(x = 25.dp, y = (-25).dp)
-                    .align(Alignment.TopEnd)
-                    .clip(CircleShape)
-                    .background(Color.White.copy(alpha = 0.12f))
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .animatedMidnightGradient(
+                    colors = listOf(
+                        Color(0xFF0F172A),
+                        Color(0xFF1E1B4B),
+                        Color(0xFF312E81),
+                        Color(0xFF4338CA),
+                        Color(0xFF1E1B4B),
+                        Color(0xFF0F172A)
+                    ),
+                    durationMillis = 6000
+                )
+        ) {
+            CosmicStarfield(
+                modifier = Modifier.matchParentSize(),
+                particleCount = 30,
+                focusCenterXRatio = 0.85f,
+                focusCenterYRatio = 0.38f
             )
 
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(20.dp)
+                    .padding(horizontal = 18.dp, vertical = 16.dp)
             ) {
-                // Pill Badge: "★ DAILY SPARK CHALLENGE (+20 SPARKS)"
-                Box(
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .background(Color.White.copy(alpha = 0.2f))
-                        .padding(horizontal = 12.dp, vertical = 6.dp)
-                ) {
-                    Text(
-                        text = stringResource(R.string.challenge_badge_format, bonusSparks),
-                        color = Color.White,
-                        style = MaterialTheme.typography.labelSmall.copy(
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 11.sp,
-                            letterSpacing = 0.5.sp
-                        )
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(14.dp))
-
-                // Title: "The 5-Why Problem Audit"
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        fontWeight = FontWeight.ExtraBold,
-                        fontSize = 22.sp
-                    ),
-                    color = Color.White
-                )
-
-                Spacer(modifier = Modifier.height(6.dp))
-
-                // Description
-                Text(
-                    text = description,
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        fontSize = 13.sp,
-                        lineHeight = 18.sp
-                    ),
-                    color = Color.White.copy(alpha = 0.85f)
-                )
-
-                Spacer(modifier = Modifier.height(20.dp))
-
-                // Button: "🧩 Complete & Earn +20"
-                Button(
-                    onClick = onCompleteClick,
-                    shape = CircleShape,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFFBBF24)
-                    ),
-                    contentPadding = ButtonDefaults.ContentPadding
+                // Header Badges
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.padding(horizontal = 4.dp)
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_puzzle),
-                            contentDescription = stringResource(R.string.cd_puzzle),
-                            tint = Color(0xFF0F172A),
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Text(
-                            text = stringResource(R.string.btn_complete_earn_format, bonusSparks),
-                            style = MaterialTheme.typography.labelLarge.copy(
-                                fontWeight = FontWeight.Bold
-                            ),
-                            color = Color(0xFF0F172A)
-                        )
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(Color.White.copy(alpha = 0.12f))
+                                .border(
+                                    BorderStroke(1.dp, GoldBadgeText.copy(alpha = 0.35f)),
+                                    shape = RoundedCornerShape(8.dp)
+                                )
+                                .padding(horizontal = 8.dp, vertical = 3.dp)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.challenge_badge_title),
+                                color = GoldBadgeText,
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                letterSpacing = 0.4.sp
+                            )
+                        }
+
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(Color.White.copy(alpha = 0.12f))
+                                .border(
+                                    BorderStroke(1.dp, MintTextColor.copy(alpha = 0.35f)),
+                                    shape = RoundedCornerShape(8.dp)
+                                )
+                                .padding(horizontal = 8.dp, vertical = 3.dp)
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(6.dp)
+                                        .clip(CircleShape)
+                                        .background(Color(0xFF10B981))
+                                )
+                                Spacer(modifier = Modifier.width(5.dp))
+                                Text(
+                                    text = stringResource(R.string.challenge_sparks_badge, bonusSparks),
+                                    color = MintTextColor,
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                // Title
+                Text(
+                    text = title,
+                    color = Color.White,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    lineHeight = 24.sp
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                // Subtitle / Description
+                Text(
+                    text = description,
+                    color = Color(0xFFE0E7FF).copy(alpha = 0.85f),
+                    fontSize = 12.5.sp,
+                    lineHeight = 18.sp
+                )
+
+                Spacer(modifier = Modifier.height(14.dp))
+
+                // Action Button: Complete & Earn
+                Surface(
+                    shape = RoundedCornerShape(12.dp),
+                    color = Color.Transparent,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(44.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(ChallengeBtnGradient)
+                        .bounceClick(scaleDown = 0.96f) { onCompleteClick() }
+                ) {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_puzzle),
+                                contentDescription = stringResource(R.string.cd_puzzle),
+                                tint = Color.White,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Text(
+                                text = stringResource(R.string.btn_complete_challenge, bonusSparks),
+                                style = androidx.compose.material3.MaterialTheme.typography.labelLarge.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 13.5.sp
+                                ),
+                                color = Color.White
+                            )
+                        }
                     }
                 }
             }
