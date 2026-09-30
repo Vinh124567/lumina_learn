@@ -155,26 +155,41 @@ class SpeechRecognitionHelper(private val context: Context) {
                 "Tuyệt vời! Phát âm chuẩn xác 100%, chuẩn âm bản xứ ✨",
                 true
             )
-            cleanSpoken.contains(cleanTarget) || cleanTarget.contains(cleanSpoken) -> Triple(
-                90,
+            cleanSpoken.contains(cleanTarget) -> Triple(
+                92,
                 "Rất tốt! Âm điệu rất rõ ràng và chuẩn xác 👍",
                 true
             )
+            cleanTarget.contains(cleanSpoken) -> {
+                if (cleanSpoken.length >= cleanTarget.length) {
+                    Triple(90, "Rất tốt! Âm điệu rõ ràng và chuẩn xác 👍", true)
+                } else if (cleanSpoken.isNotEmpty() && cleanSpoken.length == cleanTarget.length - 1 && cleanTarget.length >= 2) {
+                    Triple(68, "Bạn đã đọc được một phần (\"$spokenText\"). Hãy cố gắng đọc đủ cả từ nhé!", true)
+                } else {
+                    Triple(48, "Chưa đủ từ cần đọc (\"$spokenText\"). Hãy nghe lại mẫu và thử đọc lại!", false)
+                }
+            }
             else -> {
                 // Tính tỷ lệ ký tự trùng khớp
                 val matchedChars = cleanTarget.count { cleanSpoken.contains(it) }
                 val ratio = if (cleanTarget.isNotEmpty()) matchedChars.toFloat() / cleanTarget.length else 0f
-                if (ratio >= 0.5f) {
-                    val calculatedScore = (60 + ratio * 30).toInt().coerceIn(60, 85)
+                if (ratio >= 0.7f) {
+                    val calculatedScore = (70 + (ratio - 0.7f) * 50).toInt().coerceIn(70, 85)
                     Triple(
                         calculatedScore,
-                        "Khá tốt! Bạn hãy chú ý thêm cao độ thanh điệu nhé.",
+                        "Khá tốt! Bạn phát âm gần chuẩn, chú ý thêm cao độ thanh điệu nhé.",
                         true
+                    )
+                } else if (ratio >= 0.4f) {
+                    Triple(
+                        52,
+                        "Chưa chính xác. Bạn đã phát âm \"$spokenText\", chưa chuẩn với \"$target\".",
+                        false
                     )
                 } else {
                     Triple(
-                        45,
-                        "Chưa nhận diện đúng chữ này. Hãy bấm nghe mẫu rồi đọc lại nhé!",
+                        35,
+                        "Phát âm chưa chuẩn. Bạn đã phát âm \"$spokenText\", khác với từ mẫu \"$target\". Hãy nghe mẫu và thử lại nhé!",
                         false
                     )
                 }

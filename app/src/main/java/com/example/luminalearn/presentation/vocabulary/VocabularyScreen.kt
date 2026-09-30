@@ -28,9 +28,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -53,6 +55,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.luminalearn.R
+import com.example.luminalearn.presentation.common.VocabCardShimmerItem
 import com.example.luminalearn.presentation.vocabulary.component.FlashcardActions
 import com.example.luminalearn.presentation.vocabulary.component.FlashcardInteractiveSection
 import com.example.luminalearn.presentation.vocabulary.component.PaginationBar
@@ -77,6 +80,7 @@ import java.util.Locale
 
 private const val PAGE_SIZE = 15
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VocabularyScreen(
     modifier: Modifier = Modifier,
@@ -140,86 +144,103 @@ fun VocabularyScreen(
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
         )
 
-        LazyColumn(
-            state = listState,
-            contentPadding = PaddingValues(
-                start = 12.dp,
-                end = 12.dp,
-                top = 8.dp,
-                bottom = 110.dp
-            ),
-            verticalArrangement = Arrangement.spacedBy(14.dp),
+        var isPullRefreshing by remember { mutableStateOf(false) }
+
+        LaunchedEffect(uiState.isLoadingVocab) {
+            if (!uiState.isLoadingVocab) {
+                isPullRefreshing = false
+            }
+        }
+
+        PullToRefreshBox(
+            isRefreshing = isPullRefreshing,
+            onRefresh = {
+                isPullRefreshing = true
+                viewModel.processIntent(VocabularyUiIntent.LoadInitialData)
+            },
             modifier = Modifier.fillMaxSize()
         ) {
-            item(key = "vocab_header", contentType = "header") {
-                Column {
-                    // 1. Tiêu đề màn hình
-                    VocabHeaderTitle()
+            LazyColumn(
+                state = listState,
+                contentPadding = PaddingValues(
+                    start = 12.dp,
+                    end = 12.dp,
+                    top = 8.dp,
+                    bottom = 110.dp
+                ),
+                verticalArrangement = Arrangement.spacedBy(14.dp),
+                modifier = Modifier.fillMaxSize()
+            ) {
+                item(key = "vocab_header", contentType = "header") {
+                    Column {
+                        // 1. Tiêu đề màn hình
+                        VocabHeaderTitle()
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
 
-                    // 2. Card Bộ lọc đa tầng: Nguồn từ + Cấp độ HSK + Chủ đề từ vựng
-                    VocabFilterCard(
-                        selectedSource = uiState.selectedSource,
-                        onSelectSource = { source ->
-                            viewModel.processIntent(VocabularyUiIntent.SelectSource(source))
-                        },
-                        counts = VocabFilterCounts(
-                            allCount = uiState.vocabList.size,
-                            dueTodayCount = uiState.dueTodayCount,
-                            customCount = uiState.vocabList.count { it.isCustom },
-                            masteredCount = uiState.masteredCount
-                        ),
-                        hskLevels = uiState.hskLevels,
-                        selectedHskIndex = uiState.selectedHskIndex,
-                        onSelectHskLevel = { index, _ ->
-                            viewModel.processIntent(VocabularyUiIntent.SelectHskLevel(index))
-                        },
-                        topicsList = uiState.topics,
-                        selectedTopic = uiState.selectedTopic,
-                        onSelectTopic = { topicName ->
-                            viewModel.processIntent(VocabularyUiIntent.SelectTopic(topicName))
-                        }
-                    )
-
-                    Spacer(modifier = Modifier.height(14.dp))
-
-                    // 3. Thanh Tiến độ học
-                    VocabProgressBar(
-                        masteredCount = uiState.masteredCount,
-                        totalCount = uiState.totalCount,
-                        progressPercent = uiState.progressPercent
-                    )
-
-                    // 4. Thanh Tìm kiếm từ vựng & Nút Thêm từ mới (Chỉ hiển thị khi ở chế độ Danh sách)
-                    if (uiState.selectedMode == VocabStudyMode.LIST) {
-                        VocabSearchField(
-                            searchQuery = uiState.searchQuery,
-                            onSearchQueryChange = { query ->
-                                viewModel.processIntent(VocabularyUiIntent.UpdateSearchQuery(query))
+                        // 2. Card Bộ lọc đa tầng: Nguồn từ + Cấp độ HSK + Chủ đề từ vựng
+                        VocabFilterCard(
+                            selectedSource = uiState.selectedSource,
+                            onSelectSource = { source ->
+                                viewModel.processIntent(VocabularyUiIntent.SelectSource(source))
                             },
-                            onAddVocabClick = {
-                                viewModel.processIntent(VocabularyUiIntent.SetAddVocabSheetVisible(true))
+                            counts = VocabFilterCounts(
+                                allCount = uiState.vocabList.size,
+                                dueTodayCount = uiState.dueTodayCount,
+                                customCount = uiState.vocabList.count { it.isCustom },
+                                masteredCount = uiState.masteredCount
+                            ),
+                            hskLevels = uiState.hskLevels,
+                            selectedHskIndex = uiState.selectedHskIndex,
+                            onSelectHskLevel = { index, _ ->
+                                viewModel.processIntent(VocabularyUiIntent.SelectHskLevel(index))
                             },
-                            onAskAiClick = {
-                                viewModel.processIntent(VocabularyUiIntent.SetAddVocabSheetVisible(true))
+                            topicsList = uiState.topics,
+                            selectedTopic = uiState.selectedTopic,
+                            onSelectTopic = { topicName ->
+                                viewModel.processIntent(VocabularyUiIntent.SelectTopic(topicName))
                             }
                         )
-                    }
-                }
-            }
 
-            vocabStudyModeContent(
-                uiState = uiState,
-                viewModel = viewModel,
-                onSpeakWord = onSpeakWord,
-                onSpeakWordSlow = onSpeakWordSlow,
-                onScrollToTop = {
-                    coroutineScope.launch {
-                        listState.animateScrollToItem(0)
+                        Spacer(modifier = Modifier.height(14.dp))
+
+                        // 3. Thanh Tiến độ học
+                        VocabProgressBar(
+                            masteredCount = uiState.masteredCount,
+                            totalCount = uiState.totalCount,
+                            progressPercent = uiState.progressPercent
+                        )
+
+                        // 4. Thanh Tìm kiếm từ vựng & Nút Thêm từ mới (Chỉ hiển thị khi ở chế độ Danh sách)
+                        if (uiState.selectedMode == VocabStudyMode.LIST) {
+                            VocabSearchField(
+                                searchQuery = uiState.searchQuery,
+                                onSearchQueryChange = { query ->
+                                    viewModel.processIntent(VocabularyUiIntent.UpdateSearchQuery(query))
+                                },
+                                onAddVocabClick = {
+                                    viewModel.processIntent(VocabularyUiIntent.SetAddVocabSheetVisible(true))
+                                },
+                                onAskAiClick = {
+                                    viewModel.processIntent(VocabularyUiIntent.SetAddVocabSheetVisible(true))
+                                }
+                            )
+                        }
                     }
                 }
-            )
+
+                vocabStudyModeContent(
+                    uiState = uiState,
+                    viewModel = viewModel,
+                    onSpeakWord = onSpeakWord,
+                    onSpeakWordSlow = onSpeakWordSlow,
+                    onScrollToTop = {
+                        coroutineScope.launch {
+                            listState.animateScrollToItem(0)
+                        }
+                    }
+                )
+            }
         }
 
         // ── Dialog Chi tiết Từ vựng khi người dùng ấn vào 1 từ ──
@@ -399,21 +420,9 @@ private fun LazyListScope.vocabStudyModeContent(
     onSpeakWordSlow: (String) -> Unit,
     onScrollToTop: () -> Unit
 ) {
-    if (uiState.isLoadingVocab) {
-        item(key = "loading_state") {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 40.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "Đang tải từ vựng...",
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = VocabColors.BrandPrimary
-                )
-            }
+    if (uiState.isLoadingVocab && uiState.vocabList.isEmpty()) {
+        items(count = 4, key = { "vocab_shimmer_$it" }) {
+            VocabCardShimmerItem()
         }
         return
     }

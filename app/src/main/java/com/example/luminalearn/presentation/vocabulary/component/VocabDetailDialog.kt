@@ -8,14 +8,30 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -91,16 +107,18 @@ fun VocabDetailDialog(
                                     val clip = ClipData.newPlainText("Chinese Word", text)
                                     clipboard.setPrimaryClip(clip)
                                     Toast.makeText(context, "Đã sao chép: $text", Toast.LENGTH_SHORT).show()
-                                }
+                                },
+                                onNavigateToPitchContour = { selectedTab = 2 }
                             )
                         }
                         1 -> {
                             VocabWritingPracticeTabContent(word = word)
                         }
                         else -> {
-                            VocabPronunciationTabContent(
+                            VocabTonePitchContourTabContent(
                                 word = word,
-                                onSpeakSample = onSpeak
+                                onSpeakSample = onSpeak,
+                                onSpeakSlow = onSpeakSlow
                             )
                         }
                     }
@@ -202,6 +220,14 @@ private fun DialogTopHeader(
     }
 }
 
+private data class DialogTabItemData(val index: Int, val title: String, val indicatorWidth: androidx.compose.ui.unit.Dp)
+
+private val DIALOG_TAB_ITEMS = listOf(
+    DialogTabItemData(0, "📖 Chi tiết", 70.dp),
+    DialogTabItemData(1, "✏️ Luyện viết", 80.dp),
+    DialogTabItemData(2, "📈 Sóng âm & Cao độ", 115.dp)
+)
+
 @Composable
 private fun DialogTabRow(
     selectedTab: Int,
@@ -210,71 +236,37 @@ private fun DialogTabRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = 14.dp)
             .horizontalScroll(rememberScrollState()),
-        horizontalArrangement = Arrangement.spacedBy(20.dp)
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Tab 0: Chi tiết Từ vựng
-        Column(
-            modifier = Modifier
-                .clickable { onSelectTab(0) }
-                .padding(vertical = 8.dp)
-        ) {
-            Text(
-                text = "📖 Chi tiết Từ vựng",
-                fontSize = 13.sp,
-                fontWeight = if (selectedTab == 0) FontWeight.Bold else FontWeight.Medium,
-                color = if (selectedTab == 0) VocabColors.BrandPrimary else Color(0xFF64748B)
-            )
-            Spacer(modifier = Modifier.height(6.dp))
-            Box(
+        DIALOG_TAB_ITEMS.forEach { item ->
+            val isSelected = selectedTab == item.index
+            Column(
                 modifier = Modifier
-                    .height(2.5.dp)
-                    .width(100.dp)
-                    .background(if (selectedTab == 0) VocabColors.BrandPrimary else Color.Transparent)
-            )
-        }
-
-        // Tab 1: Luyện viết Hán tự
-        Column(
-            modifier = Modifier
-                .clickable { onSelectTab(1) }
-                .padding(vertical = 8.dp)
-        ) {
-            Text(
-                text = "✏️ Luyện viết Hán tự",
-                fontSize = 13.sp,
-                fontWeight = if (selectedTab == 1) FontWeight.Bold else FontWeight.Medium,
-                color = if (selectedTab == 1) VocabColors.BrandPrimary else Color(0xFF64748B)
-            )
-            Spacer(modifier = Modifier.height(6.dp))
-            Box(
-                modifier = Modifier
-                    .height(2.5.dp)
-                    .width(100.dp)
-                    .background(if (selectedTab == 1) VocabColors.BrandPrimary else Color.Transparent)
-            )
-        }
-
-        // Tab 2: Chấm điểm giọng nói
-        Column(
-            modifier = Modifier
-                .clickable { onSelectTab(2) }
-                .padding(vertical = 8.dp)
-        ) {
-            Text(
-                text = "🎙️ Chấm điểm giọng nói",
-                fontSize = 13.sp,
-                fontWeight = if (selectedTab == 2) FontWeight.Bold else FontWeight.Medium,
-                color = if (selectedTab == 2) VocabColors.BrandPrimary else Color(0xFF64748B)
-            )
-            Spacer(modifier = Modifier.height(6.dp))
-            Box(
-                modifier = Modifier
-                    .height(2.5.dp)
-                    .width(120.dp)
-                    .background(if (selectedTab == 2) VocabColors.BrandPrimary else Color.Transparent)
-            )
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = { onSelectTab(item.index) }
+                    )
+                    .padding(vertical = 8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = item.title,
+                    fontSize = 13.sp,
+                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+                    color = if (isSelected) VocabColors.BrandPrimary else Color(0xFF64748B),
+                    maxLines = 1
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+                Box(
+                    modifier = Modifier
+                        .height(2.5.dp)
+                        .width(item.indicatorWidth)
+                        .background(if (isSelected) VocabColors.BrandPrimary else Color.Transparent)
+                )
+            }
         }
     }
 }
@@ -290,21 +282,21 @@ private fun DialogBottomBar(
             .fillMaxWidth()
             .background(Color.White)
             .border(1.dp, Color(0xFFF1F5F9))
-            .padding(horizontal = 16.dp, vertical = 10.dp),
+            .padding(horizontal = 14.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(10.dp)
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         // Nút Nghe lại
         Surface(
             modifier = Modifier
-                .height(44.dp)
+                .height(40.dp)
                 .clickable(onClick = onSpeak),
             shape = RoundedCornerShape(12.dp),
             color = Color(0xFFF8FAFC),
             border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFE2E8F0))
         ) {
             Row(
-                modifier = Modifier.padding(horizontal = 12.dp),
+                modifier = Modifier.padding(horizontal = 10.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
@@ -312,14 +304,15 @@ private fun DialogBottomBar(
                     painter = painterResource(id = R.drawable.ic_speaker),
                     contentDescription = null,
                     tint = VocabColors.BrandPrimary,
-                    modifier = Modifier.size(14.dp)
+                    modifier = Modifier.size(13.dp)
                 )
-                Spacer(modifier = Modifier.width(6.dp))
+                Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = "Nghe lại (${word.pinyin})",
-                    fontSize = 12.sp,
+                    fontSize = 11.5.sp,
                     fontWeight = FontWeight.Bold,
-                    color = VocabColors.BrandPrimary
+                    color = VocabColors.BrandPrimary,
+                    maxLines = 1
                 )
             }
         }
@@ -327,12 +320,12 @@ private fun DialogBottomBar(
         // Nút Thuộc từ này (+5 Tia Sáng)
         val isMastered = word.isMastered
         val btnBgColor = if (isMastered) Color(0xFF059669) else VocabColors.BrandPrimary
-        val btnText = if (isMastered) "✓ Đã thuộc từ này" else "✓ Thuộc từ này (+5 Tia Sáng)"
+        val btnText = if (isMastered) "✓ Đã thuộc" else "✓ Thuộc từ (+5)"
 
         Surface(
             modifier = Modifier
                 .weight(1f)
-                .height(44.dp)
+                .height(40.dp)
                 .clickable(onClick = onToggleMastered),
             shape = RoundedCornerShape(12.dp),
             color = btnBgColor
@@ -343,9 +336,11 @@ private fun DialogBottomBar(
             ) {
                 Text(
                     text = btnText,
-                    fontSize = 13.sp,
+                    fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = Color.White,
+                    maxLines = 1,
+                    softWrap = false
                 )
             }
         }

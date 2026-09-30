@@ -38,6 +38,7 @@ fun VocabDetailTabContent(
     onSpeak: (String) -> Unit,
     onSpeakSlow: (String) -> Unit,
     onCopy: (String) -> Unit,
+    onNavigateToPitchContour: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val scrollState = rememberScrollState()
@@ -54,7 +55,8 @@ fun VocabDetailTabContent(
             word = word,
             onSpeak = { onSpeak(word.hanzi) },
             onSpeakSlow = { onSpeakSlow(word.hanzi) },
-            onCopy = { onCopy(word.hanzi) }
+            onCopy = { onCopy(word.hanzi) },
+            onNavigateToPitchContour = onNavigateToPitchContour
         )
 
         // ── Card 2: Giải nghĩa chiết tự & Cấu tạo chữ Hán ──
@@ -84,7 +86,8 @@ private fun VocabMainInfoCard(
     word: VocabWordItem,
     onSpeak: () -> Unit,
     onSpeakSlow: () -> Unit,
-    onCopy: () -> Unit
+    onCopy: () -> Unit,
+    onNavigateToPitchContour: () -> Unit = {}
 ) {
     Box(
         modifier = Modifier
@@ -294,6 +297,39 @@ private fun VocabMainInfoCard(
                     Box(contentAlignment = Alignment.Center) {
                         Text(text = "📋", fontSize = 14.sp)
                     }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            // Nút Biểu đồ cao độ (như hình Image 2 của người dùng)
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(40.dp)
+                    .clickable(onClick = onNavigateToPitchContour),
+                shape = RoundedCornerShape(12.dp),
+                color = VocabColors.BrandLight,
+                border = androidx.compose.foundation.BorderStroke(1.2.dp, Color(0xFFDCE7FE))
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_waveform),
+                        contentDescription = null,
+                        tint = VocabColors.BrandPrimary,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = "Biểu đồ cao độ",
+                        color = VocabColors.BrandPrimary,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             }
         }

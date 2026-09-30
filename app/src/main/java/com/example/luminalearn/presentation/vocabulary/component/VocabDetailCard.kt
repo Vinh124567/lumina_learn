@@ -220,8 +220,8 @@ private fun VocabCardMainRow(
                         .clickable { onSpeak(item.hanzi) }
                 )
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_mic),
-                    contentDescription = "Thử giọng nhanh",
+                    painter = painterResource(id = R.drawable.ic_waveform),
+                    contentDescription = "Biểu đồ cao độ",
                     tint = VocabColors.BrandPrimary,
                     modifier = Modifier
                         .size(16.dp)

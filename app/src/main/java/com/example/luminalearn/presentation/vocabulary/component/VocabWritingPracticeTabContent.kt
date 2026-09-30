@@ -17,6 +17,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
@@ -166,14 +167,21 @@ fun VocabWritingPracticeTabContent(
         Box(
             modifier = Modifier
                 .size(260.dp)
-                .background(Color.White, RoundedCornerShape(16.dp))
+                .clip(RoundedCornerShape(16.dp))
+                .background(Color.White)
                 .border(2.dp, Color(0xFFEF4444), RoundedCornerShape(16.dp))
                 .padding(4.dp)
-                .border(0.8.dp, Color(0xFFEF4444).copy(alpha = 0.5f), RoundedCornerShape(12.dp)),
+                .clip(RoundedCornerShape(12.dp))
+                .border(0.8.dp, Color(0xFFEF4444).copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+                .clipToBounds(),
             contentAlignment = Alignment.Center
         ) {
             // Lớp 1: Lưới Mễ tự (米字格) nét đứt màu đỏ nhạt
-            Canvas(modifier = Modifier.fillMaxSize()) {
+            Canvas(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clipToBounds()
+            ) {
                 val dashEffect = PathEffect.dashPathEffect(floatArrayOf(6f, 6f), 0f)
                 val gridColor = Color(0xFFFCA5A5).copy(alpha = 0.7f)
 
@@ -225,6 +233,8 @@ fun VocabWritingPracticeTabContent(
             Canvas(
                 modifier = Modifier
                     .fillMaxSize()
+                    .clip(RoundedCornerShape(12.dp))
+                    .clipToBounds()
                     .pointerInput(selectedColor) {
                         detectDragGestures(
                             onDragStart = { offset ->

@@ -2,7 +2,9 @@ package com.example.luminalearn.presentation.lesson
 
 import android.speech.tts.TextToSpeech
 import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,14 +17,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,11 +40,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.luminalearn.R
+import com.example.luminalearn.presentation.common.LessonCardShimmerItem
 import com.example.luminalearn.presentation.lesson.component.ChineseLessonData
 import com.example.luminalearn.presentation.lesson.component.HskLevelDetailBanner
 import com.example.luminalearn.presentation.lesson.component.HskLevelFilterBar
@@ -150,6 +158,7 @@ fun LessonScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun LessonMainContent(
     uiState: LessonUiState,
@@ -158,27 +167,40 @@ private fun LessonMainContent(
     val context = LocalContext.current
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
+    var isPullRefreshing by remember { mutableStateOf(false) }
 
-    Column(
+    LaunchedEffect(uiState.isLoading) {
+        if (!uiState.isLoading) {
+            isPullRefreshing = false
+        }
+    }
+
+    PullToRefreshBox(
+        isRefreshing = isPullRefreshing,
+        onRefresh = {
+            isPullRefreshing = true
+            actions.onRetry()
+        },
         modifier = Modifier
             .fillMaxSize()
             .statusBarsPadding()
     ) {
-        // 1. Header: Thư viện bài học & Luyện thi HSK (Cố định, không scroll)
-        LessonHeader(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color(0xFFF8FAFC))
-                .padding(start = 12.dp, end = 12.dp, top = 16.dp, bottom = 8.dp)
-        )
+        Column(modifier = Modifier.fillMaxSize()) {
+            // 1. Header: Thư viện bài học & Luyện thi HSK (Cố định, không scroll)
+            LessonHeader(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color(0xFFF8FAFC))
+                    .padding(start = 12.dp, end = 12.dp, top = 16.dp, bottom = 8.dp)
+            )
 
-        // 2. Nội dung bên dưới được scroll
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(scrollState)
-                .padding(horizontal = 12.dp)
-        ) {
+            // 2. Nội dung bên dưới được scroll
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(scrollState)
+                    .padding(horizontal = 12.dp)
+            ) {
             Spacer(modifier = Modifier.height(8.dp))
 
             // Phân loại cấp độ & Thang điểm HSK
@@ -241,10 +263,9 @@ private fun LessonMainContent(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // 5. Trạng thái tải / lỗi / Danh sách các thẻ bài học
+        // 5. Trạng thái tải / Danh sách các thẻ bài học
         LessonCardsSection(
             uiState = uiState,
-            onRetry = actions.onRetry,
             onSpeak = actions.onSpeak,
             onStartLesson = actions.onStartLesson,
             onPageChange = { targetPage ->
@@ -260,66 +281,32 @@ private fun LessonMainContent(
     }
 }
 }
+}
 
 @Composable
 private fun LessonCardsSection(
     uiState: LessonUiState,
-    onRetry: () -> Unit,
     onSpeak: (String) -> Unit,
     onStartLesson: (ChineseLessonData) -> Unit,
     onPageChange: (Int) -> Unit
 ) {
     when {
-        uiState.isLoading -> {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(
-                    color = Color(0xFF5C50F6),
-                    modifier = Modifier.size(36.dp)
-                )
-            }
-        }
-        uiState.errorMessage != null -> {
+        uiState.isLoading && uiState.allLessons.isEmpty() -> {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 32.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                verticalArrangement = Arrangement.spacedBy(14.dp),
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Text(
-                    text = uiState.errorMessage,
-                    color = Color(0xFFEF4444),
-                    fontSize = 14.sp,
-                    textAlign = TextAlign.Center
-                )
-                Spacer(modifier = Modifier.height(12.dp))
-                Button(
-                    onClick = onRetry,
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF5C50F6)),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Text(text = "Thử lại", color = Color.White)
+                repeat(3) {
+                    LessonCardShimmerItem()
                 }
             }
         }
         uiState.filteredLessons.isEmpty() -> {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 40.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "Không tìm thấy bài học nào phù hợp.",
-                    color = Color(0xFF94A3B8),
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium
-                )
-            }
+            val isFiltering = uiState.searchQuery.isNotBlank() || uiState.selectedCategory != "Tất cả"
+            LessonEmptyState(
+                title = if (isFiltering) "Không tìm thấy bài học phù hợp" else "Chưa có bài học nào",
+                subtitle = if (isFiltering) "Thử tìm kiếm với từ khóa khác hoặc đổi bộ lọc" else "Vuốt xuống để làm mới danh sách bài học"
+            )
         }
         else -> {
             val containerWidth = with(LocalDensity.current) {
@@ -376,6 +363,49 @@ private fun LessonCardsSection(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun LessonEmptyState(
+    title: String,
+    subtitle: String
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 44.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Box(
+            modifier = Modifier
+                .size(60.dp)
+                .background(Color(0xFFEEF2FF), CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_book),
+                contentDescription = null,
+                tint = Color(0xFF6366F1),
+                modifier = Modifier.size(26.dp)
+            )
+        }
+        Spacer(modifier = Modifier.height(14.dp))
+        Text(
+            text = title,
+            fontSize = 14.5.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF334155),
+            textAlign = TextAlign.Center
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = subtitle,
+            fontSize = 12.sp,
+            color = Color(0xFF94A3B8),
+            textAlign = TextAlign.Center
+        )
     }
 }
 

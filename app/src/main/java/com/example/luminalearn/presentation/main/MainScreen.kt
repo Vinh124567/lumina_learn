@@ -46,6 +46,7 @@ import com.example.luminalearn.presentation.common.CelebrationEffect
 import com.example.luminalearn.presentation.lesson.component.LessonAction
 import com.example.luminalearn.presentation.lesson.component.LessonDetailDialog
 import com.example.luminalearn.presentation.lesson.component.ToneCardData
+import com.example.luminalearn.presentation.main.component.AiRoleplayDialogueCard
 import com.example.luminalearn.presentation.main.component.DailyGoalCard
 import com.example.luminalearn.presentation.main.component.DailyWisdomCard
 import com.example.luminalearn.presentation.main.component.GreetingHeader
@@ -116,6 +117,10 @@ fun MainScreen(
                         onClaimClick = {
                             confettiTrigger++
                         }
+                    )
+                    Spacer(modifier = Modifier.height(20.dp))
+                    AiRoleplayDialogueCard(
+                        onStartRoleplayClick = onNavigateToSparkAi
                     )
                     Spacer(modifier = Modifier.height(20.dp))
                     SparkChallengeCard(
