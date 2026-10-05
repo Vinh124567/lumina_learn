@@ -1,0 +1,195 @@
+================================================================================
+           LUMINALEARN - CÁC PHONG CÁCH TRÌNH BÀY BỐ CỤC FLASHCARD (LAYOUT)
+================================================================================
+
+Tài liệu chi tiết về các phong cách tổ chức bố cục nội dung (Mặt trước & Mặt sau) 
+cho thẻ Flashcard SRS trong LuminaLearn.
+
+================================================================================
+PHONG CÁCH 1: MINIMALIST FOCUS (TỐI GIẢN CỰC ĐỘ - CHUẨN ANKI / PLECO)
+================================================================================
+Triết lý thiết kế:
+- Kích hoạt tối đa cơ chế "Active Recall" (truy xuất ký ức chủ động thuần khiết).
+- Tuyệt đối không để bất kỳ gợi ý nào ở mặt trước để não bộ phải làm việc thực sự.
+
+[Sơ đồ cấu trúc Mặt trước]:
+┌────────────────────────────────────────────────────────┐
+│ [HSK 3]                                            [🔊] │
+│                                                        │
+│                                                        │
+│                        你 好                           │
+│                     (Typography                        │
+│                     Cực đại 64sp)                      │
+│                                                        │
+│                                                        │
+│                  [ ↻ Chạm để lật ]                     │
+└────────────────────────────────────────────────────────┘
+
+[Sơ đồ cấu trúc Mặt sau]:
+┌────────────────────────────────────────────────────────┐
+│ 你 好                                             [🔊] │
+│ nǐ hǎo                                                 │
+│                                                        │
+│ Xin chào                                               │
+│ (Đại từ • Hán-Việt: Nhĩ Hảo)                           │
+│                                                        │
+│ ┌────────────────────────────────────────────────────┐ │
+│ │ Ví dụ: 你好，很高兴认识你！                     [🔊]│ │
+│ │ Nǐ hǎo, hěn gāoxìng rènshí nǐ!                     │ │
+│ │ Xin chào, rất vui được làm quen với bạn!           │ │
+│ └────────────────────────────────────────────────────┘ │
+└────────────────────────────────────────────────────────┘
+
+- Ưu điểm:
+  + Tốc độ học cực nhanh (1-2 giây / thẻ).
+  + Ép người học nhớ chính xác mặt chữ tượng hình mà không dựa dẫm vào Pinyin hay Hán-Việt.
+- Nhược điểm:
+  + Dễ gây nản lòng cho người mới học ở trình độ HSK 1 - HSK 2.
+- Đối tượng phù hợp nhất: Trình độ HSK 3 trở lên, người học ôn thi nước rút.
+
+
+================================================================================
+PHONG CÁCH 2: SMART SCAFFOLDING (BẮC CẦU NGỮ NGHĨA - DÀNH CHO NGƯỜI VIỆT)
+================================================================================
+Triết lý thiết kế:
+- Tận dụng vốn từ Hán-Việt khổng lồ (chiếm ~70% từ vựng tiếng Việt) làm "điểm tựa"
+  để não bộ liên tưởng và ghi nhớ dễ dàng hơn gấp 3 lần.
+
+[Sơ đồ cấu trúc Mặt trước]:
+┌────────────────────────────────────────────────────────┐
+│ [● HSK 3 • Chào hỏi]               [Vuốt 4 hướng ⊹ Lật]│
+│                                                        │
+│                      学 习   [🔊] [🎙️]                 │
+│                                                        │
+│                [ Hán-Việt: HỌC TẬP ]                   │
+│                    Bộ thủ: Bộ Tử 子                    │
+│                                                        │
+└────────────────────────────────────────────────────────┘
+
+[Sơ đồ cấu trúc Mặt sau]:
+┌────────────────────────────────────────────────────────┐
+│ xué xí                         [🔊 Nghe] [🎙️ Thử giọng] │
+│                                                        │
+│ Học tập, rèn luyện kiến thức                           │
+│ (Động từ)                                              │
+│                                                        │
+│ ┌────────────────────────────────────────────────────┐ │
+│ │ 我们每天努力学习汉语。                          [🔊]│ │
+│ │ Wǒmen měitiān nǔlì xuéxí hànyǔ.                    │ │
+│ │ Chúng tôi mỗi ngày đều nỗ lực học tiếng Trung.     │ │
+│ └────────────────────────────────────────────────────┘ │
+│                                                        │
+│ [Nghe]    [Thử giọng AI]    [Xem chi tiết]    [Chậm]   │
+└────────────────────────────────────────────────────────┘
+
+- Ưu điểm:
+  + Người học cảm thấy thân thuộc, tiếp thu cực nhanh, giảm tỷ lệ nản chí.
+  + Hiểu sâu bản chất gốc rễ của chữ Hán qua Hán-Việt và bộ thủ.
+- Nhược điểm:
+  + Một số từ vựng hiện đại có nghĩa Hán-Việt khác xa nghĩa tiếng Việt thông dụng
+    (ví dụ: 东西 = Đông Tây = Đồ đạc).
+- Đối tượng phù hợp nhất: Người Việt mới bắt đầu học tiếng Trung (HSK 1 - HSK 3).
+
+
+================================================================================
+PHONG CÁCH 3: BENTO STUDIO (PHÂN KHỐI ĐA CHIỀU - CHUẨN HIỆN ĐẠI LUMINALEARN)
+================================================================================
+Triết lý thiết kế:
+- Tổ chức thông tin theo các khối Bento nhỏ gọn gàng, có tính thứ bậc rõ ràng.
+- Tích hợp công cụ phát âm, sóng cao độ và luyện nói phản xạ ngay trên một màn hình.
+
+[Sơ đồ cấu trúc Mặt trước]:
+┌────────────────────────────────────────────────────────┐
+│ [● HSK 3] [⚡ Cần ôn tập]                [Chạm để lật ↻]│
+│ ────────────────────────────────────────────────────── │
+│                                                        │
+│                      朋 友   [🔊]                      │
+│                                                        │
+│ ┌───────────────────┐        ┌───────────────────────┐ │
+│ │ Hán-Việt: BẰNG HỮU│        │ Bộ: Nguyệt 月         │ │
+│ └───────────────────┘        └───────────────────────┘ │
+│                                                        │
+│ ────────────────── [Thanh công cụ] ─────────────────── │
+│ [ 🎙️ Thử phát âm ngay ]        [ 📖 Tra từ điển ]      │
+└────────────────────────────────────────────────────────┘
+
+[Sơ đồ cấu trúc Mặt sau]:
+┌────────────────────────────────────────────────────────┐
+│ péng you                                          [🔊] │
+│                                                        │
+│ Bạn bè, bằng hữu thân thiết                            │
+│ (Danh từ)                                              │
+│                                                        │
+│ ┌── [Ngữ cảnh hội thoại thực tế] ────────────────────┐ │
+│ │ 他是我的好朋友。                               [🔊]│ │
+│ │ Tā shì wǒ de hǎo péngyou.                          │ │
+│ │ Cậu ấy là người bạn tốt của tôi.                   │ │
+│ └────────────────────────────────────────────────────┘ │
+│                                                        │
+│ ┌── [Độ thông dụng & Từ loại] ───────────────────────┐ │
+│ │ Tần suất: Cao ★★★★★  •  Từ đối nghĩa: 敌人 (Kẻ thù) │ │
+│ └────────────────────────────────────────────────────┘ │
+└────────────────────────────────────────────────────────┘
+
+- Ưu điểm:
+  + Mang lại cảm giác ứng dụng cao cấp, thông minh, giàu tính năng.
+  + Thẩm mỹ công nghệ hiện đại, đẹp mắt và ấn tượng.
+- Nhược điểm:
+  + Mật độ thông tin cao, cần thiết kế khoảng cách đệm (spacing) thật tinh tế.
+- Đối tượng phù hợp nhất: Người dùng yêu thích giao diện đẹp, muốn học sâu và thực hành đa giác quan.
+
+
+================================================================================
+PHONG CÁCH 4: CONTEXT-FIRST (NGỮ CẢNH ĐI TRƯỚC - CHUẨN MIGAKU / REFOLD)
+================================================================================
+Triết lý thiết kế:
+- Học từ vựng luôn gắn liền với câu văn thực tế. Không học từ đơn lẻ để tránh tình
+  trạng thuộc từ nhưng không biết ghép câu giao tiếp.
+
+[Sơ đồ cấu trúc Mặt trước]:
+┌────────────────────────────────────────────────────────┐
+│ [Ngữ cảnh câu thực tế]:                                │
+│ "明天我想去【_____】买一些水果。"                     │
+│                                                        │
+│                         超 市                          │
+│                                                        │
+│ 💡 Gợi ý: Nơi bán nhiều đồ ăn, hàng hóa gia đình...    │
+└────────────────────────────────────────────────────────┘
+
+[Sơ đồ cấu trúc Mặt sau]:
+┌────────────────────────────────────────────────────────┐
+│ 超 市  (chāo shì)                                 [🔊] │
+│ Nghĩa: Siêu thị (Danh từ • Hán-Việt: Siêu thị)         │
+│                                                        │
+│ [Dịch câu hoàn chỉnh]:                                 │
+│ "Ngày mai tôi muốn đi siêu thị mua một ít hoa quả."    │
+│                                                        │
+│ [Điểm ngữ pháp trong câu]:                             │
+│ • 想 (xiǎng): Muốn, dự định                            │
+│ • 一些 (yīxiē): Một vài, một ít                        │
+└────────────────────────────────────────────────────────┘
+
+- Ưu điểm:
+  + Tạo phản xạ ghép câu và tư duy ngôn ngữ tự nhiên như người bản xứ.
+  + Luyện đọc hiểu song song với học từ vựng.
+- Nhược điểm:
+  + Người mới học sẽ mất nhiều thời gian đọc từng câu.
+- Đối tượng phù hợp nhất: Trình độ Trung cấp đến Cao cấp (HSK 4 - HSK 6).
+
+
+================================================================================
+BẢNG TỔNG KẾT & KHUYẾN NGHỊ:
+================================================================================
+| Phong cách            | Mức độ ghi nhớ | Tính thân thiện | Tốc độ lướt thẻ |
+|-----------------------|----------------|-----------------|-----------------|
+| 1. Minimalist Focus   | ★★★★★ (Tối đa) | ★★☆☆☆ (Khá khó) | Rất nhanh (2s)  |
+| 2. Smart Scaffolding  | ★★★★☆ (Rất tốt)| ★★★★★ (Cực tốt) | Nhanh (3-5s)    |
+| 3. Bento Studio       | ★★★★☆ (Toàn diện)★★★★☆ (Hiện đại)| Vừa phải (5-8s) |
+| 4. Context-First      | ★★★★★ (Thực tế)| ★★★☆☆ (Cần đọc) | Chậm (10-15s)   |
+
+👉 GỢI Ý KẾT HỢP HOÀN HẢO CHO LUMINALEARN:
+   Kết hợp "Smart Scaffolding" ở mặt trước (Chữ to + Chip Hán Việt tinh tế) 
+   và "Bento Studio" ở mặt sau (Pinyin + Nghĩa + Hộp câu ví dụ có audio).
+   Cách kết hợp này vừa giúp não bộ nhận diện nhanh, vừa giữ được sự sang trọng 
+   hiện đại của ứng dụng.
+================================================================================

@@ -10,12 +10,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,24 +31,35 @@ import androidx.compose.ui.unit.sp
 import com.example.luminalearn.R
 import com.example.luminalearn.core.ui.effect.AnimatedRollingCounter
 import com.example.luminalearn.core.ui.effect.bounceClick
+import com.example.luminalearn.ui.theme.PlusJakartaSans
 
-import androidx.compose.ui.graphics.Brush
-
+/**
+ * TopBar phong cách Luminous Bento cao cấp cho màn hình chính (5 Tab).
+ * - Trái: Logo thương hiệu LuminaLearn sắc nét, tỉ lệ chuẩn.
+ * - Phải: Bộ capsule sáng pastel (Streak cam đào + Điểm năng lượng tím pastel) và Nút chuông thông báo Bento.
+ */
 @Composable
 fun TopBar(
     modifier: Modifier = Modifier,
     streakDays: Int = 5,
     points: Int = 240,
+    hasUnreadNotification: Boolean = true,
+    onStreakClick: (() -> Unit)? = null,
+    onPointsClick: (() -> Unit)? = null,
+    onNotificationClick: (() -> Unit)? = null,
+    onAvatarClick: (() -> Unit)? = null,
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Logo Header
+        // Logo Header thương hiệu LuminaLearn
         Image(
             painter = painterResource(id = R.drawable.ic_header),
             contentDescription = stringResource(R.string.app_name),
-            modifier = Modifier.height(36.dp),
+            modifier = Modifier
+                .height(34.dp)
+                .bounceClick(scaleDown = 0.96f) { onAvatarClick?.invoke() },
             contentScale = ContentScale.Fit
         )
 
@@ -58,110 +69,122 @@ fun TopBar(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            // Glassmorphic Streak Capsule (Midnight Ember)
+            // ── 1. Capsule Chuỗi Ngày (Streak - Cam Đào Pastel) ──
             Row(
                 modifier = Modifier
-                    .clip(CircleShape)
-                    .background(Color(0xFF1E1512).copy(alpha = 0.92f))
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(Color(0xFFFFF7ED))
                     .border(
-                        BorderStroke(1.dp, Color(0xFFFF9800).copy(alpha = 0.45f)),
-                        shape = CircleShape
+                        BorderStroke(1.dp, Color(0xFFFED7AA)),
+                        shape = RoundedCornerShape(16.dp)
                     )
-                    .bounceClick(scaleDown = 0.92f)
-                    .padding(horizontal = 10.dp, vertical = 6.dp),
+                    .bounceClick(scaleDown = 0.92f) { onStreakClick?.invoke() }
+                    .padding(horizontal = 9.dp, vertical = 5.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(5.dp)
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_streak),
-                    contentDescription = null,
-                    tint = Color(0xFFFF9800),
+                    contentDescription = "Chuỗi ngày",
+                    tint = Color(0xFFEA580C),
                     modifier = Modifier.size(15.dp)
                 )
                 AnimatedRollingCounter(
                     count = streakDays,
                     textStyle = TextStyle(
+                        fontFamily = PlusJakartaSans,
                         fontSize = 12.5.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFFFFD54F)
+                        fontWeight = FontWeight.ExtraBold,
+                        color = Color(0xFFC2410C)
                     )
                 )
             }
 
-            // Glassmorphic Points/Energy Capsule (Midnight Violet)
+            // ── 2. Capsule Điểm Năng Lượng (Points/Energy - Tím Pastel Lumina) ──
             Row(
                 modifier = Modifier
-                    .clip(CircleShape)
-                    .background(Color(0xFF13152C).copy(alpha = 0.92f))
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(Color(0xFFEEF2FF))
                     .border(
-                        BorderStroke(1.dp, Color(0xFF818CF8).copy(alpha = 0.45f)),
-                        shape = CircleShape
+                        BorderStroke(1.dp, Color(0xFFC7D2FE)),
+                        shape = RoundedCornerShape(16.dp)
                     )
-                    .bounceClick(scaleDown = 0.92f)
-                    .padding(horizontal = 10.dp, vertical = 6.dp),
+                    .bounceClick(scaleDown = 0.92f) { onPointsClick?.invoke() }
+                    .padding(horizontal = 9.dp, vertical = 5.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(5.dp)
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_bolt),
-                    contentDescription = null,
-                    tint = Color(0xFF818CF8),
+                    contentDescription = "Điểm tích lũy",
+                    tint = Color(0xFF6366F1),
                     modifier = Modifier.size(15.dp)
                 )
                 AnimatedRollingCounter(
                     count = points,
                     textStyle = TextStyle(
+                        fontFamily = PlusJakartaSans,
                         fontSize = 12.5.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFFE0E7FF)
+                        fontWeight = FontWeight.ExtraBold,
+                        color = Color(0xFF4338CA)
                     )
                 )
             }
 
-            // Speaker Button (Midnight Glass)
+            // ── 3. Nút Chuông Thông Báo Bento (Thay cho nút loa vô nghĩa) ──
             Box(
                 modifier = Modifier
-                    .size(36.dp)
+                    .size(35.dp)
                     .clip(CircleShape)
-                    .background(Color(0xFF151C30).copy(alpha = 0.92f))
+                    .background(Color.White)
                     .border(
-                        BorderStroke(1.dp, Color(0xFF334155).copy(alpha = 0.6f)),
+                        BorderStroke(1.dp, Color(0xFFE2E8F0)),
                         shape = CircleShape
                     )
-                    .bounceClick(scaleDown = 0.90f),
+                    .bounceClick(scaleDown = 0.90f) { onNotificationClick?.invoke() },
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_speaker),
-                    contentDescription = stringResource(R.string.cd_speaker),
-                    tint = Color(0xFF94A3B8),
-                    modifier = Modifier.size(16.dp)
+                    painter = painterResource(id = R.drawable.ic_notification),
+                    contentDescription = "Thông báo",
+                    tint = Color(0xFF475569),
+                    modifier = Modifier.size(17.dp)
                 )
+
+                if (hasUnreadNotification) {
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .offset(x = (-6).dp, y = 6.dp)
+                            .size(7.dp)
+                            .clip(CircleShape)
+                            .background(Color(0xFFEF4444))
+                            .border(1.dp, Color.White, CircleShape)
+                    )
+                }
             }
 
-            // Avatar Button (Cosmic Glow)
-            Box(
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(CircleShape)
-                    .background(
-                        Brush.radialGradient(
-                            listOf(Color(0xFF3730A3), Color(0xFF1E1B4B))
+            // ── 4. Avatar Người Dùng (Nếu có callback hoặc muốn hiển thị) ──
+            if (onAvatarClick != null) {
+                Box(
+                    modifier = Modifier
+                        .size(35.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xFFF5F3FF))
+                        .border(
+                            BorderStroke(1.2.dp, Color(0xFFDDD6FE)),
+                            shape = CircleShape
                         )
+                        .bounceClick(scaleDown = 0.90f) { onAvatarClick.invoke() },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_avatar_default),
+                        contentDescription = stringResource(R.string.cd_avatar),
+                        tint = Color(0xFF7C3AED),
+                        modifier = Modifier.size(20.dp)
                     )
-                    .border(
-                        BorderStroke(1.2.dp, Color(0xFF818CF8).copy(alpha = 0.6f)),
-                        shape = CircleShape
-                    )
-                    .bounceClick(scaleDown = 0.90f),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_avatar_default),
-                    contentDescription = stringResource(R.string.cd_avatar),
-                    tint = Color(0xFFE0E7FF),
-                    modifier = Modifier.size(22.dp)
-                )
+                }
             }
         }
     }

@@ -16,10 +16,10 @@ object RetrofitClient {
      * Cấu hình Base URL:
      * - Máy thật cắm cáp USB (đã chạy adb reverse tcp:8080 tcp:8080): "http://localhost:8080/api/"
      * - Máy ảo Android Emulator: "http://10.0.2.2:8080/api/"
-     * - Máy thật kết nối cùng mạng Wi-Fi: "http://10.169.197.243:8080/api/"
+     * - Máy thật kết nối cùng mạng Wi-Fi: "http://10.105.163.104:8080/api/"
      */
     @Suppress("kotlin:S1313")
-    const val BASE_URL = "http://10.169.197.243:8080/api/"
+    const val BASE_URL = "http://10.105.163.104:8080/api/"
 
     private var tokenManager: TokenManager? = null
 
