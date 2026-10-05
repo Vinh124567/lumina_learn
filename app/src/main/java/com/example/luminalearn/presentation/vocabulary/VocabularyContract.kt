@@ -155,6 +155,7 @@ sealed interface VocabularyUiIntent : UiIntent {
     data class SetAddVocabSheetVisible(val visible: Boolean) : VocabularyUiIntent
     data class AddNewVocabulary(val request: com.example.luminalearn.data.model.CreateVocabularyRequest, val onSuccess: () -> Unit) : VocabularyUiIntent
     data class RateWordSrs(val wordId: String, val rating: com.example.luminalearn.presentation.vocabulary.model.SrsRating) : VocabularyUiIntent
+    data class ToggleEnrollSrs(val wordId: String) : VocabularyUiIntent
 }
 
 /**

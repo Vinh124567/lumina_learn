@@ -301,7 +301,7 @@ private fun ScenarioFooter(
                 modifier = Modifier.padding(horizontal = 14.dp, vertical = 7.dp)
             ) {
                 Text(
-                    text = "Bắt đầu nhập vai",
+                    text = "Bắt đầu trò chuyện",
                     fontSize = 12.5.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White

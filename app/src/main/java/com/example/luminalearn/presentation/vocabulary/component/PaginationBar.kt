@@ -1,23 +1,25 @@
 package com.example.luminalearn.presentation.vocabulary.component
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.luminalearn.R
-import com.example.luminalearn.presentation.vocabulary.model.VocabColors
-import com.example.luminalearn.presentation.vocabulary.model.VocabShapes
+import com.example.luminalearn.core.ui.effect.bounceClick
 
 @Composable
 fun PaginationBar(
@@ -35,8 +37,9 @@ fun PaginationBar(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .background(Color.White, VocabShapes.Card)
-            .border(1.dp, Color(0xFFF1F5F9), VocabShapes.Card)
+            .clip(RoundedCornerShape(18.dp))
+            .background(Color.White)
+            .border(BorderStroke(1.dp, Color(0xFFE2E8F0)), RoundedCornerShape(18.dp))
             .padding(vertical = 12.dp, horizontal = 16.dp)
     ) {
         Column(
@@ -78,7 +81,7 @@ fun PaginationBar(
             Text(
                 text = "Trang $currentPage / $totalPages · Hiển thị $startItem–$endItem trong số $totalItems $itemUnit",
                 fontSize = 11.sp,
-                color = VocabColors.TextMuted
+                color = Color(0xFF64748B)
             )
         }
     }
@@ -93,16 +96,16 @@ private fun PageNavButton(
 ) {
     val bgColor = if (enabled) Color(0xFFF8FAFC) else Color(0xFFF1F5F9)
     val borderColor = if (enabled) Color(0xFFE2E8F0) else Color(0xFFE2E8F0).copy(alpha = 0.5f)
-    val tintColor = if (enabled) Color(0xFF334155) else Color(0xFF94A3B8)
+    val tintColor = if (enabled) Color(0xFF0F172A) else Color(0xFF94A3B8)
 
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .size(36.dp)
-            .clip(VocabShapes.Checkbox)
+            .clip(RoundedCornerShape(10.dp))
             .background(bgColor)
-            .border(1.dp, borderColor, VocabShapes.Checkbox)
-            .clickable(enabled = enabled, onClick = onClick)
+            .border(BorderStroke(1.dp, borderColor), RoundedCornerShape(10.dp))
+            .bounceClick(scaleDown = 0.92f, onClick = if (enabled) onClick else null)
     ) {
         Icon(
             painter = painterResource(id = iconRes),
@@ -180,7 +183,7 @@ private fun PageNumbersRow(
                             text = "•••",
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Bold,
-                            color = VocabColors.TextMuted
+                            color = Color(0xFF64748B)
                         )
                     }
                 }
@@ -195,19 +198,28 @@ private fun PageNumberButton(
     isCurrentPage: Boolean,
     onClick: () -> Unit
 ) {
-    val bgColor = if (isCurrentPage) VocabColors.BrandPrimary else Color.Transparent
-    val borderColor = if (isCurrentPage) VocabColors.BrandPrimary else Color(0xFFE2E8F0)
-    val textColor = if (isCurrentPage) Color.White else VocabColors.TextDark
+    val backgroundModifier = if (isCurrentPage) {
+        Modifier
+            .background(
+                Brush.horizontalGradient(listOf(Color(0xFF6366F1), Color(0xFF4F46E5))),
+                RoundedCornerShape(10.dp)
+            )
+            .border(BorderStroke(1.dp, Color(0xFF818CF8).copy(alpha = 0.6f)), RoundedCornerShape(10.dp))
+    } else {
+        Modifier
+            .background(Color(0xFFF8FAFC), RoundedCornerShape(10.dp))
+            .border(BorderStroke(1.dp, Color(0xFFE2E8F0)), RoundedCornerShape(10.dp))
+    }
+    val textColor = if (isCurrentPage) Color.White else Color(0xFF475569)
     val fontWeight = if (isCurrentPage) FontWeight.Bold else FontWeight.Medium
 
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .size(36.dp)
-            .clip(VocabShapes.Checkbox)
-            .background(bgColor)
-            .border(1.dp, borderColor, VocabShapes.Checkbox)
-            .clickable(onClick = onClick)
+            .clip(RoundedCornerShape(10.dp))
+            .then(backgroundModifier)
+            .bounceClick(scaleDown = 0.92f, onClick = onClick)
     ) {
         Text(
             text = pageIndex.toString(),
@@ -217,3 +229,4 @@ private fun PageNumberButton(
         )
     }
 }
+

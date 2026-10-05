@@ -47,9 +47,9 @@ fun VocabDetailCard(
             .fillMaxWidth()
             .bounceClick(scaleDown = 0.98f, onClick = onClick),
         shape = RoundedCornerShape(20.dp),
-        colors = androidx.compose.material3.CardDefaults.cardColors(containerColor = Color.White),
-        border = BorderStroke(0.5.dp, Color(0xFFDDE3EC)),
-        elevation = androidx.compose.material3.CardDefaults.cardElevation(defaultElevation = 2.dp)
+        colors = androidx.compose.material3.CardDefaults.cardColors(containerColor = Color.Transparent),
+        border = BorderStroke(1.dp, Color(0xFF2E3458).copy(alpha = 0.65f)),
+        elevation = androidx.compose.material3.CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Box(
             modifier = Modifier
@@ -57,26 +57,15 @@ fun VocabDetailCard(
                 .background(
                     Brush.linearGradient(
                         colors = listOf(
-                            Color.White,
-                            Color.White,
-                            Color(0xFFFAF9FF)
+                            Color(0xFF161A34),
+                            Color(0xFF0F1326)
                         )
                     )
                 )
         ) {
-            Canvas(modifier = Modifier.matchParentSize()) {
-                drawCircle(
-                    brush = Brush.radialGradient(
-                        colors = listOf(Color(0xFF5C50F6).copy(alpha = 0.045f), Color.Transparent),
-                        center = Offset(size.width, 0f),
-                        radius = size.width * 0.55f
-                    )
-                )
-            }
-
             CosmicStarfield(
                 modifier = Modifier.matchParentSize(),
-                particleCount = 28,
+                particleCount = 20,
                 focusCenterXRatio = 0.88f,
                 focusCenterYRatio = 0.35f
             )
@@ -85,7 +74,7 @@ fun VocabDetailCard(
                 text = item.hanzi,
                 fontSize = 80.sp,
                 fontWeight = FontWeight.Black,
-                color = Color(0xFF5C50F6).copy(alpha = 0.10f),
+                color = Color(0xFF6366F1).copy(alpha = 0.08f),
                 maxLines = 1,
                 softWrap = false,
                 modifier = Modifier
@@ -108,9 +97,9 @@ fun VocabDetailCard(
 
                 Text(
                     text = item.meaning,
-                    fontSize = 14.5.sp,
+                    fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF0F172A)
+                    color = Color.White
                 )
 
                 Spacer(modifier = Modifier.height(10.dp))
@@ -141,55 +130,61 @@ private fun VocabCardHeader(
         ) {
             Box(
                 modifier = Modifier
-                    .background(VocabColors.BrandLight, VocabShapes.Tag)
-                    .padding(horizontal = 7.dp, vertical = 3.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Color(0xFF6366F1).copy(alpha = 0.2f))
+                    .border(BorderStroke(1.dp, Color(0xFF818CF8).copy(alpha = 0.45f)), RoundedCornerShape(8.dp))
+                    .padding(horizontal = 8.dp, vertical = 3.dp)
             ) {
                 Text(
                     text = item.hskLevel,
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Bold,
-                    color = VocabColors.BrandPrimary
+                    color = Color(0xFFA5B4FC)
                 )
             }
 
             Box(
                 modifier = Modifier
-                    .background(Color(0xFFF1F5F9), VocabShapes.Tag)
-                    .padding(horizontal = 7.dp, vertical = 3.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Color.White.copy(alpha = 0.07f))
+                    .border(BorderStroke(1.dp, Color.White.copy(alpha = 0.12f)), RoundedCornerShape(8.dp))
+                    .padding(horizontal = 8.dp, vertical = 3.dp)
             ) {
                 Text(
                     text = item.topic,
                     fontSize = 11.sp,
-                    color = VocabColors.TextSecondary
+                    color = Color(0xFF94A3B8)
                 )
             }
 
             if (item.isCustom) {
                 Box(
                     modifier = Modifier
-                        .background(VocabColors.AccentCoralBg, VocabShapes.Tag)
-                        .padding(horizontal = 7.dp, vertical = 3.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color(0xFFF43F5E).copy(alpha = 0.2f))
+                        .border(BorderStroke(1.dp, Color(0xFFFB7185).copy(alpha = 0.45f)), RoundedCornerShape(8.dp))
+                        .padding(horizontal = 8.dp, vertical = 3.dp)
                 ) {
                     Text(
                         text = "Tự thêm",
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
-                        color = VocabColors.AccentCoral
+                        color = Color(0xFFFDA4AF)
                     )
                 }
             }
         }
 
-        val checkboxBorder = if (item.isMastered) VocabColors.BrandPrimary else Color(0xFFCBD5E1)
-        val checkboxBg = if (item.isMastered) VocabColors.BrandPrimary else Color.Transparent
+        val checkboxBorder = if (item.isMastered) Color(0xFF34D399) else Color(0xFF475569)
+        val checkboxBg = if (item.isMastered) Color(0xFF10B981) else Color.White.copy(alpha = 0.05f)
 
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
                 .size(24.dp)
-                .clip(VocabShapes.Checkbox)
+                .clip(RoundedCornerShape(6.dp))
                 .background(checkboxBg)
-                .border(width = 1.5.dp, color = checkboxBorder, shape = VocabShapes.Checkbox)
+                .border(width = 1.2.dp, color = checkboxBorder, shape = RoundedCornerShape(6.dp))
                 .clickable { onToggleMastered(item.id) }
         ) {
             if (item.isMastered) {
@@ -232,14 +227,14 @@ private fun VocabCardMainRow(
             modifier = Modifier
                 .height(62.dp)
                 .width(boxWidth)
-                .clip(VocabShapes.Hanzi)
+                .clip(RoundedCornerShape(14.dp))
                 .background(
                     Brush.linearGradient(
-                        listOf(Color(0xFFF5F3FF), Color(0xFFEEF2FF))
+                        listOf(Color(0xFF1E2448), Color(0xFF151934))
                     ),
-                    VocabShapes.Hanzi
+                    RoundedCornerShape(14.dp)
                 )
-                .border(1.dp, Color(0xFFDDD6FE), VocabShapes.Hanzi)
+                .border(BorderStroke(1.dp, Color(0xFF6366F1).copy(alpha = 0.45f)), RoundedCornerShape(14.dp))
                 .bounceClick(scaleDown = 0.92f) { onSpeak(item.hanzi) }
                 .padding(horizontal = 4.dp)
         ) {
@@ -247,7 +242,7 @@ private fun VocabCardMainRow(
                 text = item.hanzi,
                 fontSize = hanziFontSize,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF312E81),
+                color = Color.White,
                 maxLines = 1,
                 softWrap = false,
                 textAlign = TextAlign.Center
@@ -265,12 +260,12 @@ private fun VocabCardMainRow(
                     text = item.pinyin,
                     fontSize = 15.sp,
                     fontWeight = FontWeight.Bold,
-                    color = VocabColors.BrandPrimary
+                    color = Color(0xFF38BDF8)
                 )
                 Icon(
                     painter = painterResource(id = R.drawable.ic_speaker),
                     contentDescription = "Speak",
-                    tint = VocabColors.BrandPrimary,
+                    tint = Color(0xFF38BDF8),
                     modifier = Modifier
                         .size(16.dp)
                         .bounceClick(scaleDown = 0.88f) { onSpeak(item.hanzi) }
@@ -278,7 +273,7 @@ private fun VocabCardMainRow(
                 Icon(
                     painter = painterResource(id = R.drawable.ic_waveform),
                     contentDescription = "Biểu đồ cao độ",
-                    tint = VocabColors.BrandPrimary,
+                    tint = Color(0xFF38BDF8),
                     modifier = Modifier
                         .size(16.dp)
                         .bounceClick(scaleDown = 0.88f, onClick = onQuickVoiceTest)
@@ -286,7 +281,7 @@ private fun VocabCardMainRow(
                 Text(
                     text = "(${item.partOfSpeech})",
                     fontSize = 11.sp,
-                    color = VocabColors.TextMuted,
+                    color = Color(0xFF94A3B8),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -297,14 +292,15 @@ private fun VocabCardMainRow(
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(6.dp))
-                    .background(Color(0xFFF1F5F9))
+                    .background(Color.White.copy(alpha = 0.08f))
+                    .border(BorderStroke(1.dp, Color.White.copy(alpha = 0.12f)), RoundedCornerShape(6.dp))
                     .padding(horizontal = 7.dp, vertical = 2.5.dp)
             ) {
                 Text(
                     text = "HV: ${item.hanViet}",
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF475569),
+                    color = Color(0xFFE2E8F0),
                     maxLines = 1,
                     softWrap = false
                 )
@@ -314,7 +310,7 @@ private fun VocabCardMainRow(
         Text(
             text = radicalAndStrokesText,
             fontSize = 10.5.sp,
-            color = Color(0xFF94A3B8),
+            color = Color(0xFF64748B),
             textAlign = TextAlign.End,
             lineHeight = 15.sp
         )
@@ -328,15 +324,15 @@ private fun VocabExampleBox(
 ) {
     val exampleAnnotatedText = remember(item.exampleHanzi, item.examplePinyin, item.exampleMeaning) {
         buildAnnotatedString {
-            withStyle(SpanStyle(fontWeight = FontWeight.SemiBold, color = Color(0xFF1E293B), fontSize = 13.sp)) {
+            withStyle(SpanStyle(fontWeight = FontWeight.SemiBold, color = Color(0xFFF1F5F9), fontSize = 13.sp)) {
                 append(item.exampleHanzi)
             }
             append("\n")
-            withStyle(SpanStyle(color = VocabColors.BrandPrimary, fontSize = 11.sp, fontWeight = FontWeight.Medium)) {
+            withStyle(SpanStyle(color = Color(0xFF38BDF8), fontSize = 11.sp, fontWeight = FontWeight.Medium)) {
                 append(item.examplePinyin)
             }
             append("\n")
-            withStyle(SpanStyle(color = Color(0xFF64748B), fontSize = 11.5.sp)) {
+            withStyle(SpanStyle(color = Color(0xFF94A3B8), fontSize = 11.5.sp)) {
                 append(item.exampleMeaning)
             }
         }
@@ -346,8 +342,8 @@ private fun VocabExampleBox(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(14.dp))
-            .background(Color(0xFFF8FAFC))
-            .border(1.dp, Color(0xFFF1F5F9), RoundedCornerShape(14.dp))
+            .background(Color.White.copy(alpha = 0.04f))
+            .border(BorderStroke(1.dp, Color(0xFF2E3458).copy(alpha = 0.6f)), RoundedCornerShape(14.dp))
             .padding(12.dp)
     ) {
         Row(
@@ -364,7 +360,7 @@ private fun VocabExampleBox(
             Icon(
                 painter = painterResource(id = R.drawable.ic_speaker),
                 contentDescription = "Speak example",
-                tint = VocabColors.BrandPrimary,
+                tint = Color(0xFF38BDF8),
                 modifier = Modifier
                     .size(16.dp)
                     .bounceClick(scaleDown = 0.88f) { onSpeak(item.exampleHanzi) }
@@ -386,20 +382,23 @@ private fun VocabCardFooter(
         Text(
             text = item.targetScore,
             fontSize = 11.sp,
-            color = VocabColors.TextMuted
+            color = Color(0xFF64748B)
         )
 
         if (item.isMastered) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .clip(VocabShapes.Tag)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Color(0xFF10B981).copy(alpha = 0.15f))
+                    .border(BorderStroke(1.dp, Color(0xFF34D399).copy(alpha = 0.35f)), RoundedCornerShape(8.dp))
                     .clickable { onToggleMastered(item.id) }
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_check_circle),
                     contentDescription = null,
-                    tint = VocabColors.SuccessGreen,
+                    tint = Color(0xFF34D399),
                     modifier = Modifier.size(13.dp)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
@@ -407,7 +406,7 @@ private fun VocabCardFooter(
                     text = "Đã thuộc",
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Bold,
-                    color = VocabColors.SuccessGreen
+                    color = Color(0xFF34D399)
                 )
             }
         } else {
@@ -415,10 +414,11 @@ private fun VocabCardFooter(
                 text = "Chưa thuộc",
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Medium,
-                color = VocabColors.TextMuted,
+                color = Color(0xFF64748B),
                 modifier = Modifier
-                    .clip(VocabShapes.Tag)
+                    .clip(RoundedCornerShape(8.dp))
                     .clickable { onToggleMastered(item.id) }
+                    .padding(horizontal = 6.dp, vertical = 3.dp)
             )
         }
     }

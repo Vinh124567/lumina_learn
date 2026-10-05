@@ -32,6 +32,8 @@ import com.example.luminalearn.R
 import com.example.luminalearn.core.ui.effect.AnimatedRollingCounter
 import com.example.luminalearn.core.ui.effect.bounceClick
 
+import androidx.compose.ui.graphics.Brush
+
 @Composable
 fun TopBar(
     modifier: Modifier = Modifier,
@@ -46,7 +48,7 @@ fun TopBar(
         Image(
             painter = painterResource(id = R.drawable.ic_header),
             contentDescription = stringResource(R.string.app_name),
-            modifier = Modifier.height(34.dp),
+            modifier = Modifier.height(36.dp),
             contentScale = ContentScale.Fit
         )
 
@@ -56,80 +58,74 @@ fun TopBar(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            // Glassmorphic Streak Capsule
+            // Glassmorphic Streak Capsule (Midnight Ember)
             Row(
                 modifier = Modifier
                     .clip(CircleShape)
-                    .background(Color(0xFFFEF3C7).copy(alpha = 0.9f))
+                    .background(Color(0xFF1E1512).copy(alpha = 0.92f))
                     .border(
-                        BorderStroke(1.dp, Color(0xFFF59E0B).copy(alpha = 0.35f)),
+                        BorderStroke(1.dp, Color(0xFFFF9800).copy(alpha = 0.45f)),
                         shape = CircleShape
                     )
                     .bounceClick(scaleDown = 0.92f)
-                    .padding(horizontal = 10.dp, vertical = 5.dp),
+                    .padding(horizontal = 10.dp, vertical = 6.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                horizontalArrangement = Arrangement.spacedBy(5.dp)
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_streak),
                     contentDescription = null,
-                    tint = Color(0xFFD97706),
-                    modifier = Modifier.size(14.dp)
+                    tint = Color(0xFFFF9800),
+                    modifier = Modifier.size(15.dp)
                 )
                 AnimatedRollingCounter(
                     count = streakDays,
                     textStyle = TextStyle(
-                        fontSize = 12.sp,
+                        fontSize = 12.5.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFFB45309)
+                        color = Color(0xFFFFD54F)
                     )
-                )
-                Text(
-                    text = "Ngày",
-                    color = Color(0xFFB45309),
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold
                 )
             }
 
-            // Glassmorphic Points/Energy Capsule
+            // Glassmorphic Points/Energy Capsule (Midnight Violet)
             Row(
                 modifier = Modifier
                     .clip(CircleShape)
-                    .background(Color(0xFFEDE9FE).copy(alpha = 0.9f))
+                    .background(Color(0xFF13152C).copy(alpha = 0.92f))
                     .border(
-                        BorderStroke(1.dp, Color(0xFF818CF8).copy(alpha = 0.35f)),
+                        BorderStroke(1.dp, Color(0xFF818CF8).copy(alpha = 0.45f)),
                         shape = CircleShape
                     )
                     .bounceClick(scaleDown = 0.92f)
-                    .padding(horizontal = 10.dp, vertical = 5.dp),
+                    .padding(horizontal = 10.dp, vertical = 6.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                horizontalArrangement = Arrangement.spacedBy(5.dp)
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_bolt),
                     contentDescription = null,
-                    tint = Color(0xFF6366F1),
-                    modifier = Modifier.size(14.dp)
+                    tint = Color(0xFF818CF8),
+                    modifier = Modifier.size(15.dp)
                 )
                 AnimatedRollingCounter(
                     count = points,
                     textStyle = TextStyle(
-                        fontSize = 12.sp,
+                        fontSize = 12.5.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF6366F1)
+                        color = Color(0xFFE0E7FF)
                     )
                 )
             }
 
-            // Speaker Button
+            // Speaker Button (Midnight Glass)
             Box(
                 modifier = Modifier
                     .size(36.dp)
                     .clip(CircleShape)
-                    .background(Color(0xFFF8FAFC))
+                    .background(Color(0xFF151C30).copy(alpha = 0.92f))
                     .border(
-                        BorderStroke(1.dp, Color(0xFFE2E8F0)),
+                        BorderStroke(1.dp, Color(0xFF334155).copy(alpha = 0.6f)),
                         shape = CircleShape
                     )
                     .bounceClick(scaleDown = 0.90f),
@@ -138,19 +134,23 @@ fun TopBar(
                 Icon(
                     painter = painterResource(id = R.drawable.ic_speaker),
                     contentDescription = stringResource(R.string.cd_speaker),
-                    tint = Color(0xFF64748B),
+                    tint = Color(0xFF94A3B8),
                     modifier = Modifier.size(16.dp)
                 )
             }
 
-            // Avatar Button
+            // Avatar Button (Cosmic Glow)
             Box(
                 modifier = Modifier
                     .size(36.dp)
                     .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primaryContainer)
+                    .background(
+                        Brush.radialGradient(
+                            listOf(Color(0xFF3730A3), Color(0xFF1E1B4B))
+                        )
+                    )
                     .border(
-                        BorderStroke(1.dp, Color(0xFF818CF8).copy(alpha = 0.3f)),
+                        BorderStroke(1.2.dp, Color(0xFF818CF8).copy(alpha = 0.6f)),
                         shape = CircleShape
                     )
                     .bounceClick(scaleDown = 0.90f),
@@ -159,8 +159,8 @@ fun TopBar(
                 Icon(
                     painter = painterResource(id = R.drawable.ic_avatar_default),
                     contentDescription = stringResource(R.string.cd_avatar),
-                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                    modifier = Modifier.size(24.dp)
+                    tint = Color(0xFFE0E7FF),
+                    modifier = Modifier.size(22.dp)
                 )
             }
         }

@@ -28,6 +28,9 @@ data class VocabWordItem(
     val isDueToday: Boolean
         get() = srsState.isDue
 
+    val isInSrs: Boolean
+        get() = srsState.isEnrolled || srsState.repetition > 0 || srsState.lastReviewTimeMillis > 0L
+
     fun matchesCategory(category: String): Boolean {
         if (category.isBlank() ||
             category == "Tất cả" ||
@@ -88,6 +91,7 @@ enum class SrsRating(val title: String, val subtitle: String) {
 @Immutable
 data class SrsWordState(
     val wordId: String = "",
+    val isEnrolled: Boolean = false,
     val repetition: Int = 0,
     val intervalDays: Int = 0,
     val easeFactor: Float = 2.5f,
@@ -96,6 +100,8 @@ data class SrsWordState(
 ) {
     val isDue: Boolean
         get() {
+            // Chỉ những từ ĐÃ được đưa vào lộ trình SRS mới được tính là đến hạn ôn
+            if (!isEnrolled && repetition == 0 && lastReviewTimeMillis == 0L) return false
             if (nextReviewTimeMillis == 0L) return true
             return System.currentTimeMillis() >= nextReviewTimeMillis
         }

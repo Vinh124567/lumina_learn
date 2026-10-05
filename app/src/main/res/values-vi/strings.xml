@@ -20,6 +20,7 @@
 
     <!-- Navigation Tabs -->
     <string name="nav_home">Trang chủ</string>
+    <string name="nav_vocabulary">Từ vựng</string>
     <string name="nav_lessons">Bài học</string>
     <string name="nav_spark_ai">Spark AI</string>
     <string name="nav_rewards">Thành tích</string>
@@ -67,7 +68,7 @@
 
     <!-- Recommended Lessons Section -->
     <string name="recommended_lessons_title">Bài học đề xuất</string>
-    <string name="view_all">Xem tất cả →</string>
+    <string name="view_all">Tất cả ↗</string>
     <string name="recommended_lessons_subtitle">Thẻ bài học tương tác vi mô giúp ghi nhớ chữ Hán siêu nhanh</string>
     <string name="category_pinyin">PHÁT ÂM &amp; THANH ĐIỆU</string>
     <string name="category_radicals">CHỮ HÁN &amp; BỘ THỦ</string>
@@ -110,4 +111,25 @@
     <string name="btn_start_now">Bắt đầu →</string>
     <string name="sparks_earned_format">+%1$d Tia Sáng</string>
     <string name="duration_mins_format">%1$d phút</string>
+    <string name="toast_streak_bonus_claimed">Chúc mừng! Bạn đã nhận thưởng +%1$d Sparks.</string>
+
+    <!-- Home Screen Section Headers & Shortcuts -->
+    <string name="section_daily_overview">Chỉ số &amp; Mục tiêu hôm nay</string>
+    <string name="section_daily_overview_subtitle">Theo dõi chuỗi học tập và tiến độ hàng ngày</string>
+    <string name="section_quick_shortcuts">Luyện tập nhanh vi mô</string>
+    <string name="section_quick_shortcuts_subtitle">Phím tắt ôn luyện kỹ năng tức thì</string>
+    <string name="section_ai_spotlight">Trợ Lý Giao Tiếp Lumina AI</string>
+    <string name="section_ai_spotlight_subtitle">Phản xạ trò chuyện thực tế &amp; sửa âm điệu chuẩn bản xứ</string>
+    <string name="section_recommended_lessons">Bài học đề xuất</string>
+    <string name="section_recommended_lessons_subtitle">Khám phá bài học vi mô chuẩn phân cấp HSK</string>
+    <string name="section_spark_challenge">Thử thách phản xạ Spark</string>
+    <string name="section_spark_challenge_subtitle">Rèn luyện phản xạ nhanh trong 60 giây và tích lũy tia sáng</string>
+    <string name="section_daily_wisdom">Góc Danh Ngôn Cảm Hứng</string>
+    <string name="section_daily_wisdom_subtitle">Châm ngôn Hán ngữ tiếp thêm năng lượng mỗi ngày</string>
+    <string name="section_vocab_list">Danh sách từ vựng</string>
+    <string name="section_vocab_list_subtitle">Hiển thị %1$d từ theo bộ lọc hiện tại</string>
+    <string name="section_vocab_flashcard">Thẻ lật Flashcard SRS</string>
+    <string name="section_vocab_flashcard_subtitle">Lặp lại ngắt quãng &amp; kiểm tra phản xạ ghi nhớ</string>
+    <string name="section_vocab_reflex">Trắc nghiệm phản xạ</string>
+    <string name="section_vocab_reflex_subtitle">Rèn luyện tốc độ nhận diện mặt chữ và nghĩa</string>
 </resources>

@@ -1,5 +1,6 @@
 package com.example.luminalearn.presentation.vocabulary.component
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -15,12 +16,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.luminalearn.R
+import com.example.luminalearn.core.ui.effect.bounceClick
 import com.example.luminalearn.presentation.vocabulary.model.HskLevelFilter
 import com.example.luminalearn.presentation.vocabulary.model.TopicItem
 import com.example.luminalearn.presentation.vocabulary.model.VocabColors
@@ -57,6 +60,7 @@ fun VocabFilterCard(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
         colors = androidx.compose.material3.CardDefaults.cardColors(containerColor = Color.White),
+        border = BorderStroke(1.dp, Color(0xFFE2E8F0)),
         elevation = androidx.compose.material3.CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
@@ -79,7 +83,7 @@ fun VocabFilterCard(
                     Icon(
                         painter = painterResource(id = R.drawable.ic_book),
                         contentDescription = null,
-                        tint = Color(0xFF6366F1),
+                        tint = Color(0xFF0284C7),
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
@@ -87,8 +91,8 @@ fun VocabFilterCard(
                         text = "Nguồn từ:",
                         fontFamily = PlusJakartaSans,
                         fontSize = 13.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = Color(0xFF64748B)
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF475569)
                     )
                 }
 
@@ -168,8 +172,8 @@ fun VocabFilterCard(
                         text = "Cấp độ:",
                         fontFamily = PlusJakartaSans,
                         fontSize = 13.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = Color(0xFF64748B)
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF475569)
                     )
                 }
 
@@ -214,7 +218,7 @@ fun VocabFilterCard(
                         Icon(
                             painter = painterResource(id = R.drawable.ic_nav_explore),
                             contentDescription = null,
-                            tint = Color(0xFF6366F1),
+                            tint = Color(0xFFD97706),
                             modifier = Modifier.size(15.dp)
                         )
                         Spacer(modifier = Modifier.width(6.dp))
@@ -222,8 +226,8 @@ fun VocabFilterCard(
                             text = "Chủ đề:",
                             fontFamily = PlusJakartaSans,
                             fontSize = 13.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = Color(0xFF64748B)
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF475569)
                         )
                     }
 
@@ -259,22 +263,27 @@ private fun SourceChip(
 ) {
     val chipShape = RoundedCornerShape(14.dp)
     val backgroundModifier = if (isSelected) {
-        Modifier.background(VocabColors.BrandPrimary, chipShape)
+        Modifier
+            .background(
+                Brush.horizontalGradient(listOf(Color(0xFF6366F1), Color(0xFF4F46E5))),
+                chipShape
+            )
+            .border(BorderStroke(1.dp, Color(0xFF818CF8).copy(alpha = 0.6f)), chipShape)
     } else {
         Modifier
             .background(Color(0xFFF8FAFC), chipShape)
-            .border(1.dp, VocabColors.BorderLight, chipShape)
+            .border(BorderStroke(1.dp, Color(0xFFE2E8F0)), chipShape)
     }
 
-    val textColor = if (isSelected) Color.White else VocabColors.TextSecondary
-    val countBgColor = if (isSelected) Color.White.copy(alpha = 0.22f) else VocabColors.BrandLight
-    val countTextColor = if (isSelected) Color.White else VocabColors.BrandPrimary
+    val textColor = if (isSelected) Color.White else Color(0xFF475569)
+    val countBgColor = if (isSelected) Color.White.copy(alpha = 0.22f) else Color(0xFFEEF2F6)
+    val countTextColor = if (isSelected) Color.White else Color(0xFF6366F1)
 
     Box(
         modifier = Modifier
             .clip(chipShape)
             .then(backgroundModifier)
-            .clickable(onClick = onClick)
+            .bounceClick(scaleDown = 0.95f, onClick = onClick)
             .padding(horizontal = 12.dp, vertical = 7.dp)
     ) {
         Row(
@@ -287,7 +296,7 @@ private fun SourceChip(
                 Icon(
                     painter = painterResource(id = drawableIconId),
                     contentDescription = null,
-                    tint = if (isSelected) Color.White else VocabColors.TextMuted,
+                    tint = if (isSelected) Color.White else Color(0xFF64748B),
                     modifier = Modifier.size(13.dp)
                 )
             }
@@ -325,22 +334,25 @@ private fun HskChip(
     onClick: () -> Unit
 ) {
     val chipShape = RoundedCornerShape(14.dp)
-    val isAllLevels = level.title.contains("Tất cả")
 
     val backgroundModifier = if (isSelected) {
-        val selectedColor = if (isAllLevels) VocabColors.TextDark else VocabColors.BrandPrimary
-        Modifier.background(selectedColor, chipShape)
+        Modifier
+            .background(
+                Brush.horizontalGradient(listOf(Color(0xFF6366F1), Color(0xFF4F46E5))),
+                chipShape
+            )
+            .border(BorderStroke(1.dp, Color(0xFF818CF8).copy(alpha = 0.6f)), chipShape)
     } else {
         Modifier
             .background(Color(0xFFF8FAFC), chipShape)
-            .border(1.dp, VocabColors.BorderLight, chipShape)
+            .border(BorderStroke(1.dp, Color(0xFFE2E8F0)), chipShape)
     }
 
     Box(
         modifier = Modifier
             .clip(chipShape)
             .then(backgroundModifier)
-            .clickable(onClick = onClick)
+            .bounceClick(scaleDown = 0.95f, onClick = onClick)
             .padding(horizontal = 12.dp, vertical = 7.dp)
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -349,7 +361,7 @@ private fun HskChip(
                 fontFamily = PlusJakartaSans,
                 fontSize = 12.5.sp,
                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold,
-                color = if (isSelected) Color.White else VocabColors.TextSecondary
+                color = if (isSelected) Color.White else Color(0xFF475569)
             )
 
             level.scoreRange?.let { score ->
@@ -357,7 +369,7 @@ private fun HskChip(
                 Box(
                     modifier = Modifier
                         .background(
-                            if (isSelected) Color.White.copy(alpha = 0.22f) else VocabColors.BrandLight,
+                            if (isSelected) Color.White.copy(alpha = 0.22f) else Color(0xFFE0F2FE),
                             RoundedCornerShape(8.dp)
                         )
                         .padding(horizontal = 6.dp, vertical = 2.dp)
@@ -367,7 +379,7 @@ private fun HskChip(
                         fontFamily = PlusJakartaSans,
                         fontSize = 10.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color = if (isSelected) Color.White else VocabColors.BrandPrimary
+                        color = if (isSelected) Color.White else Color(0xFF0284C7)
                     )
                 }
             }
@@ -383,22 +395,27 @@ private fun TopicChip(
 ) {
     val chipShape = RoundedCornerShape(14.dp)
     val backgroundModifier = if (isSelected) {
-        Modifier.background(VocabColors.BrandPrimary, chipShape)
+        Modifier
+            .background(
+                Brush.horizontalGradient(listOf(Color(0xFF6366F1), Color(0xFF4F46E5))),
+                chipShape
+            )
+            .border(BorderStroke(1.dp, Color(0xFF818CF8).copy(alpha = 0.6f)), chipShape)
     } else {
         Modifier
             .background(Color(0xFFF8FAFC), chipShape)
-            .border(1.dp, Color(0xFFE2E8F0), chipShape)
+            .border(BorderStroke(1.dp, Color(0xFFE2E8F0)), chipShape)
     }
-    val textColor = if (isSelected) Color.White else VocabColors.TextSecondary
-    val countBgColor = if (isSelected) Color.White.copy(alpha = 0.22f) else Color(0xFFEEF2FF)
-    val countTextColor = if (isSelected) Color.White else VocabColors.BrandPrimary
+    val textColor = if (isSelected) Color.White else Color(0xFF475569)
+    val countBgColor = if (isSelected) Color.White.copy(alpha = 0.22f) else Color(0xFFEEF2F6)
+    val countTextColor = if (isSelected) Color.White else Color(0xFF6366F1)
     val fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold
 
     Box(
         modifier = Modifier
             .clip(chipShape)
             .then(backgroundModifier)
-            .clickable(onClick = onSelect)
+            .bounceClick(scaleDown = 0.95f, onClick = onSelect)
             .padding(horizontal = 12.dp, vertical = 7.dp)
     ) {
         Row(
@@ -430,3 +447,4 @@ private fun TopicChip(
         }
     }
 }
+

@@ -64,7 +64,22 @@ class VocabularyViewModel : BaseViewModel<VocabularyUiState, VocabularyUiIntent,
             is VocabularyUiIntent.SelectSource -> handleSelectSource(intent.source)
             is VocabularyUiIntent.AddNewVocabulary -> handleAddNewVocabulary(intent.request, intent.onSuccess)
             is VocabularyUiIntent.RateWordSrs -> handleRateWordSrs(intent.wordId, intent.rating)
+            is VocabularyUiIntent.ToggleEnrollSrs -> handleToggleEnrollSrs(intent.wordId)
         }
+    }
+
+    private fun handleToggleEnrollSrs(wordId: String) {
+        val nextSrs = srsManager?.toggleEnrollSrs(wordId)
+        val updatedList = currentState.vocabList.map { word ->
+            if (word.id == wordId && nextSrs != null) word.copy(srsState = nextSrs) else word
+        }
+        val active = currentState.activeDetailWord
+        val updatedActive = if (active != null && active.id == wordId && nextSrs != null) {
+            active.copy(srsState = nextSrs)
+        } else {
+            active
+        }
+        setState { copy(vocabList = updatedList, activeDetailWord = updatedActive) }
     }
 
     private fun handleSelectSource(source: com.example.luminalearn.presentation.vocabulary.model.VocabSourceFilter) {

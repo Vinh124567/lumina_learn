@@ -86,8 +86,9 @@ fun VocabHeroBanner(
             ) {
             // Header Badges
             Row(
+                modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Box(
                     modifier = Modifier
@@ -104,7 +105,8 @@ fun VocabHeroBanner(
                         color = GoldBadgeText,
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
-                        letterSpacing = 0.4.sp
+                        letterSpacing = 0.4.sp,
+                        maxLines = 1
                     )
                 }
 
@@ -127,10 +129,11 @@ fun VocabHeroBanner(
                         )
                         Spacer(modifier = Modifier.width(5.dp))
                         Text(
-                            text = "Lặp Lại Ngắt Quãng SRS",
+                            text = "Ôn tập SRS",
                             color = MintTextColor,
                             fontSize = 11.sp,
-                            fontWeight = FontWeight.SemiBold
+                            fontWeight = FontWeight.SemiBold,
+                            maxLines = 1
                         )
                     }
                 }

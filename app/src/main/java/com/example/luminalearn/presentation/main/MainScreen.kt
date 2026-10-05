@@ -49,12 +49,10 @@ import com.example.luminalearn.presentation.common.CelebrationEffect
 import com.example.luminalearn.presentation.lesson.component.LessonAction
 import com.example.luminalearn.presentation.lesson.component.LessonDetailDialog
 import com.example.luminalearn.presentation.lesson.component.ToneCardData
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import com.example.luminalearn.presentation.main.component.AiRoleplayDialogueCard
 import com.example.luminalearn.presentation.main.component.DailyProgressDuo
 import com.example.luminalearn.presentation.main.component.DailyWisdomCard
-import com.example.luminalearn.presentation.main.component.GreetingHeader
+import com.example.luminalearn.presentation.main.component.HeroLessonCard
 import com.example.luminalearn.presentation.main.component.LessonCard
 import com.example.luminalearn.presentation.main.component.MainSectionHeader
 import com.example.luminalearn.presentation.main.component.QuickActionBar
@@ -62,6 +60,7 @@ import com.example.luminalearn.presentation.main.component.SparkChallengeCard
 import com.example.luminalearn.presentation.main.component.TopBar
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import kotlin.math.abs
 import kotlinx.coroutines.flow.collectLatest
@@ -75,7 +74,6 @@ fun MainScreen(
     onNavigateToLesson: () -> Unit = { navController.navigate(AppDestination.Lesson.route) }
 ) {
     val context = LocalContext.current
-    val scrollState = rememberScrollState()
     val uiState by viewModel.uiState.collectAsState()
     var confettiTrigger by remember { mutableIntStateOf(0) }
     var lessonContent by remember { mutableStateOf<ToneCardData?>(null) }
@@ -98,119 +96,156 @@ fun MainScreen(
                 .padding(paddingValues)
         ) {
             Column(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
             ) {
                 TopBar(
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
                 )
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .verticalScroll(scrollState)
-                        .padding(horizontal = 16.dp),
-                ) {
-                    Spacer(modifier = Modifier.height(12.dp))
 
-                    // ── PHÂN KHU 1: Hero & Chỉ Số Mục Tiêu Ngày ──
-                    GreetingHeader(
-                        onAskAiClick = onNavigateToSparkAi
-                    )
+                Spacer(modifier = Modifier.height(8.dp))
 
-                    Spacer(modifier = Modifier.height(20.dp))
+                // ── 1. HERO CARD: TÂM ĐIỂM BÀI HỌC HSK HIỆN TẠI ──
+                HeroLessonCard(
+                    lesson = uiState.recommendedLessons.firstOrNull(),
+                    onStartLessonClick = { lessonId -> viewModel.loadLesson(lessonId) },
+                    onViewAllLessonsClick = onNavigateToLesson,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
 
-                    MainSectionHeader(
-                        title = stringResource(R.string.section_daily_overview),
-                        subtitle = stringResource(R.string.section_daily_overview_subtitle)
-                    )
+                Spacer(modifier = Modifier.height(18.dp))
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                // ── 2. MICRO-DOCK: HÀNG PHÍM TẮT LUYỆN TẬP VI MÔ ──
+                MainSectionHeader(
+                    title = stringResource(R.string.section_quick_shortcuts),
+                    subtitle = stringResource(R.string.section_quick_shortcuts_subtitle),
+                    accentColors = listOf(Color(0xFF6366F1), Color(0xFF00F2FE)),
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
 
-                    DailyProgressDuo(
-                        currentMinutes = 10,
-                        targetMinutes = 10,
-                        bonusSparks = 30,
-                        streakDays = 5,
-                        checkedDays = listOf(true, true, true, true, true, false, false),
-                        onStartLessonClick = onNavigateToLesson,
-                        onClaimStreakClick = { confettiTrigger++ }
-                    )
+                Spacer(modifier = Modifier.height(12.dp))
 
-                    Spacer(modifier = Modifier.height(24.dp))
+                QuickActionBar(
+                    onRoleplayClick = onNavigateToSparkAi,
+                    onPinyinClick = onNavigateToLesson,
+                    onVocabClick = { navController.navigate(AppDestination.Vocabulary.route) },
+                    onRadicalsClick = onNavigateToLesson,
+                    onChallengeClick = {
+                        confettiTrigger++
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.msg_challenge_completed),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    },
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
 
-                    // ── PHÂN KHU 2: Phím Tắt Luyện Nhanh Vi Mô ──
-                    MainSectionHeader(
-                        title = stringResource(R.string.section_quick_shortcuts)
-                    )
+                Spacer(modifier = Modifier.height(20.dp))
 
-                    Spacer(modifier = Modifier.height(10.dp))
+                // ── 3. KHỐI CHỈ SỐ KÉP: MỤC TIÊU & CHUỖI STREAK SONG HÀNH (1:1) ──
+                MainSectionHeader(
+                    title = stringResource(R.string.section_daily_overview),
+                    subtitle = stringResource(R.string.section_daily_overview_subtitle),
+                    accentColors = listOf(Color(0xFFFF9800), Color(0xFFEA580C)),
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
 
-                    QuickActionBar(
-                        onRoleplayClick = onNavigateToSparkAi,
-                        onPinyinClick = onNavigateToLesson,
-                        onVocabClick = { navController.navigate(AppDestination.Vocabulary.route) },
-                        onRadicalsClick = onNavigateToLesson,
-                        onChallengeClick = onNavigateToSparkAi
-                    )
+                Spacer(modifier = Modifier.height(12.dp))
 
-                    Spacer(modifier = Modifier.height(24.dp))
+                DailyProgressDuo(
+                    currentMinutes = 10,
+                    targetMinutes = 10,
+                    bonusSparks = 30,
+                    streakDays = 5,
+                    checkedDays = listOf(true, true, true, true, true, false, false),
+                    onStartLessonClick = onNavigateToLesson,
+                    onClaimStreakClick = {
+                        confettiTrigger++
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.toast_streak_bonus_claimed, 30),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    },
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
 
-                    // ── PHÂN KHU 3: Tiêu Điểm Lumina AI & Thử Thách ──
-                    MainSectionHeader(
-                        title = stringResource(R.string.section_ai_spotlight),
-                        subtitle = stringResource(R.string.section_ai_spotlight_subtitle)
-                    )
+                Spacer(modifier = Modifier.height(20.dp))
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                // ── 4. SÂN KHẤU BÀI HỌC 3D COVER FLOW (CUỘN NGANG NHẤP NHÔ) ──
+                RecommendedLessonsSection(
+                    isLoading = uiState.isRecommendedLessonsLoading && uiState.recommendedLessons.isEmpty(),
+                    lessons = uiState.recommendedLessons,
+                    onViewAllClick = onNavigateToLesson,
+                    onStartLessonClick = { lessonId -> viewModel.loadLesson(lessonId) },
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
 
-                    AiRoleplayDialogueCard(
-                        onStartRoleplayClick = onNavigateToSparkAi
-                    )
+                Spacer(modifier = Modifier.height(20.dp))
 
-                    Spacer(modifier = Modifier.height(14.dp))
+                // ── 5. AI SPOTLIGHT BANNER: PHÒNG LAB HỘI THOẠI BẢN XỨ ──
+                MainSectionHeader(
+                    title = stringResource(R.string.section_ai_spotlight),
+                    subtitle = stringResource(R.string.section_ai_spotlight_subtitle),
+                    accentColors = listOf(Color(0xFF6366F1), Color(0xFF00F2FE)),
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
 
-                    SparkChallengeCard(
-                        bonusSparks = 20,
-                        onCompleteClick = {
-                            confettiTrigger++
-                            Toast.makeText(
-                                context,
-                                context.getString(R.string.msg_challenge_completed),
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    )
+                Spacer(modifier = Modifier.height(12.dp))
 
-                    Spacer(modifier = Modifier.height(26.dp))
+                AiRoleplayDialogueCard(
+                    onStartRoleplayClick = onNavigateToSparkAi,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
 
-                    // ── PHÂN KHU 4: Lộ Trình & Bài Học Đề Xuất (Vuốt Ngang Carousel) ──
-                    RecommendedLessonsSection(
-                        isLoading = uiState.isRecommendedLessonsLoading && uiState.recommendedLessons.isEmpty(),
-                        lessons = uiState.recommendedLessons,
-                        onViewAllClick = onNavigateToLesson,
-                        onStartLessonClick = { lessonId ->
-                            viewModel.loadLesson(lessonId)
-                        }
-                    )
+                Spacer(modifier = Modifier.height(20.dp))
 
-                    Spacer(modifier = Modifier.height(26.dp))
+                // ── 6. THỬ THÁCH SPARK ──
+                MainSectionHeader(
+                    title = stringResource(R.string.section_spark_challenge),
+                    subtitle = stringResource(R.string.section_spark_challenge_subtitle),
+                    accentColors = listOf(Color(0xFFF59E0B), Color(0xFFEF4444)),
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
 
-                    // ── PHÂN KHU 5: Góc Danh Ngôn Cảm Hứng ──
-                    MainSectionHeader(
-                        title = stringResource(R.string.section_daily_wisdom)
-                    )
+                Spacer(modifier = Modifier.height(12.dp))
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                SparkChallengeCard(
+                    bonusSparks = 20,
+                    onCompleteClick = {
+                        confettiTrigger++
+                        Toast.makeText(
+                            context,
+                            context.getString(R.string.msg_challenge_completed),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    },
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
 
-                    DailyWisdomCard(
-                        wisdom = uiState.dailyWisdom,
-                        onRefreshClick = {
-                            viewModel.refreshDailyWisdom()
-                        }
-                    )
+                Spacer(modifier = Modifier.height(20.dp))
 
-                    Spacer(modifier = Modifier.height(96.dp))
-                }
+                // ── 7. GÓC DANH NGÔN CẢM HỨNG ──
+                MainSectionHeader(
+                    title = stringResource(R.string.section_daily_wisdom),
+                    subtitle = stringResource(R.string.section_daily_wisdom_subtitle),
+                    accentColors = listOf(Color(0xFF10B981), Color(0xFF06B6D4)),
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                DailyWisdomCard(
+                    wisdom = uiState.dailyWisdom,
+                    onRefreshClick = { viewModel.refreshDailyWisdom() },
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
+
+                Spacer(modifier = Modifier.height(96.dp))
             }
+
             CelebrationEffect(
                 triggerKey = confettiTrigger,
                 modifier = Modifier.fillMaxSize()
@@ -251,86 +286,101 @@ private fun RecommendedLessonsSection(
     isLoading: Boolean,
     lessons: List<com.example.luminalearn.data.model.LessonDto>,
     onViewAllClick: () -> Unit,
-    onStartLessonClick: (String) -> Unit
+    onStartLessonClick: (String) -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    MainSectionHeader(
-        title = stringResource(R.string.section_recommended_lessons),
-        subtitle = stringResource(R.string.section_recommended_lessons_subtitle),
-        actionText = stringResource(R.string.view_all),
-        onActionClick = onViewAllClick
-    )
+    Column(modifier = modifier.fillMaxWidth()) {
+        MainSectionHeader(
+            title = stringResource(R.string.section_recommended_lessons),
+            subtitle = stringResource(R.string.section_recommended_lessons_subtitle),
+            actionText = stringResource(R.string.view_all),
+            onActionClick = onViewAllClick,
+            accentColors = listOf(Color(0xFF6366F1), Color(0xFFA855F7))
+        )
 
-    Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(14.dp))
 
-    if (isLoading) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 24.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator(
-                modifier = Modifier.size(32.dp),
-                color = Color(0xFF5538EE)
-            )
-        }
-    } else if (lessons.isNotEmpty()) {
-        val pagerState = rememberPagerState(pageCount = { lessons.size })
-
-        Column(modifier = Modifier.fillMaxWidth()) {
-            HorizontalPager(
-                state = pagerState,
-                contentPadding = PaddingValues(end = 42.dp),
-                pageSpacing = 12.dp,
-                modifier = Modifier.fillMaxWidth()
-            ) { page ->
-                val lessonDto = lessons[page]
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .graphicsLayer {
-                            // Tính toán trực tiếp trong Render Phase (GraphicsLayer)
-                            // Tránh hoàn toàn Recomposition khi vuốt kéo, đảm bảo mượt mà 120 FPS
-                            val pageOffset = (pagerState.currentPage - page) + pagerState.currentPageOffsetFraction
-                            val absOffset = abs(pageOffset).coerceIn(0f, 1f)
-
-                            val scale = 1f - (absOffset * 0.06f)
-                            scaleX = scale
-                            scaleY = scale
-                            translationY = absOffset * 10.dp.toPx()
-                            alpha = 1f - (absOffset * 0.18f)
-                        }
-                ) {
-                    LessonCard(
-                        data = lessonDto.toLessonCardData(),
-                        modifier = Modifier.fillMaxWidth(),
-                        onStartClick = {
-                            onStartLessonClick(lessonDto.id)
-                        }
-                    )
-                }
+        if (isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 24.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(32.dp),
+                    color = Color(0xFF5538EE)
+                )
             }
+        } else if (lessons.isNotEmpty()) {
+            val pagerState = rememberPagerState(pageCount = { lessons.size })
 
-            if (lessons.size > 1) {
-                Spacer(modifier = Modifier.height(12.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    repeat(lessons.size) { index ->
-                        val isSelected = pagerState.currentPage == index
-                        Box(
-                            modifier = Modifier
-                                .padding(horizontal = 3.dp)
-                                .height(4.dp)
-                                .width(if (isSelected) 18.dp else 6.dp)
-                                .clip(CircleShape)
-                                .background(
-                                    if (isSelected) Color(0xFF6366F1) else Color(0xFFCBD5E1).copy(alpha = 0.5f)
+            Column(modifier = Modifier.fillMaxWidth()) {
+                HorizontalPager(
+                    state = pagerState,
+                    contentPadding = PaddingValues(horizontal = 24.dp),
+                    pageSpacing = 14.dp,
+                    modifier = Modifier.fillMaxWidth()
+                ) { page ->
+                    val lessonDto = lessons[page]
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .graphicsLayer {
+                                // Tính toán độ lệch trang trực tiếp trong Render Phase (120 FPS không Recomposition)
+                                val pageOffset = (pagerState.currentPage - page) + pagerState.currentPageOffsetFraction
+                                val absOffset = abs(pageOffset).coerceIn(0f, 1f)
+
+                                // Khoảng cách camera 3D tạo chiều sâu không gian
+                                cameraDistance = 18f * density
+
+                                // Hiệu ứng 3D Cover Flow: Xoay quanh trục Y nghiêng góc 22 độ
+                                rotationY = -pageOffset.coerceIn(-1f, 1f) * 22f
+
+                                // Điểm tựa xoay (Pivot) tạo cảm giác lật mở tự nhiên hướng về trung tâm
+                                transformOrigin = TransformOrigin(
+                                    pivotFractionX = if (pageOffset < 0f) 0.05f else 0.95f,
+                                    pivotFractionY = 0.5f
                                 )
+
+                                // Thu phóng và độ mờ theo chiều sâu
+                                val scale = 1f - (absOffset * 0.08f)
+                                scaleX = scale
+                                scaleY = scale
+                                alpha = 1f - (absOffset * 0.22f)
+                            }
+                    ) {
+                        LessonCard(
+                            data = lessonDto.toLessonCardData(),
+                            modifier = Modifier.fillMaxWidth(),
+                            onStartClick = {
+                                onStartLessonClick(lessonDto.id)
+                            }
                         )
+                    }
+                }
+
+                if (lessons.size > 1) {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        repeat(lessons.size) { index ->
+                            val isSelected = pagerState.currentPage == index
+                            Box(
+                                modifier = Modifier
+                                    .padding(horizontal = 3.dp)
+                                    .height(4.dp)
+                                    .width(if (isSelected) 18.dp else 6.dp)
+                                    .clip(CircleShape)
+                                    .background(
+                                        if (isSelected) Color(0xFF6366F1) else Color(0xFFCBD5E1).copy(alpha = 0.5f)
+                                    )
+                            )
+                        }
                     }
                 }
             }

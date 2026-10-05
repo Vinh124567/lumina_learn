@@ -14,6 +14,7 @@ class SrsManager(context: Context) {
 
     companion object {
         private const val PREF_NAME = "lumina_srs_prefs"
+        private const val KEY_PREFIX_ENROLLED = "enrolled_"
         private const val KEY_PREFIX_REP = "rep_"
         private const val KEY_PREFIX_INTERVAL = "interval_"
         private const val KEY_PREFIX_EASE = "ease_"
@@ -27,8 +28,10 @@ class SrsManager(context: Context) {
         val ease = prefs.getFloat("$KEY_PREFIX_EASE$wordId", 2.5f)
         val next = prefs.getLong("$KEY_PREFIX_NEXT$wordId", 0L)
         val last = prefs.getLong("$KEY_PREFIX_LAST$wordId", 0L)
+        val enrolled = prefs.getBoolean("$KEY_PREFIX_ENROLLED$wordId", false)
         return SrsWordState(
             wordId = wordId,
+            isEnrolled = enrolled || last > 0L || rep > 0,
             repetition = rep,
             intervalDays = interval,
             easeFactor = ease,
@@ -39,6 +42,7 @@ class SrsManager(context: Context) {
 
     fun saveSrsState(state: SrsWordState) {
         prefs.edit {
+            putBoolean("$KEY_PREFIX_ENROLLED${state.wordId}", state.isEnrolled)
             putInt("$KEY_PREFIX_REP${state.wordId}", state.repetition)
             putInt("$KEY_PREFIX_INTERVAL${state.wordId}", state.intervalDays)
             putFloat("$KEY_PREFIX_EASE${state.wordId}", state.easeFactor)
@@ -47,9 +51,20 @@ class SrsManager(context: Context) {
         }
     }
 
+    fun toggleEnrollSrs(wordId: String): SrsWordState {
+        val current = getSrsState(wordId)
+        val newEnrolled = !current.isEnrolled
+        val next = current.copy(
+            isEnrolled = newEnrolled,
+            nextReviewTimeMillis = if (newEnrolled && current.nextReviewTimeMillis == 0L) 0L else current.nextReviewTimeMillis
+        )
+        saveSrsState(next)
+        return next
+    }
+
     fun rateWord(wordId: String, rating: SrsRating): SrsWordState {
         val current = getSrsState(wordId)
-        val next = SrsScheduler.calculateNextState(current, rating)
+        val next = SrsScheduler.calculateNextState(current, rating).copy(isEnrolled = true)
         saveSrsState(next)
         return next
     }

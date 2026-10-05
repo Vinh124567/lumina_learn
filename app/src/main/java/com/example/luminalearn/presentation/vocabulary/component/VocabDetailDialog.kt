@@ -55,6 +55,7 @@ fun VocabDetailDialog(
     onSpeak: (String) -> Unit,
     onSpeakSlow: (String) -> Unit,
     onToggleMastered: (String) -> Unit,
+    onToggleEnrollSrs: (String) -> Unit = {},
     initialTab: Int = 0,
     modifier: Modifier = Modifier
 ) {
@@ -78,9 +79,10 @@ fun VocabDetailDialog(
             color = Color.White
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
-                // ── 1. Top Header Bar (Chip Cấp độ, Chủ đề & Nút đóng) ──
+                // ── 1. Top Header Bar (Chip Cấp độ, Chủ đề, Nút SRS & Nút đóng) ──
                 DialogTopHeader(
                     word = word,
+                    onToggleEnrollSrs = { onToggleEnrollSrs(word.id) },
                     onDismiss = onDismiss
                 )
 
@@ -138,6 +140,7 @@ fun VocabDetailDialog(
 @Composable
 private fun DialogTopHeader(
     word: VocabWordItem,
+    onToggleEnrollSrs: () -> Unit,
     onDismiss: () -> Unit
 ) {
     Row(
@@ -201,21 +204,57 @@ private fun DialogTopHeader(
             }
         }
 
-        // Nút đóng Dialog tròn
-        Box(
-            modifier = Modifier
-                .size(32.dp)
-                .clip(CircleShape)
-                .background(Color(0xFFF1F5F9))
-                .clickable(onClick = onDismiss),
-            contentAlignment = Alignment.Center
+        // Cụm action bên phải: Nút Bật/Tắt Ôn SRS & Nút đóng
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_close),
-                contentDescription = "Đóng",
-                tint = Color(0xFF64748B),
-                modifier = Modifier.size(16.dp)
-            )
+            val isInSrs = word.isInSrs
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(if (isInSrs) Color(0xFFFEF3C7) else Color(0xFFF1F5F9))
+                    .border(
+                        1.dp,
+                        if (isInSrs) Color(0xFFF59E0B) else Color(0xFFE2E8F0),
+                        RoundedCornerShape(8.dp)
+                    )
+                    .clickable(onClick = onToggleEnrollSrs)
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_bolt),
+                        contentDescription = null,
+                        tint = if (isInSrs) Color(0xFFD97706) else Color(0xFF64748B),
+                        modifier = Modifier.size(12.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = if (isInSrs) "Đang ôn SRS" else "+ Ôn SRS",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = if (isInSrs) Color(0xFFD97706) else Color(0xFF475569)
+                    )
+                }
+            }
+
+            // Nút đóng Dialog tròn
+            Box(
+                modifier = Modifier
+                    .size(32.dp)
+                    .clip(CircleShape)
+                    .background(Color(0xFFF1F5F9))
+                    .clickable(onClick = onDismiss),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_close),
+                    contentDescription = "Đóng",
+                    tint = Color(0xFF64748B),
+                    modifier = Modifier.size(16.dp)
+                )
+            }
         }
     }
 }

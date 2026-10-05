@@ -80,25 +80,42 @@
     <!-- AI Roleplay Card -->
     <string name="ai_roleplay_badge">✨ TÍNH NĂNG MỚI 4.0</string>
     <string name="ai_roleplay_tag_status">AI Bản Xứ Realtime</string>
-    <string name="ai_roleplay_title">Hội Thoại Nhập Vai Cùng Lumina AI</string>
-    <string name="ai_roleplay_desc">Luyện phản xạ giao tiếp đời sống: gọi món, taxi, mặc cả... AI đóng vai bản xứ, phân tích ngữ pháp và sửa phát âm!</string>
-    <string name="ai_roleplay_btn">Nhập vai trò chuyện ngay</string>
+    <string name="ai_roleplay_title">Hội Thoại Giao Tiếp Cùng Lumina AI</string>
+    <string name="ai_roleplay_desc">Luyện phản xạ giao tiếp đời sống: gọi món, taxi, mặc cả... AI bản xứ trò chuyện 1:1, phân tích ngữ pháp và sửa phát âm!</string>
+    <string name="ai_roleplay_btn">Luyện nói ngay</string>
 
     <!-- Daily Wisdom Card -->
     <string name="daily_wisdom_badge">💡 CHÂM NGÔN HÔM NAY</string>
     <string name="daily_wisdom_tag_status">Trích Dẫn Cổ Học</string>
 
+    <!-- Home Screen Segmented Hub Tabs -->
+    <string name="hub_tab_today">🔥 Hôm nay</string>
+    <string name="hub_tab_lessons">📚 Bài học HSK</string>
+    <string name="hub_tab_ai">🤖 Trợ lý AI</string>
+    <string name="hub_ai_subtitle">Phản xạ giao tiếp thực tế và thử thách luyện âm chuẩn bản xứ</string>
+    <string name="hub_lessons_subtitle">Lộ trình bài học vi mô phân cấp HSK 1–6</string>
+
     <!-- Home Screen Section Headers & Shortcuts -->
     <string name="section_daily_overview">Chỉ số &amp; Mục tiêu hôm nay</string>
     <string name="section_daily_overview_subtitle">Theo dõi chuỗi học tập và tiến độ hàng ngày</string>
     <string name="section_quick_shortcuts">Luyện tập nhanh vi mô</string>
-    <string name="section_ai_spotlight">Không gian Trí tuệ Lumina AI</string>
-    <string name="section_ai_spotlight_subtitle">Đột phá giao tiếp thực tế và nhận diện âm điệu chuẩn bản xứ</string>
-    <string name="section_recommended_lessons">Bài học đề xuất hôm nay</string>
+    <string name="section_quick_shortcuts_subtitle">Phím tắt ôn luyện kỹ năng tức thì</string>
+    <string name="section_ai_spotlight">Trợ Lý Giao Tiếp Lumina AI</string>
+    <string name="section_ai_spotlight_subtitle">Phản xạ trò chuyện thực tế &amp; sửa âm điệu chuẩn bản xứ</string>
+    <string name="section_recommended_lessons">Bài học đề xuất</string>
     <string name="section_recommended_lessons_subtitle">Khám phá bài học vi mô chuẩn phân cấp HSK</string>
+    <string name="section_spark_challenge">Thử thách phản xạ Spark</string>
+    <string name="section_spark_challenge_subtitle">Rèn luyện phản xạ nhanh trong 60 giây và tích lũy tia sáng</string>
     <string name="section_daily_wisdom">Góc Danh Ngôn Cảm Hứng</string>
+    <string name="section_daily_wisdom_subtitle">Châm ngôn Hán ngữ tiếp thêm năng lượng mỗi ngày</string>
+    <string name="section_vocab_list">Danh sách từ vựng</string>
+    <string name="section_vocab_list_subtitle">Hiển thị %1$d từ theo bộ lọc hiện tại</string>
+    <string name="section_vocab_flashcard">Thẻ lật Flashcard SRS</string>
+    <string name="section_vocab_flashcard_subtitle">Lặp lại ngắt quãng &amp; kiểm tra phản xạ ghi nhớ</string>
+    <string name="section_vocab_reflex">Trắc nghiệm phản xạ</string>
+    <string name="section_vocab_reflex_subtitle">Rèn luyện tốc độ nhận diện mặt chữ và nghĩa</string>
 
-    <string name="shortcut_ai_roleplay">Nhập vai AI</string>
+    <string name="shortcut_ai_roleplay">Luyện nói AI</string>
     <string name="shortcut_pinyin">Luyện Pinyin</string>
     <string name="shortcut_vocab">Kho Từ Vựng</string>
     <string name="shortcut_radicals">Bộ thủ Hán tự</string>
@@ -106,7 +123,7 @@
 
     <!-- Recommended Lessons Section -->
     <string name="recommended_lessons_title">Recommended Lessons</string>
-    <string name="view_all">Xem tất cả →</string>
+    <string name="view_all">Tất cả ↗</string>
     <string name="recommended_lessons_subtitle">Interactive micro-lessons for fast Chinese mastery</string>
     <string name="category_pinyin">PINYIN &amp; TONES</string>
     <string name="category_radicals">HANZI &amp; RADICALS</string>
@@ -149,4 +166,35 @@
     <string name="btn_start_now">Bắt đầu học →</string>
     <string name="sparks_earned_format">+%1$d Tia Sáng</string>
     <string name="duration_mins_format">%1$d phút</string>
+
+    <!-- Bento Grid Dashboard -->
+    <string name="bento_hero_badge">HSK 1 • ĐANG HỌC</string>
+    <string name="bento_hero_title">Mastering 4 Pinyin Tones</string>
+    <string name="bento_hero_progress">Tiến độ bài học: 65%</string>
+    <string name="bento_hero_btn_resume">Tiếp tục →</string>
+    <string name="bento_hero_all_lessons">Tất cả bài học ↗</string>
+
+    <string name="bento_energy_title">Mục tiêu &amp; Chuỗi</string>
+    <string name="bento_energy_progress">10/10m • 100%</string>
+    <string name="bento_streak_days">%1$d ngày liên tiếp</string>
+    <string name="bento_claim_ready">Nhận +30 Sparks ✨</string>
+
+    <string name="bento_ai_title">AI Spark Studio</string>
+    <string name="bento_ai_badge">Bản xứ 4.0</string>
+    <string name="bento_ai_scenario">Gọi món tại nhà hàng</string>
+    <string name="bento_ai_btn">Hội thoại 🎙️</string>
+
+    <string name="bento_vocab_title">Kho Từ Vựng</string>
+    <string name="bento_vocab_hanzi">你好 • Nǐ hǎo</string>
+    <string name="bento_vocab_count">35 từ cần ôn tập</string>
+    <string name="bento_vocab_btn">Ôn tập</string>
+
+    <string name="bento_challenge_title">Thử Thách 60s</string>
+    <string name="bento_challenge_badge">Nhanh</string>
+    <string name="bento_challenge_topic">Phân biệt Điệu 2 &amp; 3</string>
+    <string name="bento_challenge_reward">+20 Sparks</string>
+    <string name="bento_challenge_btn">Chơi ngay</string>
+
+    <string name="hub_tab_bento">⚡ Bento Grid</string>
+    <string name="toast_streak_bonus_claimed">Congratulations! You earned +%1$d Sparks.</string>
 </resources>

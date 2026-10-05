@@ -46,11 +46,11 @@ private val GoldBadgeText = Color(0xFFFEF08A)
 private val GreenDotColor = Color(0xFF22C55E)
 private val MintTextColor = Color(0xFF6EE7B7)
 
-private const val BADGE_STUDIO = "✨ AI ROLEPLAY 4.0"
+private const val BADGE_STUDIO = "✨ AI DIALOGUE 4.0"
 private const val BADGE_VOICE = "Giọng Bắc Kinh"
-private const val BANNER_TITLE = "Phòng Luyện Hội Thoại Nhập Vai"
+private const val BANNER_TITLE = "Phòng Luyện Hội Thoại AI"
 private const val BANNER_DESC =
-    "Đóng vai bản xứ theo ngữ cảnh đời sống thực tế: gọi trà sữa, nhà hàng, bắt taxi, mua sắm..."
+    "Thực hành giao tiếp bản xứ theo ngữ cảnh đời sống thực tế: gọi trà sữa, nhà hàng, bắt taxi, mua sắm..."
 
 @Composable
 fun RoleplayStudioBanner(
