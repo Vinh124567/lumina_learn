@@ -1,8 +1,12 @@
 package com.example.luminalearn.presentation.container
 
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -67,8 +71,21 @@ fun MainContainerScreen(
             navController = bottomNavController,
             startDestination = AppDestination.Main.route,
             modifier = Modifier.fillMaxSize(),
-            enterTransition = { fadeIn(animationSpec = tween(220)) },
-            exitTransition = { fadeOut(animationSpec = tween(220)) }
+            enterTransition = {
+                fadeIn(animationSpec = tween(260)) + scaleIn(
+                    initialScale = 0.96f,
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioNoBouncy,
+                        stiffness = Spring.StiffnessMediumLow
+                    )
+                )
+            },
+            exitTransition = {
+                fadeOut(animationSpec = tween(180)) + scaleOut(
+                    targetScale = 1.02f,
+                    animationSpec = tween(180)
+                )
+            }
         ) {
             composable(AppDestination.Main.route) {
                 MainScreen(

@@ -19,7 +19,7 @@ object RetrofitClient {
      * - Máy thật kết nối cùng mạng Wi-Fi: "http://10.105.163.104:8080/api/"
      */
     @Suppress("kotlin:S1313")
-    const val BASE_URL = "http://10.105.163.104:8080/api/"
+    const val BASE_URL = "http://10.169.197.243:8080/api/"
 
     private var tokenManager: TokenManager? = null
 

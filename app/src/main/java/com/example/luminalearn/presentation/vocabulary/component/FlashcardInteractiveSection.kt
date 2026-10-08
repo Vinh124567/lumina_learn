@@ -1,6 +1,8 @@
 package com.example.luminalearn.presentation.vocabulary.component
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
@@ -23,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
@@ -36,8 +39,6 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.luminalearn.R
-import com.example.luminalearn.core.ui.effect.CosmicStarfield
-import com.example.luminalearn.core.ui.effect.animatedMidnightGradient
 import com.example.luminalearn.core.ui.effect.bounceClick
 import com.example.luminalearn.presentation.vocabulary.model.SrsRating
 import com.example.luminalearn.presentation.vocabulary.model.SrsScheduler
@@ -61,6 +62,7 @@ data class FlashcardActions(
 @Composable
 fun FlashcardInteractiveSection(
     currentWord: VocabWordItem,
+    nextWord: VocabWordItem? = null,
     currentIndex: Int,
     totalCount: Int,
     isFlipped: Boolean,
@@ -83,8 +85,10 @@ fun FlashcardInteractiveSection(
 
         FlashcardCardSurface(
             word = currentWord,
+            nextWord = nextWord,
             isFlipped = isFlipped,
-            actions = actions
+            actions = actions,
+            remainingCards = (totalCount - 1 - currentIndex).coerceAtLeast(0)
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -164,13 +168,27 @@ private fun FlashcardIndexBar(
             color = Color(0xFF64748B)
         )
 
-        Text(
-            text = targetScore,
-            fontFamily = PlusJakartaSans,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFF4F46E5)
-        )
+        val cleanScore = if (targetScore.contains("(")) {
+            targetScore.substringBefore(" (")
+        } else {
+            targetScore
+        }
+        if (cleanScore.isNotBlank()) {
+            Surface(
+                shape = RoundedCornerShape(8.dp),
+                color = Color(0xFFEEF2FF),
+                border = BorderStroke(1.dp, Color(0xFFC7D2FE))
+            ) {
+                Text(
+                    text = cleanScore,
+                    fontFamily = PlusJakartaSans,
+                    fontSize = 11.5.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF4F46E5),
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+                )
+            }
+        }
     }
 }
 
@@ -184,8 +202,10 @@ private fun FlashcardIndexBar(
 @Composable
 private fun FlashcardCardSurface(
     word: VocabWordItem,
+    nextWord: VocabWordItem? = null,
     isFlipped: Boolean,
-    actions: FlashcardActions
+    actions: FlashcardActions,
+    remainingCards: Int = 0
 ) {
     val dragOffsetX = remember { Animatable(0f) }
     val dragOffsetY = remember { Animatable(0f) }
@@ -202,202 +222,244 @@ private fun FlashcardCardSurface(
         totalDragY = 0f
     }
 
-    Card(
-        shape = RoundedCornerShape(26.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        border = BorderStroke(
-            1.5.dp,
-            Brush.linearGradient(
-                listOf(
-                    Color(0xFF818CF8).copy(alpha = 0.65f),
-                    Color(0xFF5538EE).copy(alpha = 0.40f),
-                    Color(0xFFC7D2FE).copy(alpha = 0.50f)
-                )
-            )
-        ),
+    val dragProgress = (kotlin.math.abs(dragOffsetX.value) / 320f).coerceIn(0f, 1f)
+
+    val startPadding = when {
+        remainingCards >= 2 -> 18.dp
+        remainingCards >= 1 -> 10.dp
+        else -> 0.dp
+    }
+
+    Box(
         modifier = Modifier
             .fillMaxWidth()
-            .graphicsLayer {
-                translationX = dragOffsetX.value
-                translationY = dragOffsetY.value
-                rotationZ = (dragOffsetX.value / 60f).coerceIn(-14f, 14f)
-                val distance = hypot(dragOffsetX.value, dragOffsetY.value)
-                val scale = (1f - (distance / 3500f)).coerceIn(0.93f, 1f)
-                scaleX = scale
-                scaleY = scale
+            .padding(start = startPadding, end = if (remainingCards > 0) 4.dp else 0.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        // ── THẺ THỨ 3 (DƯỚI CÙNG - XÒE RỘNG NHẤT Ở PHẦN TRÊN, CHỤM SÁT Ở ĐÁY) ──
+        if (remainingCards >= 2) {
+            val layer3Rotation = -7.0f + (3.5f * dragProgress)
+            val layer3ScaleX = 0.97f + (0.015f * dragProgress)
+            val layer3ScaleY = 0.98f + (0.01f * dragProgress)
+            val layer3Alpha = 0.85f + (0.12f * dragProgress)
+            Card(
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFF8FAFC)),
+                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+                border = BorderStroke(1.dp, Color(0xFFC7D2FE).copy(alpha = 0.6f)),
+                modifier = Modifier
+                    .matchParentSize()
+                    .graphicsLayer {
+                        transformOrigin = TransformOrigin(0.5f, 1f)
+                        rotationZ = layer3Rotation
+                        scaleX = layer3ScaleX
+                        scaleY = layer3ScaleY
+                        alpha = layer3Alpha
+                    }
+            ) {
+                Box(modifier = Modifier.fillMaxSize())
             }
-            .pointerInput(word.id) {
-                detectDragGestures(
-                    onDragStart = {
-                        totalDragX = 0f
-                        totalDragY = 0f
-                    },
-                    onDrag = { change, dragAmount ->
-                        change.consume()
-                        totalDragX += dragAmount.x
-                        totalDragY += dragAmount.y
-                        coroutineScope.launch {
-                            dragOffsetX.snapTo(totalDragX)
-                            dragOffsetY.snapTo(totalDragY)
-                        }
-                    },
-                    onDragEnd = {
-                        val thresholdPx = with(density) { 55.dp.toPx() }
-                        val tapThresholdPx = with(density) { 15.dp.toPx() }
-                        val absX = kotlin.math.abs(totalDragX)
-                        val absY = kotlin.math.abs(totalDragY)
+        }
 
-                        if (absX < tapThresholdPx && absY < tapThresholdPx) {
-                            // Chạm nhẹ -> Lật thẻ
-                            actions.onFlip()
+        // ── THẺ THỨ 2 (Ở GIỮA - XÒE VỪA PHẢI Ở TRÊN, CHỤM SÁT Ở ĐÁY, HIỂN THỊ TỪ TIẾP THEO) ──
+        if (remainingCards >= 1 && nextWord != null) {
+            val layer2Rotation = -3.5f + (3.5f * dragProgress)
+            val layer2ScaleX = 0.985f + (0.015f * dragProgress)
+            val layer2ScaleY = 0.99f + (0.01f * dragProgress)
+            val layer2Alpha = 0.94f + (0.06f * dragProgress)
+            Card(
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                border = BorderStroke(
+                    1.dp,
+                    Brush.linearGradient(
+                        listOf(
+                            Color(0xFF5538EE).copy(alpha = 0.35f),
+                            Color(0xFF818CF8).copy(alpha = 0.35f)
+                        )
+                    )
+                ),
+                modifier = Modifier
+                    .matchParentSize()
+                    .graphicsLayer {
+                        transformOrigin = TransformOrigin(0.5f, 1f)
+                        rotationZ = layer2Rotation
+                        scaleX = layer2ScaleX
+                        scaleY = layer2ScaleY
+                        alpha = layer2Alpha
+                    }
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    FlashcardCleanHeader(
+                        word = nextWord,
+                        onSpeak = { actions.onSpeak(nextWord.hanzi) },
+                        onToggleMastered = { actions.onToggleMastered(nextWord.id) }
+                    )
+
+                    Spacer(modifier = Modifier.height(26.dp))
+
+                    FlashcardCleanFront(word = nextWord)
+
+                    Spacer(modifier = Modifier.height(26.dp))
+
+                    Text(
+                        text = "↻ Chạm để xem đáp án",
+                        fontFamily = PlusJakartaSans,
+                        fontSize = 11.5.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color(0xFF94A3B8)
+                    )
+                }
+            }
+        }
+
+        // ── THẺ CHÍNH (TRÊN CÙNG - TRẮNG SÁNG TINH KHÔI, VIỀN GRADIENT TÍM THƯƠNG HIỆU NỔI BẬT) ──
+        Card(
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+            border = BorderStroke(
+                1.5.dp,
+                Brush.linearGradient(
+                    listOf(
+                        Color(0xFF5538EE),
+                        Color(0xFF818CF8)
+                    )
+                )
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .graphicsLayer {
+                    transformOrigin = TransformOrigin(0.5f, 1f)
+                    translationX = dragOffsetX.value
+                    translationY = dragOffsetY.value
+                    rotationZ = (dragOffsetX.value / 35f).coerceIn(-12f, 12f)
+                }
+                .pointerInput(word.id) {
+                    detectDragGestures(
+                        onDragStart = {
+                            totalDragX = 0f
+                            totalDragY = 0f
+                        },
+                        onDrag = { change, dragAmount ->
+                            change.consume()
+                            totalDragX += dragAmount.x
+                            totalDragY += dragAmount.y * 0.15f
                             coroutineScope.launch {
-                                dragOffsetX.snapTo(0f)
-                                dragOffsetY.snapTo(0f)
+                                dragOffsetX.snapTo(totalDragX)
+                                dragOffsetY.snapTo(totalDragY)
                             }
-                        } else if (absX > absY && absX > thresholdPx) {
-                            // Vuốt ngang
-                            if (totalDragX < 0) {
-                                // Sang trái -> Thẻ tiếp theo
+                        },
+                        onDragEnd = {
+                            val swipeThresholdPx = with(density) { 95.dp.toPx() }
+                            val tapThresholdPx = with(density) { 15.dp.toPx() }
+                            val absX = kotlin.math.abs(totalDragX)
+                            val absY = kotlin.math.abs(totalDragY)
+
+                            if (absX < tapThresholdPx && absY < tapThresholdPx) {
+                                actions.onFlip()
                                 coroutineScope.launch {
-                                    dragOffsetX.animateTo(-1200f, tween(130))
-                                    actions.onNext()
+                                    dragOffsetX.snapTo(0f)
+                                    dragOffsetY.snapTo(0f)
+                                }
+                            } else if (absX >= swipeThresholdPx) {
+                                val targetX = if (totalDragX < 0) -1100f else 1100f
+                                coroutineScope.launch {
+                                    dragOffsetX.animateTo(
+                                        targetValue = targetX,
+                                        animationSpec = tween(180, easing = FastOutLinearInEasing)
+                                    )
+                                    if (totalDragX < 0) {
+                                        actions.onNext()
+                                    } else {
+                                        actions.onPrevious()
+                                    }
                                     dragOffsetX.snapTo(0f)
                                     dragOffsetY.snapTo(0f)
                                 }
                             } else {
-                                // Sang phải -> Thẻ trước
                                 coroutineScope.launch {
-                                    dragOffsetX.animateTo(1200f, tween(130))
-                                    actions.onPrevious()
-                                    dragOffsetX.snapTo(0f)
-                                    dragOffsetY.snapTo(0f)
-                                }
-                            }
-                        } else if (absY >= absX && absY > thresholdPx) {
-                            // Vuốt dọc (Lên hoặc Xuống) -> Lật thẻ
-                            actions.onFlip()
-                            coroutineScope.launch {
-                                launch {
                                     dragOffsetX.animateTo(
-                                        0f,
-                                        spring(
-                                            dampingRatio = Spring.DampingRatioMediumBouncy,
-                                            stiffness = Spring.StiffnessMedium
+                                        targetValue = 0f,
+                                        animationSpec = spring(
+                                            dampingRatio = Spring.DampingRatioNoBouncy,
+                                            stiffness = Spring.StiffnessMediumLow
                                         )
                                     )
                                 }
-                                launch {
+                                coroutineScope.launch {
                                     dragOffsetY.animateTo(
-                                        0f,
-                                        spring(
-                                            dampingRatio = Spring.DampingRatioMediumBouncy,
-                                            stiffness = Spring.StiffnessMedium
+                                        targetValue = 0f,
+                                        animationSpec = spring(
+                                            dampingRatio = Spring.DampingRatioNoBouncy,
+                                            stiffness = Spring.StiffnessMediumLow
                                         )
                                     )
                                 }
                             }
-                        } else {
-                            // Chưa tới ngưỡng -> Đàn hồi về tâm
+                        },
+                        onDragCancel = {
                             coroutineScope.launch {
-                                launch {
-                                    dragOffsetX.animateTo(
-                                        0f,
-                                        spring(
-                                            dampingRatio = Spring.DampingRatioMediumBouncy,
-                                            stiffness = Spring.StiffnessMedium
-                                        )
+                                dragOffsetX.animateTo(
+                                    targetValue = 0f,
+                                    animationSpec = spring(
+                                        dampingRatio = Spring.DampingRatioNoBouncy,
+                                        stiffness = Spring.StiffnessMediumLow
                                     )
-                                }
-                                launch {
-                                    dragOffsetY.animateTo(
-                                        0f,
-                                        spring(
-                                            dampingRatio = Spring.DampingRatioMediumBouncy,
-                                            stiffness = Spring.StiffnessMedium
-                                        )
+                                )
+                            }
+                            coroutineScope.launch {
+                                dragOffsetY.animateTo(
+                                    targetValue = 0f,
+                                    animationSpec = spring(
+                                        dampingRatio = Spring.DampingRatioNoBouncy,
+                                        stiffness = Spring.StiffnessMediumLow
                                     )
-                                }
+                                )
                             }
                         }
-                    },
-                    onDragCancel = {
-                        coroutineScope.launch {
-                            dragOffsetX.animateTo(0f)
-                            dragOffsetY.animateTo(0f)
-                        }
-                    }
-                )
-            }
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .animatedMidnightGradient(
-                    colors = listOf(
-                        Color(0xFF161338),
-                        Color(0xFF221C52),
-                        Color(0xFF2B2068),
-                        Color(0xFF1C1646),
-                        Color(0xFF161338)
-                    ),
-                    durationMillis = 8000
-                )
+                    )
+                }
         ) {
-            CosmicStarfield(
-                modifier = Modifier.matchParentSize(),
-                particleCount = 26,
-                focusCenterXRatio = 0.5f,
-                focusCenterYRatio = 0.4f
-            )
-
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 18.dp, vertical = 18.dp),
+                    .padding(20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                FlashcardHeader(
-                    hskLevel = word.hskLevel,
-                    topic = word.topic,
-                    isDueToday = word.isDueToday,
-                    isFlipped = isFlipped
+                // Header gọn gàng
+                FlashcardCleanHeader(
+                    word = word,
+                    onSpeak = { actions.onSpeak(word.hanzi) },
+                    onToggleMastered = { actions.onToggleMastered(word.id) }
                 )
 
-                Spacer(modifier = Modifier.height(18.dp))
+                Spacer(modifier = Modifier.height(26.dp))
 
                 if (!isFlipped) {
-                    FlashcardFront(
-                        word = word,
-                        onSpeak = actions.onSpeak,
-                        onVoiceTest = { actions.onVoiceTest(word) }
-                    )
+                    FlashcardCleanFront(word = word)
                 } else {
-                    FlashcardBack(
+                    FlashcardCleanBack(
                         word = word,
-                        onSpeak = actions.onSpeak,
-                        onVoiceTest = { actions.onVoiceTest(word) }
+                        onSpeak = actions.onSpeak
                     )
                 }
 
-                Spacer(modifier = Modifier.height(18.dp))
+                Spacer(modifier = Modifier.height(26.dp))
 
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(1.dp)
-                        .background(Color.White.copy(alpha = 0.12f))
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                FlashcardActionFooter(
-                    word = word,
-                    onSpeak = actions.onSpeak,
-                    onSpeakSlow = actions.onSpeakSlow,
-                    onToggleMastered = actions.onToggleMastered,
-                    onOpenDetail = { actions.onOpenDetail(word) },
-                    onVoiceTest = { actions.onVoiceTest(word) }
+                // Bottom hint
+                Text(
+                    text = if (isFlipped) "↺ Chạm để xem mặt trước" else "↻ Chạm để xem đáp án",
+                    fontFamily = PlusJakartaSans,
+                    fontSize = 11.5.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Color(0xFF94A3B8)
                 )
             }
         }
@@ -405,306 +467,191 @@ private fun FlashcardCardSurface(
 }
 
 @Composable
-private fun FlashcardHeader(
-    hskLevel: String,
-    topic: String,
-    isDueToday: Boolean,
-    isFlipped: Boolean
+private fun FlashcardCleanHeader(
+    word: VocabWordItem,
+    onSpeak: () -> Unit,
+    onToggleMastered: () -> Unit
 ) {
-    val flipHint = if (isFlipped) "Vuốt 4 hướng ⊹ Lật lại ↺" else "Vuốt 4 hướng ⊹ Chạm lật ↻"
-
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(6.dp)
+        // Tag HSK & Topic bên trái
+        Surface(
+            shape = RoundedCornerShape(8.dp),
+            color = Color(0xFFF1F5F9),
+            border = BorderStroke(1.dp, Color(0xFFE2E8F0))
         ) {
-            // Indigo Quartz Badge
             Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Color(0xFF818CF8).copy(alpha = 0.15f))
-                    .border(BorderStroke(1.dp, Color(0xFF818CF8).copy(alpha = 0.4f)), RoundedCornerShape(8.dp))
-                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                modifier = Modifier.padding(horizontal = 9.dp, vertical = 4.5.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Box(
                     modifier = Modifier
                         .size(6.dp)
-                        .background(Color(0xFF818CF8), CircleShape)
+                        .clip(CircleShape)
+                        .background(Color(0xFF5538EE))
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
-                    text = "$hskLevel • $topic",
+                    text = "${word.hskLevel} • ${word.topic}",
                     fontFamily = PlusJakartaSans,
-                    fontSize = 11.sp,
+                    fontSize = 11.5.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFFC7D2FE),
+                    color = Color(0xFF475569),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
             }
-
-            if (isDueToday) {
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(Color(0xFFF59E0B).copy(alpha = 0.20f))
-                        .border(BorderStroke(1.dp, Color(0xFFFDE68A).copy(alpha = 0.5f)), RoundedCornerShape(8.dp))
-                        .padding(horizontal = 6.dp, vertical = 4.dp)
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_clock),
-                            contentDescription = null,
-                            tint = Color(0xFFFDE68A),
-                            modifier = Modifier.size(11.dp)
-                        )
-                        Spacer(modifier = Modifier.width(3.dp))
-                        Text(
-                            text = "⚡ Cần ôn",
-                            fontFamily = PlusJakartaSans,
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFFFDE68A),
-                            maxLines = 1
-                        )
-                    }
-                }
-            }
         }
 
-        Box(
-            modifier = Modifier
-                .clip(RoundedCornerShape(8.dp))
-                .background(Color.White.copy(alpha = 0.10f))
-                .padding(horizontal = 8.dp, vertical = 4.dp)
-        ) {
-            Text(
-                text = flipHint,
-                fontFamily = PlusJakartaSans,
-                fontSize = 10.5.sp,
-                fontWeight = FontWeight.Medium,
-                color = Color(0xFFE2E8F0),
-                maxLines = 1,
-                softWrap = false
-            )
-        }
-    }
-}
-
-@Composable
-private fun FlashcardFront(
-    word: VocabWordItem,
-    onSpeak: (String) -> Unit,
-    onVoiceTest: () -> Unit = {}
-) {
-    val hanziFontSize = remember(word.hanzi) {
-        when {
-            word.hanzi.length <= 1 -> 56.sp
-            word.hanzi.length == 2 -> 46.sp
-            word.hanzi.length == 3 -> 36.sp
-            else -> 30.sp
-        }
-    }
-
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+        // 2 nút Loa & Thuộc từ bên phải
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Text(
-                text = word.hanzi,
-                fontFamily = PlusJakartaSans,
-                fontSize = hanziFontSize,
-                fontWeight = FontWeight.ExtraBold,
-                color = Color.White,
-                textAlign = TextAlign.Center,
-                maxLines = 1,
-                softWrap = false
-            )
-            Spacer(modifier = Modifier.width(12.dp))
+            // Nút Loa
             Box(
                 modifier = Modifier
-                    .size(36.dp)
+                    .size(34.dp)
                     .clip(CircleShape)
-                    .background(Color.White.copy(alpha = 0.12f))
-                    .border(BorderStroke(1.dp, Color(0xFF818CF8).copy(alpha = 0.45f)), CircleShape)
-                    .bounceClick(scaleDown = 0.88f) { onSpeak(word.hanzi) },
+                    .background(Color(0xFFEEF2FF))
+                    .bounceClick(scaleDown = 0.88f, onClick = onSpeak),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_speaker),
                     contentDescription = "Phát âm",
-                    tint = Color(0xFFC7D2FE),
-                    modifier = Modifier.size(18.dp)
+                    tint = Color(0xFF5538EE),
+                    modifier = Modifier.size(16.dp)
                 )
             }
-            Spacer(modifier = Modifier.width(6.dp))
+
+            // Nút Thuộc từ
             Box(
                 modifier = Modifier
-                    .size(36.dp)
+                    .size(34.dp)
                     .clip(CircleShape)
-                    .background(Color.White.copy(alpha = 0.12f))
-                    .border(BorderStroke(1.dp, Color(0xFF818CF8).copy(alpha = 0.45f)), CircleShape)
-                    .bounceClick(scaleDown = 0.88f, onClick = onVoiceTest),
+                    .background(if (word.isMastered) Color(0xFF10B981) else Color(0xFFF1F5F9))
+                    .border(
+                        BorderStroke(1.dp, if (word.isMastered) Color(0xFF059669) else Color(0xFFE2E8F0)),
+                        CircleShape
+                    )
+                    .bounceClick(scaleDown = 0.88f, onClick = onToggleMastered),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_mic),
-                    contentDescription = "Thử giọng",
-                    tint = Color(0xFFC7D2FE),
-                    modifier = Modifier.size(17.dp)
+                    painter = painterResource(id = R.drawable.ic_check),
+                    contentDescription = "Trạng thái thuộc",
+                    tint = if (word.isMastered) Color.White else Color(0xFF94A3B8),
+                    modifier = Modifier.size(15.dp)
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun FlashcardCleanFront(word: VocabWordItem) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // Chữ Hán to, thanh lịch
+        Text(
+            text = word.hanzi,
+            fontFamily = PlusJakartaSans,
+            fontSize = if (word.hanzi.length <= 2) 58.sp else 44.sp,
+            fontWeight = FontWeight.ExtraBold,
+            color = Color(0xFF0F172A),
+            textAlign = TextAlign.Center,
+            maxLines = 1
+        )
 
         Spacer(modifier = Modifier.height(14.dp))
 
-        if (word.hanViet.isNotBlank()) {
-            Spacer(modifier = Modifier.height(14.dp))
-
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(Color(0xFFF59E0B).copy(alpha = 0.18f))
-                    .border(BorderStroke(1.dp, Color(0xFFFDE68A).copy(alpha = 0.45f)), RoundedCornerShape(10.dp))
-                    .padding(horizontal = 14.dp, vertical = 5.dp)
+        // Pinyin • Hán-Việt
+        val pinyinHanViet = buildString {
+            if (word.pinyin.isNotBlank()) append(word.pinyin)
+            if (word.pinyin.isNotBlank() && word.hanViet.isNotBlank()) append(" • ")
+            if (word.hanViet.isNotBlank()) append(word.hanViet)
+        }
+        if (pinyinHanViet.isNotBlank()) {
+            Surface(
+                shape = RoundedCornerShape(10.dp),
+                color = Color(0xFFF8FAFC),
+                border = BorderStroke(1.dp, Color(0xFFE2E8F0))
             ) {
                 Text(
-                    text = "Hán-Việt: ${word.hanViet}",
+                    text = pinyinHanViet,
                     fontFamily = PlusJakartaSans,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFFFDE68A)
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color(0xFF5538EE),
+                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp)
                 )
             }
         }
 
         if (word.radical.isNotBlank()) {
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(10.dp))
             val radicalText = if (word.radical.startsWith("Bộ")) word.radical else "Bộ thủ: ${word.radical}"
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(5.dp)
-                        .background(Color(0xFF818CF8), CircleShape)
-                )
-                Spacer(modifier = Modifier.width(6.dp))
-                Text(
-                    text = radicalText,
-                    fontFamily = PlusJakartaSans,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Color(0xFFA5B4FC),
-                    textAlign = TextAlign.Center
-                )
-            }
+            Text(
+                text = radicalText,
+                fontFamily = PlusJakartaSans,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Medium,
+                color = Color(0xFF94A3B8),
+                textAlign = TextAlign.Center
+            )
         }
     }
 }
 
 @Composable
-private fun FlashcardBack(
+private fun FlashcardCleanBack(
     word: VocabWordItem,
-    onSpeak: (String) -> Unit,
-    onVoiceTest: () -> Unit = {}
+    onSpeak: (String) -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = word.pinyin,
-                fontFamily = PlusJakartaSans,
-                fontSize = 26.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = Color(0xFFC7D2FE),
-                textAlign = TextAlign.Center
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Box(
-                modifier = Modifier
-                    .size(32.dp)
-                    .clip(CircleShape)
-                    .background(Color.White.copy(alpha = 0.12f))
-                    .border(BorderStroke(1.dp, Color(0xFF818CF8).copy(alpha = 0.45f)), CircleShape)
-                    .bounceClick(scaleDown = 0.88f) { onSpeak(word.hanzi) },
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_speaker),
-                    contentDescription = "Phát âm",
-                    tint = Color(0xFFC7D2FE),
-                    modifier = Modifier.size(16.dp)
-                )
-            }
-            Spacer(modifier = Modifier.width(6.dp))
-            Box(
-                modifier = Modifier
-                    .size(32.dp)
-                    .clip(CircleShape)
-                    .background(Color.White.copy(alpha = 0.12f))
-                    .border(BorderStroke(1.dp, Color(0xFF818CF8).copy(alpha = 0.45f)), CircleShape)
-                    .bounceClick(scaleDown = 0.88f, onClick = onVoiceTest),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_mic),
-                    contentDescription = "Thử giọng",
-                    tint = Color(0xFFC7D2FE),
-                    modifier = Modifier.size(16.dp)
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
+        // Nghĩa tiếng Việt
         Text(
             text = word.meaning,
             fontFamily = PlusJakartaSans,
             fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.White,
+            color = Color(0xFF0F172A),
             textAlign = TextAlign.Center
         )
 
-        Spacer(modifier = Modifier.height(4.dp))
-
-        Text(
-            text = "(${word.partOfSpeech})",
-            fontFamily = PlusJakartaSans,
-            fontSize = 12.sp,
-            color = Color(0xFF94A3B8),
-            textAlign = TextAlign.Center
-        )
+        if (word.partOfSpeech.isNotBlank()) {
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "(${word.partOfSpeech})",
+                fontFamily = PlusJakartaSans,
+                fontSize = 12.5.sp,
+                color = Color(0xFF64748B),
+                textAlign = TextAlign.Center
+            )
+        }
 
         if (word.exampleHanzi.isNotBlank()) {
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(14.dp))
-                    .background(Color.White.copy(alpha = 0.08f))
-                    .border(BorderStroke(1.dp, Color(0xFF818CF8).copy(alpha = 0.35f)), RoundedCornerShape(14.dp))
-                    .padding(12.dp)
+            Surface(
+                shape = RoundedCornerShape(14.dp),
+                color = Color(0xFFF8FAFC),
+                border = BorderStroke(1.dp, Color(0xFFE2E8F0)),
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(14.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.Top
                 ) {
@@ -714,161 +661,46 @@ private fun FlashcardBack(
                             fontFamily = PlusJakartaSans,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFFF8FAFC)
+                            color = Color(0xFF0F172A)
                         )
-                        Spacer(modifier = Modifier.height(3.dp))
-                        Text(
-                            text = word.examplePinyin,
-                            fontFamily = PlusJakartaSans,
-                            fontSize = 12.sp,
-                            color = Color(0xFFA5B4FC)
-                        )
-                        Spacer(modifier = Modifier.height(2.dp))
-                        Text(
-                            text = word.exampleMeaning,
-                            fontFamily = PlusJakartaSans,
-                            fontSize = 12.sp,
-                            color = Color(0xFFCBD5E1)
-                        )
+                        if (word.examplePinyin.isNotBlank()) {
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text(
+                                text = word.examplePinyin,
+                                fontFamily = PlusJakartaSans,
+                                fontSize = 12.sp,
+                                color = Color(0xFF5538EE)
+                            )
+                        }
+                        if (word.exampleMeaning.isNotBlank()) {
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text(
+                                text = word.exampleMeaning,
+                                fontFamily = PlusJakartaSans,
+                                fontSize = 12.sp,
+                                color = Color(0xFF64748B)
+                            )
+                        }
                     }
+
                     Box(
                         modifier = Modifier
                             .size(30.dp)
                             .clip(CircleShape)
-                            .background(Color.White.copy(alpha = 0.12f))
+                            .background(Color(0xFFEEF2FF))
                             .bounceClick(scaleDown = 0.88f) { onSpeak(word.exampleHanzi) },
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_speaker),
                             contentDescription = "Nghe ví dụ",
-                            tint = Color(0xFFC7D2FE),
+                            tint = Color(0xFF5538EE),
                             modifier = Modifier.size(14.dp)
                         )
                     }
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun FlashcardActionFooter(
-    word: VocabWordItem,
-    onSpeak: (String) -> Unit,
-    onSpeakSlow: (String) -> Unit,
-    onToggleMastered: (String) -> Unit,
-    onOpenDetail: () -> Unit,
-    onVoiceTest: () -> Unit = {}
-) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalAlignment = Alignment.Start
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            ActionChip(
-                iconRes = R.drawable.ic_speaker,
-                label = "Nghe",
-                modifier = Modifier.weight(1f),
-                onClick = { onSpeak(word.hanzi) }
-            )
-            ActionChip(
-                iconRes = R.drawable.ic_mic,
-                label = "Thử giọng",
-                modifier = Modifier.weight(1.2f),
-                onClick = onVoiceTest
-            )
-            ActionChip(
-                iconRes = R.drawable.ic_book,
-                label = "Chi tiết",
-                modifier = Modifier.weight(1.1f),
-                onClick = onOpenDetail
-            )
-            ActionChip(
-                iconRes = R.drawable.ic_clock,
-                label = "Chậm",
-                modifier = Modifier.weight(0.9f),
-                onClick = { onSpeakSlow(word.hanzi) }
-            )
-        }
-
-        MasteredButton(
-            isMastered = word.isMastered,
-            onClick = { onToggleMastered(word.id) }
-        )
-    }
-}
-
-@Composable
-private fun ActionChip(
-    @androidx.annotation.DrawableRes iconRes: Int,
-    label: String,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
-) {
-    Box(
-        modifier = modifier
-            .clip(RoundedCornerShape(20.dp))
-            .background(Color.White.copy(alpha = 0.08f))
-            .border(BorderStroke(1.dp, Color(0xFF818CF8).copy(alpha = 0.35f)), RoundedCornerShape(20.dp))
-            .bounceClick(scaleDown = 0.92f, onClick = onClick)
-            .padding(vertical = 6.dp, horizontal = 4.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Icon(
-                painter = painterResource(id = iconRes),
-                contentDescription = null,
-                tint = Color(0xFFC7D2FE),
-                modifier = Modifier.size(12.dp)
-            )
-            Spacer(modifier = Modifier.width(3.dp))
-            Text(
-                text = label,
-                fontFamily = PlusJakartaSans,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFFC7D2FE),
-                maxLines = 1
-            )
-        }
-    }
-}
-
-@Composable
-private fun MasteredButton(
-    isMastered: Boolean,
-    onClick: () -> Unit
-) {
-    val bgColor = if (isMastered) Color(0xFF10B981).copy(alpha = 0.22f) else Color.White.copy(alpha = 0.08f)
-    val contentColor = if (isMastered) Color(0xFF34D399) else Color(0xFFC7D2FE)
-    val borderColor = if (isMastered) Color(0xFF34D399).copy(alpha = 0.5f) else Color(0xFF818CF8).copy(alpha = 0.35f)
-    val label = if (isMastered) "✓ Đã thuộc từ này" else "✓ Đánh dấu đã thuộc"
-
-    Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(20.dp))
-            .background(bgColor)
-            .border(BorderStroke(1.dp, borderColor), RoundedCornerShape(20.dp))
-            .bounceClick(scaleDown = 0.95f, onClick = onClick)
-            .padding(horizontal = 14.dp, vertical = 6.dp)
-    ) {
-        Text(
-            text = label,
-            fontFamily = PlusJakartaSans,
-            fontSize = 11.5.sp,
-            fontWeight = FontWeight.Bold,
-            color = contentColor,
-            maxLines = 1
-        )
     }
 }
 

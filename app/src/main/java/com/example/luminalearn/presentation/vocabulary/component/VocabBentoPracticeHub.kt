@@ -34,6 +34,7 @@ import com.example.luminalearn.R
 import com.example.luminalearn.core.ui.effect.EnergyPulseAura
 import com.example.luminalearn.core.ui.effect.animatedMidnightGradient
 import com.example.luminalearn.core.ui.effect.bounceClick
+import com.example.luminalearn.core.ui.effect.breathingGlow
 import com.example.luminalearn.ui.theme.PlusJakartaSans
 
 private val GoldBadgeText = Color(0xFFFEF08A)
@@ -140,7 +141,9 @@ private fun FlashcardBentoCard(
                         painter = painterResource(id = R.drawable.ic_clock),
                         contentDescription = null,
                         tint = SkyAccentColor,
-                        modifier = Modifier.size(14.dp)
+                        modifier = Modifier
+                            .size(14.dp)
+                            .breathingGlow(minScale = 0.9f, maxScale = 1.25f, durationMillis = 1600)
                     )
                 }
 
@@ -276,7 +279,8 @@ private fun ReflexQuizBentoCard(
                         fontFamily = PlusJakartaSans,
                         color = MintTextColor,
                         fontSize = 10.5.sp,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.breathingGlow(minScale = 0.94f, maxScale = 1.15f, durationMillis = 1500)
                     )
                 }
 

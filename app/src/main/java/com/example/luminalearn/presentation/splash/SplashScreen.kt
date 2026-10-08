@@ -59,7 +59,7 @@ fun SplashScreen(
 
         delay(1600)
 
-        navController.navigate(AppDestination.Login.route) {
+        navController.navigate(AppDestination.Onboarding.route) {
             popUpTo(AppDestination.Splash.route) { inclusive = true }
         }
     }

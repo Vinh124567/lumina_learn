@@ -36,6 +36,10 @@
     <!-- TopBar & Stats -->
     <string name="stat_days_format">%1$d Ngày</string>
     <string name="stat_points_format">%1$d</string>
+    <string name="greeting_nihao_sub">Nǐ hǎo • Chào bạn 👋</string>
+    <string name="greeting_daily_ready">Sẵn sàng chinh phục tiếng Trung hôm nay? ✨</string>
+    <string name="large_greeting_name">Nǐ hǎo, Alex Vance! ✨</string>
+    <string name="large_greeting_badge">HSK 1 • Sơ cấp</string>
 
     <!-- Greeting Header -->
     <string name="welcome_back">CHÀO MỪNG TRỞ LẠI • 欢迎</string>

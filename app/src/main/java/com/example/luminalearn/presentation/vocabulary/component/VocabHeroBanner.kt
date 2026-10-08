@@ -21,6 +21,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,8 +32,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.luminalearn.R
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import com.example.luminalearn.core.ui.effect.CosmicStarfield
 import com.example.luminalearn.core.ui.effect.animatedMidnightGradient
+import com.example.luminalearn.core.ui.effect.breathingGlow
 
 private val GoldBadgeText = Color(0xFFFEF08A)
 private val MintTextColor = Color(0xFF6EE7B7)
@@ -178,7 +183,9 @@ fun VocabHeroBanner(
                             painter = painterResource(id = R.drawable.ic_bolt),
                             contentDescription = null,
                             tint = Color(0xFFFBBF24),
-                            modifier = Modifier.size(13.dp)
+                            modifier = Modifier
+                                .size(13.dp)
+                                .breathingGlow(minScale = 0.92f, maxScale = 1.25f, durationMillis = 1400)
                         )
                         Spacer(modifier = Modifier.width(5.dp))
                         Text(
@@ -206,11 +213,19 @@ fun VocabHeroBanner(
                         .clip(RoundedCornerShape(3.dp))
                         .background(Color.White.copy(alpha = 0.15f))
                 ) {
-                    val progressFraction = (progressPercent.coerceIn(0, 100) / 100f)
-                    if (progressFraction > 0f) {
+                    val targetFraction = (progressPercent.coerceIn(0, 100) / 100f)
+                    val animatedFraction by animateFloatAsState(
+                        targetValue = targetFraction,
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioLowBouncy,
+                            stiffness = Spring.StiffnessMediumLow
+                        ),
+                        label = "vocab_hero_progress_anim"
+                    )
+                    if (animatedFraction > 0f) {
                         Box(
                             modifier = Modifier
-                                .fillMaxWidth(progressFraction)
+                                .fillMaxWidth(animatedFraction)
                                 .fillMaxHeight()
                                 .clip(RoundedCornerShape(3.dp))
                                 .background(ProgressGradient)

@@ -48,6 +48,7 @@ import com.example.luminalearn.ui.theme.PlusJakartaSans
 fun FlashcardPracticeDialog(
     isOpen: Boolean,
     currentWord: VocabWordItem?,
+    nextWord: VocabWordItem? = null,
     currentIndex: Int,
     totalCount: Int,
     isFlipped: Boolean,
@@ -124,6 +125,7 @@ fun FlashcardPracticeDialog(
                 ) {
                     FlashcardInteractiveSection(
                         currentWord = currentWord,
+                        nextWord = nextWord,
                         currentIndex = currentIndex,
                         totalCount = totalCount,
                         isFlipped = isFlipped,

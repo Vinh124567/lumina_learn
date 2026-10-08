@@ -24,7 +24,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
-import com.example.luminalearn.presentation.main.component.TopBar
 import com.example.luminalearn.presentation.spark_ai_lab.component.DEFAULT_SCENARIOS
 import com.example.luminalearn.presentation.spark_ai_lab.component.MicroPromptStudioBanner
 import com.example.luminalearn.presentation.spark_ai_lab.component.ReflexQuizStudioBanner
@@ -57,11 +56,6 @@ fun SparkAILab(
             .background(Color(0xFFF6F8FB))
             .statusBarsPadding()
     ) {
-        TopBar(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
-            streakDays = 7,
-            points = 445
-        )
 
         Column(
             modifier = Modifier

@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.luminalearn.R
+import com.example.luminalearn.core.ui.effect.staggeredEntrance
 import com.example.luminalearn.data.model.toLessonCardData
 import com.example.luminalearn.presentation.common.AppScaffold
 import com.example.luminalearn.presentation.common.CelebrationEffect
@@ -57,6 +58,9 @@ import com.example.luminalearn.presentation.main.component.LessonCard
 import com.example.luminalearn.presentation.main.component.MainSectionHeader
 import com.example.luminalearn.presentation.main.component.QuickActionBar
 import com.example.luminalearn.presentation.main.component.SparkChallengeCard
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.ui.platform.LocalDensity
+import com.example.luminalearn.presentation.main.component.CollapsingHomeTopBar
 import com.example.luminalearn.presentation.main.component.TopBar
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -89,6 +93,17 @@ fun MainScreen(
         }
     }
 
+    val scrollState = rememberScrollState()
+    val density = LocalDensity.current
+    val collapseThresholdPx = with(density) { 80.dp.toPx() }
+    val collapseProgress by remember {
+        derivedStateOf {
+            if (collapseThresholdPx > 0) {
+                (scrollState.value / collapseThresholdPx).coerceIn(0f, 1f)
+            } else 0f
+        }
+    }
+
     AppScaffold { paddingValues ->
         Box(
             modifier = Modifier
@@ -98,20 +113,19 @@ fun MainScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
+                    .verticalScroll(scrollState)
             ) {
-                TopBar(
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
+                // Khoảng đệm đỉnh bằng đúng chiều cao mở rộng của Large Header (138dp) + 8dp thở
+                Spacer(modifier = Modifier.height(146.dp))
 
                 // ── 1. HERO CARD: TÂM ĐIỂM BÀI HỌC HSK HIỆN TẠI ──
                 HeroLessonCard(
                     lesson = uiState.recommendedLessons.firstOrNull(),
                     onStartLessonClick = { lessonId -> viewModel.loadLesson(lessonId) },
                     onViewAllLessonsClick = onNavigateToLesson,
-                    modifier = Modifier.padding(horizontal = 16.dp)
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .staggeredEntrance(index = 1)
                 )
 
                 Spacer(modifier = Modifier.height(18.dp))
@@ -121,7 +135,9 @@ fun MainScreen(
                     title = stringResource(R.string.section_quick_shortcuts),
                     subtitle = stringResource(R.string.section_quick_shortcuts_subtitle),
                     accentColors = listOf(Color(0xFF6366F1), Color(0xFF00F2FE)),
-                    modifier = Modifier.padding(horizontal = 16.dp)
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .staggeredEntrance(index = 2)
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -139,7 +155,9 @@ fun MainScreen(
                             Toast.LENGTH_SHORT
                         ).show()
                     },
-                    modifier = Modifier.padding(horizontal = 16.dp)
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .staggeredEntrance(index = 2)
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
@@ -149,7 +167,9 @@ fun MainScreen(
                     title = stringResource(R.string.section_daily_overview),
                     subtitle = stringResource(R.string.section_daily_overview_subtitle),
                     accentColors = listOf(Color(0xFFFF9800), Color(0xFFEA580C)),
-                    modifier = Modifier.padding(horizontal = 16.dp)
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .staggeredEntrance(index = 3)
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -169,7 +189,9 @@ fun MainScreen(
                             Toast.LENGTH_SHORT
                         ).show()
                     },
-                    modifier = Modifier.padding(horizontal = 16.dp)
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .staggeredEntrance(index = 3)
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
@@ -180,7 +202,9 @@ fun MainScreen(
                     lessons = uiState.recommendedLessons,
                     onViewAllClick = onNavigateToLesson,
                     onStartLessonClick = { lessonId -> viewModel.loadLesson(lessonId) },
-                    modifier = Modifier.padding(horizontal = 16.dp)
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .staggeredEntrance(index = 4)
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
@@ -190,14 +214,18 @@ fun MainScreen(
                     title = stringResource(R.string.section_ai_spotlight),
                     subtitle = stringResource(R.string.section_ai_spotlight_subtitle),
                     accentColors = listOf(Color(0xFF6366F1), Color(0xFF00F2FE)),
-                    modifier = Modifier.padding(horizontal = 16.dp)
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .staggeredEntrance(index = 5)
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
 
                 AiRoleplayDialogueCard(
                     onStartRoleplayClick = onNavigateToSparkAi,
-                    modifier = Modifier.padding(horizontal = 16.dp)
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .staggeredEntrance(index = 5)
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
@@ -207,7 +235,9 @@ fun MainScreen(
                     title = stringResource(R.string.section_spark_challenge),
                     subtitle = stringResource(R.string.section_spark_challenge_subtitle),
                     accentColors = listOf(Color(0xFFF59E0B), Color(0xFFEF4444)),
-                    modifier = Modifier.padding(horizontal = 16.dp)
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .staggeredEntrance(index = 6)
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -222,7 +252,9 @@ fun MainScreen(
                             Toast.LENGTH_SHORT
                         ).show()
                     },
-                    modifier = Modifier.padding(horizontal = 16.dp)
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .staggeredEntrance(index = 6)
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
@@ -232,7 +264,9 @@ fun MainScreen(
                     title = stringResource(R.string.section_daily_wisdom),
                     subtitle = stringResource(R.string.section_daily_wisdom_subtitle),
                     accentColors = listOf(Color(0xFF10B981), Color(0xFF06B6D4)),
-                    modifier = Modifier.padding(horizontal = 16.dp)
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .staggeredEntrance(index = 7)
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -240,11 +274,34 @@ fun MainScreen(
                 DailyWisdomCard(
                     wisdom = uiState.dailyWisdom,
                     onRefreshClick = { viewModel.refreshDailyWisdom() },
-                    modifier = Modifier.padding(horizontal = 16.dp)
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .staggeredEntrance(index = 7)
                 )
 
-                Spacer(modifier = Modifier.height(96.dp))
+                Spacer(modifier = Modifier.height(130.dp))
             }
+
+            // ── TOPBAR COLLAPSING STICKY: Tự động co dần và dừng đóng cố định ở mép trên màn hình ──
+            CollapsingHomeTopBar(
+                collapseProgress = collapseProgress,
+                streakDays = 5,
+                points = 240,
+                hasUnreadNotification = true,
+                onStreakClick = {
+                    Toast.makeText(context, context.getString(R.string.msg_streak_claimed), Toast.LENGTH_SHORT).show()
+                },
+                onPointsClick = {
+                    Toast.makeText(context, "Năng lượng: 240 Sparks", Toast.LENGTH_SHORT).show()
+                },
+                onNotificationClick = {
+                    Toast.makeText(context, "Bạn không có thông báo mới", Toast.LENGTH_SHORT).show()
+                },
+                onAvatarClick = {
+                    navController.navigate(AppDestination.Reward.route)
+                },
+                modifier = Modifier.align(Alignment.TopCenter)
+            )
 
             CelebrationEffect(
                 triggerKey = confettiTrigger,

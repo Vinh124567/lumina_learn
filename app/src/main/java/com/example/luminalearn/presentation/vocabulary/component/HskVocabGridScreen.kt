@@ -22,11 +22,14 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -101,9 +104,12 @@ private fun getWordLevelGradient(hskLevelStr: String, defaultGradient: List<Colo
     }
 }
 
+private const val PAGE_SIZE = 10
+
 /**
  * Màn hình danh sách từ vựng chi tiết theo cấp độ HSK / Tất cả từ vựng dạng Grid 2 cột.
- * Thiết kế giao diện Luminous Bento cao cấp, đồng bộ hoàn hảo với Home và Vocab Tab.
+ * Hỗ trợ phân trang 10 từ/trang với PaginationBar điều hướng trang trước/sau.
+ * Header tinh gọn thoáng đãng, tích hợp sẵn tiến độ và tìm kiếm realtime.
  */
 @Composable
 fun HskVocabGridScreen(
@@ -153,7 +159,7 @@ fun HskVocabGridScreen(
 
     val filterOptions = remember(levelWords.size, masteredCount, srsEnrolledCount, dueInLevelCount, customCount) {
         listOf(
-            "Tất cả (${levelWords.size})",
+            "Toàn bộ (${levelWords.size})",
             "Đã thuộc ($masteredCount)",
             "Đang ôn SRS ($srsEnrolledCount)",
             "Cần ôn ($dueInLevelCount)",
@@ -206,23 +212,33 @@ fun HskVocabGridScreen(
         }
     }
 
+    // 4. Phân trang tối đa 10 từ mỗi trang
+    var currentPage by remember(selectedHskLevelNumber, searchQuery, selectedFilterIndex) { mutableIntStateOf(1) }
+    val totalFilteredWords = displayWords.size
+    val totalPages = maxOf(1, (totalFilteredWords + PAGE_SIZE - 1) / PAGE_SIZE)
+    val safeCurrentPage = currentPage.coerceIn(1, totalPages)
+    val paginatedWords = remember(displayWords, safeCurrentPage) {
+        val startIndex = (safeCurrentPage - 1) * PAGE_SIZE
+        displayWords.drop(startIndex).take(PAGE_SIZE)
+    }
+
     Column(
         modifier = modifier
             .fillMaxSize()
             .background(Color(0xFFF6F8FB))
     ) {
-        // ── 1. APP BAR MÀN CON CHUYÊN BIỆT: CHỈ 1 DÒNG DUY NHẤT, THOÁNG ĐÃNG ──
+        // ── 1. APP BAR THANH LỊCH TÍCH HỢP TIẾN ĐỘ & NÚT THÊM TỪ ──
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .statusBarsPadding()
-                .padding(start = 8.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
+                .padding(start = 8.dp, end = 16.dp, top = 6.dp, bottom = 4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Nút quay lại dạng < (chevron) phẳng
             Box(
                 modifier = Modifier
-                    .size(40.dp)
+                    .size(38.dp)
                     .bounceClick(scaleDown = 0.86f, onClick = onBack),
                 contentAlignment = Alignment.Center
             ) {
@@ -234,128 +250,48 @@ fun HskVocabGridScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.width(6.dp))
+            Spacer(modifier = Modifier.width(4.dp))
 
-            // Tiêu đề duy nhất 1 dòng phẳng đẹp, không badge thừa
-            Text(
-                text = if (selectedHskLevelNumber == 0) "Tất cả từ vựng" else currentHskData.stageName,
-                fontFamily = PlusJakartaSans,
-                fontSize = 19.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = Color(0xFF0F172A),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.weight(1f)
-            )
-        }
-
-        // ── 2. DẢI CHỌN CẤP ĐỘ HSK (CHUYỂN NHANH HSK 1–6 HOẶC XEM TẤT CẢ) ──
-        LazyRow(
-            contentPadding = PaddingValues(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-        ) {
-            items(hskLevelPills) { (levelNum, label) ->
-                val isSelected = selectedHskLevelNumber == levelNum
-                val pillGradient = getHskGradientColors(levelNum)
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(
-                            if (isSelected) {
-                                Brush.horizontalGradient(pillGradient)
-                            } else {
-                                SolidColor(Color.White)
-                            }
-                        )
-                        .border(
-                            BorderStroke(
-                                1.dp,
-                                if (isSelected) Color.Transparent
-                                else Color(0xFFE2E8F0)
-                            ),
-                            RoundedCornerShape(12.dp)
-                        )
-                        .bounceClick(scaleDown = 0.94f) {
-                            selectedHskLevelNumber = levelNum
-                            selectedFilterIndex = 0
-                        }
-                        .padding(horizontal = 13.dp, vertical = 6.5.dp)
-                ) {
-                    Text(
-                        text = label,
-                        fontFamily = PlusJakartaSans,
-                        fontSize = 12.sp,
-                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold,
-                        color = if (isSelected) Color.White else Color(0xFF475569)
-                    )
-                }
+            // Tiêu đề + Tiến độ thu gọn
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = if (selectedHskLevelNumber == 0) "Tất cả từ vựng" else currentHskData.stageName,
+                    fontFamily = PlusJakartaSans,
+                    fontSize = 17.5.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = Color(0xFF0F172A),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = "Tiến độ: $masteredCount/${levelWords.size} từ đã thuộc • $progressPercent%",
+                    fontFamily = PlusJakartaSans,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Color(0xFF64748B)
+                )
             }
-        }
 
-        // ── 3. TIẾN ĐỘ GHI NHỚ TRONG BODY ──
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 5.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            // Nút + Thêm từ nhanh
+            Box(
+                modifier = Modifier
+                    .size(34.dp)
+                    .clip(CircleShape)
+                    .background(Color(0xFFEEF2FF))
+                    .border(BorderStroke(0.5.dp, Color(0xFFC7D2FE)), CircleShape)
+                    .bounceClick(scaleDown = 0.88f, onClick = onAddVocabClick),
+                contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_bolt),
-                    contentDescription = null,
-                    tint = Color(0xFFF59E0B),
-                    modifier = Modifier.size(13.dp)
-                )
-                Text(
-                    text = "Tiến độ: $masteredCount / ${levelWords.size} từ đã thuộc",
-                    fontFamily = PlusJakartaSans,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color(0xFF334155)
-                )
-            }
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .width(72.dp)
-                        .height(5.dp)
-                        .clip(RoundedCornerShape(2.5.dp))
-                        .background(Color(0xFFE2E8F0))
-                ) {
-                    val progressFraction = (progressPercent.coerceIn(0, 100) / 100f)
-                    if (progressFraction > 0f) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth(progressFraction)
-                                .fillMaxHeight()
-                                .clip(RoundedCornerShape(2.5.dp))
-                                .background(Brush.horizontalGradient(currentGradient))
-                        )
-                    }
-                }
-
-                Text(
-                    text = "$progressPercent%",
-                    fontFamily = PlusJakartaSans,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = if (selectedHskLevelNumber == 0) Color(0xFF6366F1) else currentHskData.accentColor
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Thêm từ",
+                    tint = Color(0xFF6366F1),
+                    modifier = Modifier.size(16.dp)
                 )
             }
         }
 
-        // ── 4. KHUNG TÌM KIẾM ──
+        // ── 2. KHUNG TÌM KIẾM MỎNG GỌN ──
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -364,23 +300,23 @@ fun HskVocabGridScreen(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(42.dp),
+                    .height(38.dp),
                 shape = RoundedCornerShape(12.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.White),
-                border = BorderStroke(1.dp, Color(0xFFE2E8F0)),
+                border = BorderStroke(0.5.dp, Color(0xFFE2E8F0)),
                 elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(horizontal = 12.dp),
+                        .padding(horizontal = 11.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_search),
                         contentDescription = "Search",
                         tint = Color(0xFF6366F1),
-                        modifier = Modifier.size(16.dp)
+                        modifier = Modifier.size(15.dp)
                     )
 
                     Spacer(modifier = Modifier.width(8.dp))
@@ -390,7 +326,7 @@ fun HskVocabGridScreen(
                             Text(
                                 text = "Tìm chữ Hán, Pinyin, nghĩa...",
                                 fontFamily = PlusJakartaSans,
-                                fontSize = 12.5.sp,
+                                fontSize = 12.sp,
                                 color = Color(0xFF94A3B8),
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
@@ -401,7 +337,7 @@ fun HskVocabGridScreen(
                             onValueChange = { searchQuery = it },
                             textStyle = TextStyle(
                                 fontFamily = PlusJakartaSans,
-                                fontSize = 12.5.sp,
+                                fontSize = 12.sp,
                                 fontWeight = FontWeight.Medium,
                                 color = Color(0xFF0F172A)
                             ),
@@ -417,7 +353,7 @@ fun HskVocabGridScreen(
                             contentDescription = "Clear",
                             tint = Color(0xFF94A3B8),
                             modifier = Modifier
-                                .size(16.dp)
+                                .size(15.dp)
                                 .clickable { searchQuery = "" }
                         )
                     }
@@ -425,41 +361,87 @@ fun HskVocabGridScreen(
             }
         }
 
-        // ── 5. BỘ LỌC PHÂN LOẠI & TRẠNG THÁI (STATUS / POS) ──
+        // ── 3. DẢI CHỌN CẤP ĐỘ HSK (CHUYỂN NHANH HSK 1–6 HOẶC XEM TẤT CẢ) ──
         LazyRow(
             contentPadding = PaddingValues(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(7.dp),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 4.dp)
+                .padding(vertical = 3.dp)
+        ) {
+            items(hskLevelPills) { (levelNum, label) ->
+                val isSelected = selectedHskLevelNumber == levelNum
+                val pillGradient = getHskGradientColors(levelNum)
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(
+                            if (isSelected) {
+                                Brush.horizontalGradient(pillGradient)
+                            } else {
+                                SolidColor(Color.White)
+                            }
+                        )
+                        .border(
+                            BorderStroke(
+                                0.5.dp,
+                                if (isSelected) Color.Transparent
+                                else Color(0xFFE2E8F0)
+                            ),
+                            RoundedCornerShape(10.dp)
+                        )
+                        .bounceClick(scaleDown = 0.94f) {
+                            selectedHskLevelNumber = levelNum
+                            selectedFilterIndex = 0
+                        }
+                        .padding(horizontal = 12.dp, vertical = 5.dp)
+                ) {
+                    Text(
+                        text = label,
+                        fontFamily = PlusJakartaSans,
+                        fontSize = 11.5.sp,
+                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold,
+                        color = if (isSelected) Color.White else Color(0xFF475569)
+                    )
+                }
+            }
+        }
+
+        // ── 4. BỘ LỌC PHÂN LOẠI & TRẠNG THÁI (STATUS / POS) ──
+        LazyRow(
+            contentPadding = PaddingValues(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(7.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 3.dp)
         ) {
             itemsIndexed(filterOptions) { index, title ->
                 val isSelected = selectedFilterIndex == index
                 val activeAccent = if (selectedHskLevelNumber == 0) Color(0xFF6366F1) else currentHskData.accentColor
                 Box(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(16.dp))
+                        .clip(RoundedCornerShape(10.dp))
                         .background(
                             if (isSelected) activeAccent.copy(alpha = 0.12f)
                             else Color.White
                         )
                         .border(
                             BorderStroke(
-                                1.dp,
+                                0.5.dp,
                                 if (isSelected) activeAccent.copy(alpha = 0.45f)
                                 else Color(0xFFE2E8F0)
                             ),
-                            RoundedCornerShape(16.dp)
+                            RoundedCornerShape(10.dp)
                         )
                         .bounceClick(scaleDown = 0.94f) {
                             selectedFilterIndex = index
                         }
-                        .padding(horizontal = 11.dp, vertical = 5.dp)
+                        .padding(horizontal = 10.dp, vertical = 4.5.dp)
                 ) {
                     Text(
                         text = title,
                         fontFamily = PlusJakartaSans,
-                        fontSize = 11.5.sp,
+                        fontSize = 11.sp,
                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
                         color = if (isSelected) activeAccent else Color(0xFF64748B)
                     )
@@ -467,7 +449,7 @@ fun HskVocabGridScreen(
             }
         }
 
-        // ── 6. NỘI DUNG GRID 2 CỘT ──
+        // ── 5. NỘI DUNG GRID 2 CỘT (PHÂN TRANG TỐI ĐA 10 TỪ / TRANG) ──
         if (isLoading && levelWords.isEmpty()) {
             Box(
                 modifier = Modifier
@@ -538,7 +520,7 @@ fun HskVocabGridScreen(
                             )
                         }
                     }
-                    if (selectedFilterIndex == 6) {
+                    if (selectedFilterIndex == 7) {
                         Spacer(modifier = Modifier.height(10.dp))
                         Box(
                             modifier = Modifier
@@ -565,28 +547,44 @@ fun HskVocabGridScreen(
                     start = 16.dp,
                     end = 16.dp,
                     top = 6.dp,
-                    bottom = 120.dp
+                    bottom = 140.dp
                 ),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.fillMaxSize()
             ) {
                 items(
-                    items = displayWords,
+                    items = paginatedWords,
                     key = { it.id }
                 ) { wordItem ->
                     val wordAccent = getWordLevelAccent(wordItem.hskLevel, currentHskData.accentColor)
-                    val wordGradient = getWordLevelGradient(wordItem.hskLevel, currentGradient)
 
                     VocabGridCard(
                         item = wordItem,
                         accentColor = wordAccent,
-                        accentGradient = wordGradient,
                         onSpeak = onSpeakWord,
                         onToggleMastered = { onToggleMastered(wordItem.id) },
                         onToggleEnrollSrs = { onToggleEnrollSrs(wordItem.id) },
                         onClick = { onOpenWordDetail(wordItem) }
                     )
+                }
+
+                // ── THANH PHÂN TRANG PAGINATION BAR DƯỚI CÙNG (10 TỪ/TRANG) ──
+                if (totalPages > 1 || totalFilteredWords > 0) {
+                    item(span = { GridItemSpan(2) }, key = "pagination_bar") {
+                        PaginationBar(
+                            currentPage = safeCurrentPage,
+                            totalPages = totalPages,
+                            totalItems = totalFilteredWords,
+                            pageSize = PAGE_SIZE,
+                            onPageChange = { newPage ->
+                                currentPage = newPage
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 10.dp, bottom = 24.dp)
+                        )
+                    }
                 }
             }
         }
@@ -594,14 +592,16 @@ fun HskVocabGridScreen(
 }
 
 /**
- * Thẻ từ vựng hiển thị dạng Grid 2 cột phong cách Deep Indigo Quartz cao cấp.
- * Nền tím chàm hoàng gia, chữ Hán trắng tuyết, Pinyin chàm phấn, Hán-Việt hổ phách.
+ * Thẻ từ vựng hiển thị dạng Grid 2 cột phong cách Luxury Flashcard:
+ * - Nền trắng sứ tinh tế, bo góc 20dp, viền siêu mỏng hairline 0.5dp.
+ * - Header: Nhãn loại từ bên trái & Duy nhất nút Loa phát âm bên phải (thoáng đãng, không chật chội).
+ * - Center: Chữ Hán to rõ 35sp mực than sâu, Pinyin & Hán Việt hài hòa.
+ * - Footer: Nghĩa tiếng Việt cùng cụm nút hành động SRS và Đánh dấu thuộc cân xứng ở đáy.
  */
 @Composable
 private fun VocabGridCard(
     item: VocabWordItem,
     accentColor: Color,
-    accentGradient: List<Color>,
     onSpeak: (String) -> Unit,
     onToggleMastered: () -> Unit,
     onToggleEnrollSrs: () -> Unit,
@@ -611,233 +611,192 @@ private fun VocabGridCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .height(176.dp)
+            .height(172.dp)
             .bounceClick(scaleDown = 0.96f, onClick = onClick),
-        shape = RoundedCornerShape(18.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-        border = BorderStroke(
-            1.2.dp,
-            if (item.isMastered) Color(0xFF10B981).copy(alpha = 0.65f)
-            else Color(0xFF818CF8).copy(alpha = 0.35f)
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = if (item.isMastered) Color(0xFFF9FDFB) else Color.White
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+        border = BorderStroke(
+            0.5.dp,
+            if (item.isMastered) Color(0xFF10B981).copy(alpha = 0.35f)
+            else Color(0xFFE2E8F0).copy(alpha = 0.6f)
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(
-                    Brush.linearGradient(
-                        colors = listOf(
-                            Color(0xFF161338),
-                            Color(0xFF221C52),
-                            Color(0xFF1A1442)
-                        )
-                    )
-                )
+                .padding(horizontal = 12.dp, vertical = 11.dp),
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Column(
-                modifier = Modifier.fillMaxSize()
+            // ── 1. Header: Loại từ badge bên trái + Duy nhất nút Loa phát âm bên phải ──
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                // ── Vạch màu Gradient mỏng ở mép trên nhận diện cấp độ HSK ──
+                val posLabel = item.partOfSpeech.ifBlank { "Từ vựng" }
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(3.5.dp)
-                        .clip(RoundedCornerShape(topStart = 18.dp, topEnd = 18.dp))
-                        .background(Brush.horizontalGradient(accentGradient))
+                        .clip(RoundedCornerShape(6.dp))
+                        .background(accentColor.copy(alpha = 0.08f))
+                        .padding(horizontal = 7.dp, vertical = 2.5.dp)
+                ) {
+                    Text(
+                        text = posLabel,
+                        fontFamily = PlusJakartaSans,
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = accentColor,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+
+                // Nút loa phát âm tròn thoáng đãng
+                Box(
+                    modifier = Modifier
+                        .size(28.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xFFF8FAFC))
+                        .border(BorderStroke(0.5.dp, Color(0xFFE2E8F0)), CircleShape)
+                        .bounceClick(scaleDown = 0.85f) {
+                            onSpeak(item.hanzi)
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_speaker),
+                        contentDescription = "Phát âm",
+                        tint = Color(0xFF475569),
+                        modifier = Modifier.size(13.dp)
+                    )
+                }
+            }
+
+            // ── 2. Centerpiece: Chữ Hán to rõ 35sp mực than sâu + Pinyin & Hán Việt ──
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = item.hanzi,
+                    fontFamily = PlusJakartaSans,
+                    fontSize = 35.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = Color(0xFF0F172A),
+                    textAlign = TextAlign.Center,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
 
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 11.dp, vertical = 9.dp),
-                    verticalArrangement = Arrangement.SpaceBetween
+                Spacer(modifier = Modifier.height(2.dp))
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
                 ) {
-                    // Header: Loại từ badge bên trái + Cụm 3 nút hành động bên phải
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        val posLabel = item.partOfSpeech.ifBlank { "Từ vựng" }
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(6.dp))
-                                .background(Color.White.copy(alpha = 0.08f))
-                                .border(
-                                    BorderStroke(0.8.dp, accentColor.copy(alpha = 0.45f)),
-                                    RoundedCornerShape(6.dp)
-                                )
-                                .padding(horizontal = 6.dp, vertical = 2.dp)
-                        ) {
-                            Text(
-                                text = posLabel,
-                                fontFamily = PlusJakartaSans,
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = accentColor,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                        }
-
-                        // Cụm nút: Loa phát âm & Ôn SRS & Đánh dấu thuộc từ
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(5.dp)
-                        ) {
-                            // Nút loa phát âm
-                            Box(
-                                modifier = Modifier
-                                    .size(28.dp)
-                                    .clip(CircleShape)
-                                    .background(Color.White.copy(alpha = 0.10f))
-                                    .border(BorderStroke(0.8.dp, Color(0xFF818CF8).copy(alpha = 0.35f)), CircleShape)
-                                    .bounceClick(scaleDown = 0.85f) {
-                                        onSpeak(item.hanzi)
-                                    },
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.ic_speaker),
-                                    contentDescription = "Phát âm",
-                                    tint = Color(0xFFC7D2FE),
-                                    modifier = Modifier.size(13.dp)
-                                )
-                            }
-
-                            // Nút thêm/bớt khỏi lộ trình ôn SRS
-                            val isInSrs = item.isInSrs
-                            Box(
-                                modifier = Modifier
-                                    .size(28.dp)
-                                    .clip(CircleShape)
-                                    .background(
-                                        if (isInSrs) Color(0xFFF59E0B).copy(alpha = 0.20f)
-                                        else Color.White.copy(alpha = 0.08f)
-                                    )
-                                    .border(
-                                        BorderStroke(
-                                            0.8.dp,
-                                            if (isInSrs) Color(0xFFFDE68A).copy(alpha = 0.50f)
-                                            else Color.White.copy(alpha = 0.15f)
-                                        ),
-                                        CircleShape
-                                    )
-                                    .bounceClick(scaleDown = 0.85f, onClick = onToggleEnrollSrs),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.ic_bolt),
-                                    contentDescription = if (isInSrs) "Đang trong lộ trình SRS" else "Thêm vào lộ trình SRS",
-                                    tint = if (isInSrs) Color(0xFFFDE68A) else Color(0xFF94A3B8),
-                                    modifier = Modifier.size(13.dp)
-                                )
-                            }
-
-                            // Nút đánh dấu Đã thuộc / Chưa thuộc ở góc phải
-                            Box(
-                                modifier = Modifier
-                                    .size(28.dp)
-                                    .clip(CircleShape)
-                                    .background(
-                                        if (item.isMastered) Color(0xFF10B981).copy(alpha = 0.20f)
-                                        else Color.White.copy(alpha = 0.08f)
-                                    )
-                                    .border(
-                                        BorderStroke(
-                                            0.8.dp,
-                                            if (item.isMastered) Color(0xFF34D399).copy(alpha = 0.55f)
-                                            else Color.White.copy(alpha = 0.20f)
-                                        ),
-                                        CircleShape
-                                    )
-                                    .bounceClick(scaleDown = 0.85f, onClick = onToggleMastered),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                if (item.isMastered) {
-                                    Icon(
-                                        painter = painterResource(R.drawable.ic_check),
-                                        contentDescription = "Đã thuộc",
-                                        tint = Color(0xFF34D399),
-                                        modifier = Modifier.size(13.dp)
-                                    )
-                                } else {
-                                    Box(
-                                        modifier = Modifier
-                                            .size(9.dp)
-                                            .border(1.2.dp, Color(0xFF94A3B8), CircleShape)
-                                    )
-                                }
-                            }
-                        }
-                    }
-
-                    // Centerpiece: Chữ Hán to rõ 35sp trắng tuyết + Pinyin & Hán Việt hổ phách
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = item.hanzi,
-                            fontFamily = PlusJakartaSans,
-                            fontSize = 35.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = Color.White,
-                            textAlign = TextAlign.Center,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-
-                        Spacer(modifier = Modifier.height(2.dp))
-
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            Text(
-                                text = item.pinyin,
-                                fontFamily = PlusJakartaSans,
-                                fontSize = 13.5.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFFC7D2FE),
-                                maxLines = 1
-                            )
-
-                            if (item.hanViet.isNotBlank()) {
-                                Text(
-                                    text = " • ",
-                                    fontFamily = PlusJakartaSans,
-                                    fontSize = 10.sp,
-                                    color = Color(0xFF818CF8)
-                                )
-                                Text(
-                                    text = item.hanViet,
-                                    fontFamily = PlusJakartaSans,
-                                    fontSize = 11.5.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = Color(0xFFFDE68A),
-                                    maxLines = 1
-                                )
-                            }
-                        }
-                    }
-
-                    // Bottom: Nghĩa tiếng Việt sáng rõ, tương phản sắc nét
                     Text(
-                        text = item.meaning,
+                        text = item.pinyin,
                         fontFamily = PlusJakartaSans,
-                        fontSize = 12.5.sp,
-                        lineHeight = 16.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color(0xFFE2E8F0),
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 2.dp)
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = accentColor,
+                        maxLines = 1
                     )
+
+                    if (item.hanViet.isNotBlank()) {
+                        Text(
+                            text = " • ",
+                            fontFamily = PlusJakartaSans,
+                            fontSize = 10.sp,
+                            color = Color(0xFFCBD5E1)
+                        )
+                        Text(
+                            text = item.hanViet,
+                            fontFamily = PlusJakartaSans,
+                            fontSize = 11.5.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color(0xFF64748B),
+                            maxLines = 1
+                        )
+                    }
+                }
+            }
+
+            // ── 3. Footer: Nghĩa tiếng Việt bên trái + Nút SRS & Đã thuộc bên phải ──
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = item.meaning,
+                    fontFamily = PlusJakartaSans,
+                    fontSize = 11.5.sp,
+                    lineHeight = 15.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Color(0xFF334155),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f)
+                )
+
+                Spacer(modifier = Modifier.width(6.dp))
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    // Nút thêm/bớt khỏi lộ trình ôn SRS
+                    val isInSrs = item.isInSrs
+                    Box(
+                        modifier = Modifier
+                            .size(24.dp)
+                            .clip(CircleShape)
+                            .background(
+                                if (isInSrs) Color(0xFFFEF3C7)
+                                else Color(0xFFF1F5F9)
+                            )
+                            .bounceClick(scaleDown = 0.85f, onClick = onToggleEnrollSrs),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_bolt),
+                            contentDescription = if (isInSrs) "Đang ôn SRS" else "Thêm SRS",
+                            tint = if (isInSrs) Color(0xFFD97706) else Color(0xFF94A3B8),
+                            modifier = Modifier.size(11.dp)
+                        )
+                    }
+
+                    // Nút đánh dấu Đã thuộc / Chưa thuộc
+                    Box(
+                        modifier = Modifier
+                            .size(24.dp)
+                            .clip(CircleShape)
+                            .background(
+                                if (item.isMastered) Color(0xFFDCFCE7)
+                                else Color(0xFFF1F5F9)
+                            )
+                            .bounceClick(scaleDown = 0.85f, onClick = onToggleMastered),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (item.isMastered) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_check),
+                                contentDescription = "Đã thuộc",
+                                tint = Color(0xFF059669),
+                                modifier = Modifier.size(11.dp)
+                            )
+                        } else {
+                            Box(
+                                modifier = Modifier
+                                    .size(8.dp)
+                                    .border(1.dp, Color(0xFF94A3B8), CircleShape)
+                            )
+                        }
+                    }
                 }
             }
         }

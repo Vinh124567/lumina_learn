@@ -41,6 +41,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import com.example.luminalearn.core.ui.effect.bounceClick
+import com.example.luminalearn.core.ui.effect.staggeredEntrance
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -51,9 +52,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.luminalearn.R
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
@@ -70,7 +75,6 @@ import com.example.luminalearn.presentation.vocabulary.component.VocabDetailDial
 import com.example.luminalearn.presentation.vocabulary.component.VocabHeroBanner
 import androidx.compose.foundation.layout.statusBarsPadding
 import com.example.luminalearn.presentation.main.component.MainSectionHeader
-import com.example.luminalearn.presentation.main.component.TopBar
 import com.example.luminalearn.ui.theme.PlusJakartaSans
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -85,10 +89,16 @@ fun VocabularyScreen(
 
     var isFlashcardPracticeOpen by remember { mutableStateOf(false) }
     var isReflexQuizPracticeOpen by remember { mutableStateOf(false) }
+    var isSpeedMatchOpen by remember { mutableStateOf(false) }
     var selectedHskDetailData by remember { mutableStateOf<HskLevelCardData?>(null) }
+    var selectedHanziDetailData by remember { mutableStateOf<com.example.luminalearn.presentation.vocabulary.component.HanziSpotlightData?>(null) }
 
-    BackHandler(enabled = selectedHskDetailData != null) {
-        selectedHskDetailData = null
+    BackHandler(enabled = selectedHskDetailData != null || selectedHanziDetailData != null) {
+        if (selectedHanziDetailData != null) {
+            selectedHanziDetailData = null
+        } else {
+            selectedHskDetailData = null
+        }
     }
 
     LaunchedEffect(Unit) {
@@ -125,11 +135,47 @@ fun VocabularyScreen(
             targetState = selectedHskDetailData,
             transitionSpec = {
                 if (targetState != null) {
-                    (slideInHorizontally { width -> width } + fadeIn(tween(250)))
-                        .togetherWith(slideOutHorizontally { width -> -width / 3 } + fadeOut(tween(250)))
+                    // Mở màn hình con: Trượt vào với độ nảy vật lý Spring nhẹ và zoom từ 94%
+                    (slideInHorizontally(
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioNoBouncy,
+                            stiffness = Spring.StiffnessMediumLow
+                        )
+                    ) { width -> (width * 0.92f).toInt() } + fadeIn(tween(280)) + scaleIn(
+                        initialScale = 0.94f,
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioNoBouncy,
+                            stiffness = Spring.StiffnessMediumLow
+                        )
+                    )).togetherWith(
+                        slideOutHorizontally(
+                            animationSpec = tween(280)
+                        ) { width -> (-width * 0.25f).toInt() } + fadeOut(tween(220)) + scaleOut(
+                            targetScale = 0.96f,
+                            animationSpec = tween(280)
+                        )
+                    )
                 } else {
-                    (slideInHorizontally { width -> -width / 3 } + fadeIn(tween(250)))
-                        .togetherWith(slideOutHorizontally { width -> width } + fadeOut(tween(250)))
+                    // Đóng màn hình con quay lại: Màn hình cha hồi phục mượt mà
+                    (slideInHorizontally(
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioNoBouncy,
+                            stiffness = Spring.StiffnessMediumLow
+                        )
+                    ) { width -> (-width * 0.25f).toInt() } + fadeIn(tween(280)) + scaleIn(
+                        initialScale = 0.96f,
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioNoBouncy,
+                            stiffness = Spring.StiffnessMediumLow
+                        )
+                    )).togetherWith(
+                        slideOutHorizontally(
+                            animationSpec = tween(280)
+                        ) { width -> (width * 0.92f).toInt() } + fadeOut(tween(220)) + scaleOut(
+                            targetScale = 0.94f,
+                            animationSpec = tween(280)
+                        )
+                    )
                 }
             },
             label = "hsk_vocab_screen_transition",
@@ -162,15 +208,8 @@ fun VocabularyScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(Color(0xFFF6F8FB))
+                        .statusBarsPadding()
                 ) {
-                    TopBar(
-                        modifier = Modifier
-                            .statusBarsPadding()
-                            .padding(horizontal = 16.dp, vertical = 6.dp),
-                        streakDays = 5,
-                        points = 240
-                    )
-
                     var isPullRefreshing by remember { mutableStateOf(false) }
 
                     LaunchedEffect(uiState.isLoadingVocab) {
@@ -192,55 +231,38 @@ fun VocabularyScreen(
                             contentPadding = PaddingValues(
                                 start = 16.dp,
                                 end = 16.dp,
-                                top = 8.dp,
+                                top = 4.dp,
                                 bottom = 110.dp
                             ),
-                            verticalArrangement = Arrangement.spacedBy(14.dp),
+                            verticalArrangement = Arrangement.spacedBy(16.dp),
                             modifier = Modifier.fillMaxSize()
                         ) {
-                            // ── 1. HERO BANNER TIẾN ĐỘ TỔNG QUAN ──
-                            item(key = "vocab_hero_banner", contentType = "hero") {
-                                VocabHeroBanner(
-                                    masteredCount = uiState.masteredCount,
-                                    totalCount = uiState.totalCount,
-                                    progressPercent = uiState.progressPercent
+                            // ── 1. TIÊU ĐỀ KHO TỪ VỰNG & NÚT HÀNH ĐỘNG (TRA CỨU / THÊM TỪ) ──
+                            item(key = "vocab_header_bar", contentType = "header_bar") {
+                                com.example.luminalearn.presentation.vocabulary.component.VocabHeaderBar(
+                                    onSearchClick = {
+                                        selectedHskDetailData = com.example.luminalearn.presentation.vocabulary.component.HSK_LEVEL_INFOS.firstOrNull()
+                                    },
+                                    onAddVocabClick = {
+                                        viewModel.processIntent(VocabularyUiIntent.SetAddVocabSheetVisible(true))
+                                    },
+                                    modifier = Modifier.staggeredEntrance(index = 0)
                                 )
                             }
 
-                            // ── 2. CAROUSEL 3D CẤP ĐỘ HSK 1–6 ──
-                            item(key = "vocab_hsk_carousel_header", contentType = "header") {
+                            // ── 2. PHÂN KHU 1: NHỊP HỌC HÔM NAY (SRS, PHẢN XẠ & ĐẤU GHÉP 60S) ──
+                            item(key = "section_daily_practice_header", contentType = "section_header") {
                                 MainSectionHeader(
-                                    title = "Lộ trình cấp độ HSK",
-                                    subtitle = "Vuốt ngang & chạm thẻ để mở kho từ vựng HSK",
-                                    accentColors = listOf(Color(0xFF6366F1), Color(0xFF00F2FE))
+                                    title = "Nhịp học hôm nay",
+                                    subtitle = "Ôn tập ngắt quãng SRS và thử thách phản xạ nhanh",
+                                    accentColors = listOf(Color(0xFF6366F1), Color(0xFF00F2FE)),
+                                    modifier = Modifier.staggeredEntrance(index = 1)
                                 )
                             }
 
-                            item(key = "vocab_hsk_carousel", contentType = "carousel") {
-                                HskLevelCoverFlowCarousel(
-                                    hskLevels = uiState.hskLevels,
-                                    selectedHskIndex = uiState.selectedHskIndex,
-                                    vocabList = uiState.vocabList,
-                                    onSelectHskLevel = { _, _ -> },
-                                    onOpenHskLevel = { levelData ->
-                                        selectedHskDetailData = levelData
-                                    }
-                                )
-                            }
-
-                            // ── 3. CỤM BENTO HUBS: LUYỆN TẬP VI MÔ (SRS & QUIZ) ──
-                            item(key = "vocab_bento_header", contentType = "header") {
-                                MainSectionHeader(
-                                    title = "Luyện tập vi mô",
-                                    subtitle = "Ôn tập ngắt quãng SRS Ebbinghaus & Thử thách phản xạ",
-                                    accentColors = listOf(Color(0xFF6366F1), Color(0xFF00F2FE))
-                                )
-                            }
-
-                            item(key = "vocab_bento_hub", contentType = "bento") {
-                                VocabBentoPracticeHub(
+                            item(key = "vocab_daily_practice_duo", contentType = "practice_duo") {
+                                com.example.luminalearn.presentation.vocabulary.component.VocabDailyPracticeDuo(
                                     dueTodayCount = uiState.dueTodayCount,
-                                    quizQuestionCount = 10,
                                     onStartFlashcard = {
                                         if (uiState.dueTodayCount > 0) {
                                             viewModel.processIntent(VocabularyUiIntent.SelectSource(com.example.luminalearn.presentation.vocabulary.model.VocabSourceFilter.DUE_TODAY))
@@ -252,19 +274,85 @@ fun VocabularyScreen(
                                     onStartQuiz = {
                                         viewModel.processIntent(VocabularyUiIntent.StartReflexQuiz)
                                         isReflexQuizPracticeOpen = true
-                                    }
+                                    },
+                                    modifier = Modifier.staggeredEntrance(index = 1)
                                 )
                             }
+
+                            item(key = "speed_word_match_card", contentType = "gamification") {
+                                com.example.luminalearn.presentation.vocabulary.component.SpeedWordMatchCard(
+                                    onStartMatch = { isSpeedMatchOpen = true },
+                                    modifier = Modifier.staggeredEntrance(index = 2)
+                                )
+                            }
+
+                            // ── 3. PHÂN KHU 2: LỘ TRÌNH CẤP ĐỘ HSK ──
+                            item(key = "section_hsk_route_header", contentType = "section_header") {
+                                MainSectionHeader(
+                                    title = "Lộ trình cấp độ HSK",
+                                    subtitle = "Từ vựng chuẩn HSK 1 đến 6 theo khung quốc tế",
+                                    actionText = "Mở kho từ",
+                                    onActionClick = {
+                                        selectedHskDetailData = com.example.luminalearn.presentation.vocabulary.component.HSK_LEVEL_INFOS.firstOrNull()
+                                    },
+                                    accentColors = listOf(Color(0xFF06B6D4), Color(0xFF3B82F6)),
+                                    modifier = Modifier.staggeredEntrance(index = 3)
+                                )
+                            }
+
+                            item(key = "hsk_mini_pager", contentType = "hsk_pager") {
+                                com.example.luminalearn.presentation.vocabulary.component.HskMiniPagerCard(
+                                    hskLevels = com.example.luminalearn.presentation.vocabulary.component.HSK_LEVEL_INFOS,
+                                    onOpenHskLevel = { levelData ->
+                                        selectedHskDetailData = levelData
+                                    },
+                                    modifier = Modifier.staggeredEntrance(index = 3)
+                                )
+                            }
+
+                            item(key = "hsk_mastery_breakdown", contentType = "mastery_breakdown") {
+                                com.example.luminalearn.presentation.vocabulary.component.HskMasteryBreakdownCard(
+                                    vocabList = uiState.vocabList,
+                                    masteredCount = uiState.masteredCount,
+                                    totalCount = uiState.totalCount,
+                                    progressPercent = uiState.progressPercent,
+                                    onOpenHskLevel = { levelData ->
+                                        selectedHskDetailData = levelData
+                                    },
+                                    modifier = Modifier.staggeredEntrance(index = 4)
+                                )
+                            }
+
+                            // ── 4. PHÂN KHU 3: KHÁM PHÁ & CHIẾT TỰ ──
+                            item(key = "section_hanzi_spotlight_header", contentType = "section_header") {
+                                MainSectionHeader(
+                                    title = "Chiết tự tâm điểm",
+                                    subtitle = "Thấu hiểu triết lý và kết cấu chữ Hán mỗi ngày",
+                                    accentColors = listOf(Color(0xFF10B981), Color(0xFF059669)),
+                                    modifier = Modifier.staggeredEntrance(index = 5)
+                                )
+                            }
+
+                            item(key = "daily_hanzi_spotlight", contentType = "hanzi_spotlight") {
+                                com.example.luminalearn.presentation.vocabulary.component.DailyHanziSpotlightCard(
+                                    onSpeakWord = onSpeakWord,
+                                    onOpenDetail = { hanziData ->
+                                        selectedHanziDetailData = hanziData
+                                    },
+                                    modifier = Modifier.staggeredEntrance(index = 5)
+                                )
+                            }
+                        }
                         }
                     }
                 }
             }
-        }
 
         // ── Dialog Luyện Flashcard SRS tập trung ──
         FlashcardPracticeDialog(
             isOpen = isFlashcardPracticeOpen,
             currentWord = uiState.currentFlashcardWord,
+            nextWord = uiState.nextFlashcardWord,
             currentIndex = uiState.safeFlashcardIndex,
             totalCount = uiState.filteredList.size,
             isFlipped = uiState.isCardFlipped,
@@ -348,6 +436,22 @@ fun VocabularyScreen(
                 onSubmit = { request ->
                     viewModel.processIntent(VocabularyUiIntent.AddNewVocabulary(request) {})
                 }
+            )
+        }
+
+        // ── Dialog Thử thách Đấu ghép từ 60s Gamification ──
+        com.example.luminalearn.presentation.vocabulary.component.SpeedWordMatchDialog(
+            isOpen = isSpeedMatchOpen,
+            vocabList = uiState.vocabList,
+            onDismiss = { isSpeedMatchOpen = false }
+        )
+
+        // ── Dialog Chi Tiết Chiết Tự Chữ Hán Chuyên Sâu (Ô Mễ Tự Cách & Cội Nguồn) ──
+        if (selectedHanziDetailData != null) {
+            com.example.luminalearn.presentation.vocabulary.component.HanziSpotlightDetailDialog(
+                hanziData = selectedHanziDetailData!!,
+                onDismiss = { selectedHanziDetailData = null },
+                onSpeak = onSpeakWord
             )
         }
     }

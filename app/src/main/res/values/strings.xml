@@ -37,6 +37,10 @@
     <!-- TopBar & Stats -->
     <string name="stat_days_format">%1$d Days</string>
     <string name="stat_points_format">%1$d</string>
+    <string name="greeting_nihao_sub">Nǐ hǎo • Hello 👋</string>
+    <string name="greeting_daily_ready">Ready to master Chinese today? ✨</string>
+    <string name="large_greeting_name">Nǐ hǎo, Alex Vance! ✨</string>
+    <string name="large_greeting_badge">HSK 1 • Beginner</string>
 
     <!-- Greeting Header -->
     <string name="welcome_back">WELCOME BACK • 欢迎</string>

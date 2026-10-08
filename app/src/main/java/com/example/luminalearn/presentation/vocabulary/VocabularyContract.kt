@@ -105,6 +105,9 @@ data class VocabularyUiState(
 
     val currentFlashcardWord: VocabWordItem?
         get() = filteredList.getOrNull(safeFlashcardIndex)
+
+    val nextFlashcardWord: VocabWordItem?
+        get() = filteredList.getOrNull(safeFlashcardIndex + 1)
 }
 
 /**

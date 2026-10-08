@@ -2,12 +2,15 @@ package com.example.luminalearn.presentation.common
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -117,24 +120,40 @@ private fun NavTabItem(
 ) {
     val interactionSource = remember { MutableInteractionSource() }
 
-    // Chiều rộng hoạt ảnh: Tab không chọn = 42dp (tròn), Tab chọn = activeWidth
+    // Chiều rộng hoạt ảnh: Spring physics tạo độ dãn nảy đàn hồi chuẩn iOS Dynamic Island
     val animatedWidth by animateDpAsState(
         targetValue = if (isSelected) activeWidth else 42.dp,
-        animationSpec = tween(durationMillis = TAB_ANIM_DURATION, easing = FastOutSlowInEasing),
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioLowBouncy,
+            stiffness = Spring.StiffnessMediumLow
+        ),
         label = "tabWidth"
+    )
+
+    // Hiệu ứng micro-bounce cho icon khi tab được chọn
+    val iconScale by animateFloatAsState(
+        targetValue = if (isSelected) 1.12f else 1f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMedium
+        ),
+        label = "tabIconScale"
     )
 
     // Màu nền chuyển sang màu tím thương hiệu thực tế của app Color(0xFF5C50F6)
     val backgroundColor by animateColorAsState(
         targetValue = if (isSelected) Color(0xFF5C50F6) else Color.Transparent,
-        animationSpec = tween(durationMillis = TAB_ANIM_DURATION, easing = FastOutSlowInEasing),
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioNoBouncy,
+            stiffness = Spring.StiffnessMediumLow
+        ),
         label = "tabBgColor"
     )
 
     // Màu icon chuyển trắng / slate đậm
     val contentColor by animateColorAsState(
         targetValue = if (isSelected) Color.White else Color(0xFF334155),
-        animationSpec = tween(durationMillis = TAB_ANIM_DURATION, easing = FastOutSlowInEasing),
+        animationSpec = tween(durationMillis = 200),
         label = "tabContentColor"
     )
 
@@ -151,7 +170,10 @@ private fun NavTabItem(
 
     val elevation by animateDpAsState(
         targetValue = if (isSelected) 4.dp else 0.dp,
-        animationSpec = tween(durationMillis = TAB_ANIM_DURATION, easing = FastOutSlowInEasing),
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioNoBouncy,
+            stiffness = Spring.StiffnessMediumLow
+        ),
         label = "tabElevation"
     )
 
@@ -182,7 +204,12 @@ private fun NavTabItem(
                 painter = painterResource(id = iconRes),
                 contentDescription = title,
                 tint = contentColor,
-                modifier = Modifier.size(20.dp)
+                modifier = Modifier
+                    .size(20.dp)
+                    .graphicsLayer {
+                        scaleX = iconScale
+                        scaleY = iconScale
+                    }
             )
 
             if (isSelected || animatedWidth > 64.dp) {
