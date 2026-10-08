@@ -72,9 +72,11 @@ import com.example.luminalearn.presentation.vocabulary.component.QuizActions
 import com.example.luminalearn.presentation.vocabulary.component.ReflexQuizPracticeDialog
 import com.example.luminalearn.presentation.vocabulary.component.VocabBentoPracticeHub
 import com.example.luminalearn.presentation.vocabulary.component.VocabDetailDialog
-import com.example.luminalearn.presentation.vocabulary.component.VocabHeroBanner
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.foundation.layout.statusBarsPadding
 import com.example.luminalearn.presentation.main.component.MainSectionHeader
+import com.example.luminalearn.presentation.vocabulary.component.CollapsingVocabHeaderBar
 import com.example.luminalearn.ui.theme.PlusJakartaSans
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -85,6 +87,19 @@ fun VocabularyScreen(
 ) {
     val context = LocalContext.current
     val listState = rememberLazyListState()
+    val density = LocalDensity.current
+    val collapseThresholdPx = with(density) { 52.dp.toPx() }
+    val vocabCollapseProgress by remember {
+        derivedStateOf {
+            if (listState.firstVisibleItemIndex > 0) {
+                1f
+            } else if (collapseThresholdPx > 0) {
+                (listState.firstVisibleItemScrollOffset / collapseThresholdPx).coerceIn(0f, 1f)
+            } else {
+                0f
+            }
+        }
+    }
     val uiState by viewModel.uiState.collectAsState()
 
     var isFlashcardPracticeOpen by remember { mutableStateOf(false) }
@@ -204,7 +219,7 @@ fun VocabularyScreen(
                     }
                 )
             } else {
-                Column(
+                Box(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(Color(0xFFF6F8FB))
@@ -231,24 +246,12 @@ fun VocabularyScreen(
                             contentPadding = PaddingValues(
                                 start = 16.dp,
                                 end = 16.dp,
-                                top = 4.dp,
-                                bottom = 110.dp
+                                top = 114.dp,
+                                bottom = 130.dp
                             ),
                             verticalArrangement = Arrangement.spacedBy(16.dp),
                             modifier = Modifier.fillMaxSize()
                         ) {
-                            // ── 1. TIÊU ĐỀ KHO TỪ VỰNG & NÚT HÀNH ĐỘNG (TRA CỨU / THÊM TỪ) ──
-                            item(key = "vocab_header_bar", contentType = "header_bar") {
-                                com.example.luminalearn.presentation.vocabulary.component.VocabHeaderBar(
-                                    onSearchClick = {
-                                        selectedHskDetailData = com.example.luminalearn.presentation.vocabulary.component.HSK_LEVEL_INFOS.firstOrNull()
-                                    },
-                                    onAddVocabClick = {
-                                        viewModel.processIntent(VocabularyUiIntent.SetAddVocabSheetVisible(true))
-                                    },
-                                    modifier = Modifier.staggeredEntrance(index = 0)
-                                )
-                            }
 
                             // ── 2. PHÂN KHU 1: NHỊP HỌC HÔM NAY (SRS, PHẢN XẠ & ĐẤU GHÉP 60S) ──
                             item(key = "section_daily_practice_header", contentType = "section_header") {
@@ -343,10 +346,22 @@ fun VocabularyScreen(
                                 )
                             }
                         }
-                        }
                     }
+
+                    // ── COLLAPSING STICKY HEADER (Chuẩn Apple Books / Spotify Library) ──
+                    CollapsingVocabHeaderBar(
+                        collapseProgress = vocabCollapseProgress,
+                        onSearchClick = {
+                            selectedHskDetailData = com.example.luminalearn.presentation.vocabulary.component.HSK_LEVEL_INFOS.firstOrNull()
+                        },
+                        onAddVocabClick = {
+                            viewModel.processIntent(VocabularyUiIntent.SetAddVocabSheetVisible(true))
+                        },
+                        modifier = Modifier.align(Alignment.TopCenter)
+                    )
                 }
             }
+        }
 
         // ── Dialog Luyện Flashcard SRS tập trung ──
         FlashcardPracticeDialog(
