@@ -60,7 +60,7 @@
     <string name="streak_active">Đang duy trì</string>
     <string name="streak_flame_title_format">%1$d Ngày rực lửa!</string>
     <string name="streak_subtitle">Duy trì phản xạ tiếng Trung với 1 bài học mỗi ngày.</string>
-    <string name="btn_claim_streak">Điểm danh chuỗi ngày hôm nay</string>
+    <string name="btn_claim_streak">Điểm danh ngay</string>
     <string name="msg_streak_claimed">Đã điểm danh chuỗi ngày thành công!</string>
 
     <!-- Daily Spark Challenge Card -->
@@ -136,4 +136,8 @@
     <string name="section_vocab_flashcard_subtitle">Lặp lại ngắt quãng &amp; kiểm tra phản xạ ghi nhớ</string>
     <string name="section_vocab_reflex">Trắc nghiệm phản xạ</string>
     <string name="section_vocab_reflex_subtitle">Rèn luyện tốc độ nhận diện mặt chữ và nghĩa</string>
+
+    <!-- Vocab View Mode -->
+    <string name="content_desc_switch_to_list">Chuyển sang dạng danh sách</string>
+    <string name="content_desc_switch_to_grid">Chuyển sang dạng lưới</string>
 </resources>

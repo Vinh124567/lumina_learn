@@ -358,6 +358,18 @@ private fun HskLevelStageCard(
 
                 // Bottom: Progress bar & Action Button
                 Column {
+                    val pctString = if (masteredCount <= 0 || totalCount <= 0) {
+                        "0%"
+                    } else {
+                        val pct = (masteredCount.toDouble() / totalCount) * 100.0
+                        when {
+                            pct >= 100.0 -> "100%"
+                            pct >= 10.0 -> "${pct.toInt()}%"
+                            pct >= 0.1 -> String.format(java.util.Locale.US, "%.1f%%", pct)
+                            else -> "<0.1%"
+                        }
+                    }
+
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -371,7 +383,7 @@ private fun HskLevelStageCard(
                             color = Color(0xFFCBD5E1)
                         )
                         Text(
-                            text = "$progressPercent%",
+                            text = pctString,
                             fontFamily = PlusJakartaSans,
                             fontSize = 11.5.sp,
                             fontWeight = FontWeight.Bold,
@@ -389,9 +401,11 @@ private fun HskLevelStageCard(
                             .clip(CircleShape)
                             .background(Color.White.copy(alpha = 0.15f))
                     ) {
+                        val rawFraction = if (totalCount > 0) (masteredCount.toFloat() / totalCount).coerceIn(0f, 1f) else 0f
+                        val progressFraction = if (masteredCount > 0) maxOf(rawFraction, 0.035f) else 0f
                         Box(
                             modifier = Modifier
-                                .fillMaxWidth((progressPercent / 100f).coerceIn(0f, 1f))
+                                .fillMaxWidth(progressFraction)
                                 .fillMaxHeight()
                                 .clip(CircleShape)
                                 .background(data.accentColor)

@@ -56,7 +56,7 @@ fun VocabDetailTabContent(
             .padding(horizontal = 16.dp, vertical = 10.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
-        // ── Card 1: Thẻ Hero Luminous Midnight Bento Tổng quan chữ Hán ──
+        // ── Card 1: Thẻ Porcelain Luxury Tổng quan chữ Hán & Thanh thao tác tập trung ──
         VocabMainInfoCard(
             word = word,
             onSpeak = { onSpeak(word.hanzi) },
@@ -65,22 +65,19 @@ fun VocabDetailTabContent(
             onNavigateToPitchContour = onNavigateToPitchContour
         )
 
-        // ── Card 2: Giải nghĩa chiết tự & Cấu tạo chữ Hán ──
-        VocabDecompositionCard(word = word)
-
-        // ── Card 3: Câu ví dụ thực tế & Ngữ cảnh ──
+        // ── Card 2: Câu ví dụ thực tế & Ngữ cảnh ──
         VocabExampleCard(
             word = word,
             onSpeakSentence = { onSpeak(word.exampleHanzi) }
         )
 
-        // ── Card 4: Từ ghép thông dụng liên quan ──
+        // ── Card 3: Từ ghép thông dụng liên quan ──
         VocabCompoundsCard(
             word = word,
             onSpeakCompound = onSpeak
         )
 
-        // ── Card 5: Chiến thuật phòng thi HSK ──
+        // ── Card 4: Chiến thuật phòng thi HSK ──
         VocabExamStrategyCard(word = word)
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -113,316 +110,261 @@ private fun VocabMainInfoCard(
 
     val accentColor = remember(levelNumber) {
         when (levelNumber) {
-            1 -> Color(0xFF34D399)
-            2 -> Color(0xFF818CF8)
-            3 -> Color(0xFF60A5FA)
-            4 -> Color(0xFFC084FC)
-            5 -> Color(0xFFFBBF24)
-            6 -> Color(0xFFF87171)
-            else -> Color(0xFFA5B4FC)
+            1 -> Color(0xFF059669)
+            2 -> Color(0xFF4F46E5)
+            3 -> Color(0xFF2563EB)
+            4 -> Color(0xFF7E22CE)
+            5 -> Color(0xFFD97706)
+            6 -> Color(0xFFDC2626)
+            else -> Color(0xFF6366F1)
         }
     }
 
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(22.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-        border = BorderStroke(1.2.dp, Color(0xFF818CF8).copy(alpha = 0.35f)),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        border = BorderStroke(0.5.dp, Color(0xFFE2E8F0).copy(alpha = 0.7f)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.5.dp)
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    Brush.linearGradient(
-                        colors = listOf(
-                            Color(0xFF161338),
-                            Color(0xFF221C52),
-                            Color(0xFF1A1442)
-                        )
-                    )
-                )
-        ) {
-            Column(modifier = Modifier.fillMaxWidth()) {
-                // ── Vạch Gradient trên mép nhận diện cấp độ HSK ──
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(3.5.dp)
-                        .clip(RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp))
-                        .background(Brush.horizontalGradient(accentGradient))
-                )
+        Column(modifier = Modifier.fillMaxWidth()) {
+            // Vạch Gradient trên mép nhận diện cấp độ HSK
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(3.5.dp)
+                    .clip(RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp))
+                    .background(Brush.horizontalGradient(accentGradient))
+            )
 
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(18.dp)
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(18.dp)
+            ) {
+                // 1. Header Badges: Cấp độ HSK, Loại từ & Hán Việt
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    // 1. Header Badges: Cấp độ HSK, Chủ đề & Hán Việt
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        // Badge HSK
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(accentColor.copy(alpha = 0.10f))
+                                .padding(horizontal = 8.dp, vertical = 3.dp)
                         ) {
-                            // Badge HSK
-                            Box(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(6.dp))
-                                    .background(Color.White.copy(alpha = 0.10f))
-                                    .border(
-                                        BorderStroke(0.8.dp, accentColor.copy(alpha = 0.45f)),
-                                        RoundedCornerShape(6.dp)
-                                    )
-                                    .padding(horizontal = 7.dp, vertical = 2.5.dp)
-                            ) {
-                                Text(
-                                    text = word.hskLevel,
-                                    fontFamily = PlusJakartaSans,
-                                    fontSize = 11.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = accentColor
-                                )
-                            }
+                            Text(
+                                text = word.hskLevel,
+                                fontFamily = PlusJakartaSans,
+                                fontSize = 11.5.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = accentColor
+                            )
+                        }
 
-                            // Badge Từ loại
-                            val posLabel = word.partOfSpeech.ifBlank { "Từ vựng" }
+                        // Badge Từ loại
+                        val posLabel = word.partOfSpeech.ifBlank { "Từ vựng" }
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(Color(0xFFF1F5F9))
+                                .padding(horizontal = 7.dp, vertical = 3.dp)
+                        ) {
+                            Text(
+                                text = posLabel,
+                                fontFamily = PlusJakartaSans,
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = Color(0xFF475569)
+                            )
+                        }
+
+                        // Badge Chủ đề
+                        if (word.topic.isNotBlank()) {
                             Box(
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(6.dp))
-                                    .background(Color.White.copy(alpha = 0.08f))
-                                    .padding(horizontal = 7.dp, vertical = 2.5.dp)
+                                    .background(Color(0xFFF8FAFC))
+                                    .padding(horizontal = 7.dp, vertical = 3.dp)
                             ) {
                                 Text(
-                                    text = posLabel,
+                                    text = word.topic,
                                     fontFamily = PlusJakartaSans,
                                     fontSize = 11.sp,
                                     fontWeight = FontWeight.Medium,
-                                    color = Color(0xFFC7D2FE)
-                                )
-                            }
-                        }
-
-                        // Badge Hán Việt
-                        if (word.hanViet.isNotBlank()) {
-                            Box(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(6.dp))
-                                    .background(Color(0xFFF59E0B).copy(alpha = 0.20f))
-                                    .border(
-                                        BorderStroke(0.8.dp, Color(0xFFFDE68A).copy(alpha = 0.40f)),
-                                        RoundedCornerShape(6.dp)
-                                    )
-                                    .padding(horizontal = 8.dp, vertical = 2.5.dp)
-                            ) {
-                                Text(
-                                    text = "HV: ${word.hanViet}",
-                                    fontFamily = PlusJakartaSans,
-                                    fontSize = 11.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color(0xFFFDE68A)
+                                    color = Color(0xFF64748B)
                                 )
                             }
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    // Badge Hán Việt
+                    if (word.hanViet.isNotBlank()) {
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(Color(0xFFFEF3C7))
+                                .padding(horizontal = 8.dp, vertical = 3.dp)
+                        ) {
+                            Text(
+                                text = "HV: ${word.hanViet}",
+                                fontFamily = PlusJakartaSans,
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFFB45309)
+                            )
+                        }
+                    }
+                }
 
-                    // 2. Centerpiece: Chữ Hán to 44sp trắng tuyết + Pinyin phát sáng
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                Spacer(modifier = Modifier.height(18.dp))
+
+                // 2. Centerpiece: Chữ Hán to 44sp mực than sâu + Pinyin nổi bật
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = word.hanzi,
+                        fontFamily = PlusJakartaSans,
+                        fontSize = 44.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = Color(0xFF0F172A),
+                        textAlign = TextAlign.Center,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            text = word.hanzi,
+                            text = word.pinyin,
                             fontFamily = PlusJakartaSans,
-                            fontSize = 44.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = Color.White,
-                            textAlign = TextAlign.Center,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
+                            fontSize = 17.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = accentColor
                         )
 
-                        Spacer(modifier = Modifier.height(4.dp))
+                        if (word.hanViet.isNotBlank()) {
+                            Text(
+                                text = " • ",
+                                fontFamily = PlusJakartaSans,
+                                fontSize = 12.sp,
+                                color = Color(0xFFCBD5E1)
+                            )
+                            Text(
+                                text = word.hanViet,
+                                fontFamily = PlusJakartaSans,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = Color(0xFF64748B)
+                            )
+                        }
+                    }
 
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // Nghĩa tiếng Việt
+                    Text(
+                        text = word.meaning,
+                        fontFamily = PlusJakartaSans,
+                        fontSize = 14.5.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color(0xFF334155),
+                        textAlign = TextAlign.Center,
+                        lineHeight = 20.sp,
+                        modifier = Modifier.fillMaxWidth(0.92f)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                // 3. Thanh thao tác âm thanh & tiện ích tập trung (Action Bar)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Nút Phát âm chính
+                    Box(
+                        modifier = Modifier
+                            .weight(1.3f)
+                            .height(42.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(accentColor)
+                            .bounceClick(scaleDown = 0.92f, onClick = onSpeak),
+                        contentAlignment = Alignment.Center
+                    ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Center
                         ) {
-                            Text(
-                                text = word.pinyin,
-                                fontFamily = PlusJakartaSans,
-                                fontSize = 17.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFF38BDF8)
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_speaker),
+                                contentDescription = null,
+                                tint = Color.White,
+                                modifier = Modifier.size(15.dp)
                             )
-
-                            if (word.hanViet.isNotBlank()) {
-                                Text(
-                                    text = " • ",
-                                    fontFamily = PlusJakartaSans,
-                                    fontSize = 12.sp,
-                                    color = Color(0xFF818CF8)
-                                )
-                                Text(
-                                    text = word.hanViet,
-                                    fontFamily = PlusJakartaSans,
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = Color(0xFFFDE68A)
-                                )
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        // Nghĩa tiếng Việt
-                        Text(
-                            text = word.meaning,
-                            fontFamily = PlusJakartaSans,
-                            fontSize = 14.5.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = Color(0xFFE2E8F0),
-                            textAlign = TextAlign.Center,
-                            lineHeight = 20.sp,
-                            modifier = Modifier.fillMaxWidth(0.92f)
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(18.dp))
-
-                    // 3. Ba ô Bento chỉ số nhỏ (Bộ thủ, Nét bút, Mục tiêu)
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        MetricSmallDarkCard(
-                            label = "Bộ thủ",
-                            value = word.radical.replace("Bộ: ", ""),
-                            modifier = Modifier.weight(1.2f)
-                        )
-                        MetricSmallDarkCard(
-                            label = "Số nét bút",
-                            value = word.strokes,
-                            modifier = Modifier.weight(1f)
-                        )
-                        MetricSmallDarkCard(
-                            label = "Mục tiêu",
-                            value = word.hskLevel,
-                            valueColor = accentColor,
-                            modifier = Modifier.weight(1.1f)
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // 4. Hàng nút thao tác nhanh (Phát âm, Chậm 0.6x, Sao chép)
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        // Nút Phát âm chính
-                        Box(
-                            modifier = Modifier
-                                .weight(1.2f)
-                                .height(40.dp)
-                                .clip(RoundedCornerShape(12.dp))
-                                .background(VocabColors.BrandPrimary)
-                                .bounceClick(scaleDown = 0.92f, onClick = onSpeak),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.Center
-                            ) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_speaker),
-                                    contentDescription = null,
-                                    tint = Color.White,
-                                    modifier = Modifier.size(15.dp)
-                                )
-                                Spacer(modifier = Modifier.width(6.dp))
-                                Text(
-                                    text = "Phát âm",
-                                    fontFamily = PlusJakartaSans,
-                                    color = Color.White,
-                                    fontSize = 12.5.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-                        }
-
-                        // Nút Phát âm Chậm (0.6x)
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(40.dp)
-                                .clip(RoundedCornerShape(12.dp))
-                                .background(Color.White.copy(alpha = 0.10f))
-                                .border(
-                                    BorderStroke(1.dp, Color.White.copy(alpha = 0.18f)),
-                                    RoundedCornerShape(12.dp)
-                                )
-                                .bounceClick(scaleDown = 0.92f, onClick = onSpeakSlow),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.Center
-                            ) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_clock),
-                                    contentDescription = null,
-                                    tint = Color(0xFFC7D2FE),
-                                    modifier = Modifier.size(14.dp)
-                                )
-                                Spacer(modifier = Modifier.width(5.dp))
-                                Text(
-                                    text = "Chậm",
-                                    fontFamily = PlusJakartaSans,
-                                    color = Color(0xFFC7D2FE),
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.SemiBold
-                                )
-                            }
-                        }
-
-                        // Nút Sao chép
-                        Box(
-                            modifier = Modifier
-                                .size(40.dp)
-                                .clip(RoundedCornerShape(12.dp))
-                                .background(Color.White.copy(alpha = 0.08f))
-                                .border(
-                                    BorderStroke(1.dp, Color.White.copy(alpha = 0.15f)),
-                                    RoundedCornerShape(12.dp)
-                                )
-                                .bounceClick(scaleDown = 0.90f, onClick = onCopy),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(text = "📋", fontSize = 15.sp)
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = "Phát âm",
+                                fontFamily = PlusJakartaSans,
+                                color = Color.White,
+                                fontSize = 12.5.sp,
+                                fontWeight = FontWeight.Bold
+                            )
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(10.dp))
-
-                    // 5. Nút tắt đến tab Biểu đồ cao độ
+                    // Nút Phát âm Chậm (0.6x)
                     Box(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .height(40.dp)
+                            .weight(1f)
+                            .height(42.dp)
                             .clip(RoundedCornerShape(12.dp))
-                            .background(Color(0xFF38BDF8).copy(alpha = 0.15f))
-                            .border(
-                                BorderStroke(1.dp, Color(0xFF38BDF8).copy(alpha = 0.35f)),
-                                RoundedCornerShape(12.dp)
+                            .background(Color(0xFFEEF2FF))
+                            .bounceClick(scaleDown = 0.92f, onClick = onSpeakSlow),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_clock),
+                                contentDescription = null,
+                                tint = Color(0xFF4F46E5),
+                                modifier = Modifier.size(14.dp)
                             )
-                            .bounceClick(scaleDown = 0.94f, onClick = onNavigateToPitchContour),
+                            Spacer(modifier = Modifier.width(5.dp))
+                            Text(
+                                text = "Chậm",
+                                fontFamily = PlusJakartaSans,
+                                color = Color(0xFF4F46E5),
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+
+                    // Nút Sóng âm & Cao độ
+                    Box(
+                        modifier = Modifier
+                            .weight(1.2f)
+                            .height(42.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(Color(0xFFF0FDF4))
+                            .bounceClick(scaleDown = 0.92f, onClick = onNavigateToPitchContour),
                         contentAlignment = Alignment.Center
                     ) {
                         Row(
@@ -432,19 +374,56 @@ private fun VocabMainInfoCard(
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_waveform),
                                 contentDescription = null,
-                                tint = Color(0xFF38BDF8),
-                                modifier = Modifier.size(16.dp)
+                                tint = Color(0xFF059669),
+                                modifier = Modifier.size(14.dp)
                             )
-                            Spacer(modifier = Modifier.width(7.dp))
+                            Spacer(modifier = Modifier.width(5.dp))
                             Text(
-                                text = "Biểu đồ cao độ & Sóng âm",
+                                text = "Sóng âm",
                                 fontFamily = PlusJakartaSans,
-                                color = Color(0xFF38BDF8),
-                                fontSize = 13.sp,
+                                color = Color(0xFF059669),
+                                fontSize = 12.sp,
                                 fontWeight = FontWeight.Bold
                             )
                         }
                     }
+
+                    // Nút Sao chép
+                    Box(
+                        modifier = Modifier
+                            .size(42.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(Color(0xFFF1F5F9))
+                            .bounceClick(scaleDown = 0.90f, onClick = onCopy),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(text = "📋", fontSize = 15.sp)
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // 4. Ba ô Bento chỉ số cấu tạo tích hợp: Bộ thủ, Số nét bút, Mục tiêu HSK
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    MetricSmallLightCard(
+                        label = "Bộ thủ",
+                        value = word.radical.replace("Bộ: ", ""),
+                        modifier = Modifier.weight(1.2f)
+                    )
+                    MetricSmallLightCard(
+                        label = "Số nét bút",
+                        value = word.strokes,
+                        modifier = Modifier.weight(1f)
+                    )
+                    MetricSmallLightCard(
+                        label = "Mục tiêu HSK",
+                        value = word.hskLevel,
+                        valueColor = accentColor,
+                        modifier = Modifier.weight(1.1f)
+                    )
                 }
             }
         }
@@ -452,123 +431,40 @@ private fun VocabMainInfoCard(
 }
 
 @Composable
-private fun MetricSmallDarkCard(
+private fun MetricSmallLightCard(
     label: String,
     value: String,
     modifier: Modifier = Modifier,
-    valueColor: Color = Color.White
+    valueColor: Color = Color(0xFF0F172A)
 ) {
     Box(
         modifier = modifier
-            .clip(RoundedCornerShape(10.dp))
-            .background(Color.White.copy(alpha = 0.06f))
+            .clip(RoundedCornerShape(12.dp))
+            .background(Color(0xFFF8FAFC))
             .border(
-                BorderStroke(0.8.dp, Color.White.copy(alpha = 0.12f)),
-                RoundedCornerShape(10.dp)
+                BorderStroke(0.5.dp, Color(0xFFE2E8F0).copy(alpha = 0.7f)),
+                RoundedCornerShape(12.dp)
             )
-            .padding(horizontal = 8.dp, vertical = 7.dp)
+            .padding(horizontal = 9.dp, vertical = 8.dp)
     ) {
         Column {
             Text(
                 text = label,
                 fontFamily = PlusJakartaSans,
                 fontSize = 10.sp,
-                color = Color(0xFF94A3B8),
+                color = Color(0xFF64748B),
                 fontWeight = FontWeight.Medium
             )
-            Spacer(modifier = Modifier.height(2.dp))
+            Spacer(modifier = Modifier.height(3.dp))
             Text(
                 text = value,
                 fontFamily = PlusJakartaSans,
-                fontSize = 12.sp,
+                fontSize = 12.5.sp,
                 color = valueColor,
                 fontWeight = FontWeight.Bold,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
-        }
-    }
-}
-
-@Composable
-private fun VocabDecompositionCard(word: VocabWordItem) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = BorderStroke(1.dp, Color(0xFFE2E8F0)),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_sparkle),
-                    contentDescription = null,
-                    tint = Color(0xFFD97706),
-                    modifier = Modifier.size(15.dp)
-                )
-                Spacer(modifier = Modifier.width(7.dp))
-                Text(
-                    text = "GIẢI NGHĨA CHIẾT TỰ & CẤU TẠO HÁN TỰ",
-                    fontFamily = PlusJakartaSans,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = Color(0xFF1E293B),
-                    letterSpacing = 0.2.sp
-                )
-            }
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            Text(
-                text = "Chữ Hán \"${word.hanzi}\" (Âm Hán Việt: ${word.hanViet}) gồm ${word.radical} với ${word.strokes} chuẩn. Đây là từ vựng thuộc cấp độ ${word.hskLevel}, xuất hiện rất thường xuyên trong đời sống và đề thi HSK.",
-                fontFamily = PlusJakartaSans,
-                fontSize = 12.5.sp,
-                color = Color(0xFF475569),
-                lineHeight = 18.5.sp
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // Box cấu trúc bộ phận
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(Color(0xFFF8FAFC))
-                    .border(BorderStroke(1.dp, Color(0xFFE2E8F0)), RoundedCornerShape(10.dp))
-                    .padding(horizontal = 12.dp, vertical = 9.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "Cấu trúc: ${word.radical} • ${word.strokes}",
-                    fontFamily = PlusJakartaSans,
-                    fontSize = 12.sp,
-                    color = Color(0xFF334155),
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.weight(1f, fill = false),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(6.dp))
-                        .background(Color(0xFFEFF6FF))
-                        .padding(horizontal = 7.dp, vertical = 3.dp)
-                ) {
-                    Text(
-                        text = "CHUẨN NÉT",
-                        fontFamily = PlusJakartaSans,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF2563EB),
-                        maxLines = 1,
-                        softWrap = false
-                    )
-                }
-            }
         }
     }
 }
@@ -582,7 +478,7 @@ private fun VocabExampleCard(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = BorderStroke(1.dp, Color(0xFFE2E8F0)),
+        border = BorderStroke(0.5.dp, Color(0xFFE2E8F0).copy(alpha = 0.7f)),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -600,7 +496,7 @@ private fun VocabExampleCard(
                     )
                     Spacer(modifier = Modifier.width(7.dp))
                     Text(
-                        text = "CÂU VÍ DỤ THỰC TẾ & NGỮ CẢNH",
+                        text = "CÂU VÍ DỤ THỰC TẾ",
                         fontFamily = PlusJakartaSans,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.ExtraBold,
@@ -613,7 +509,7 @@ private fun VocabExampleCard(
                         .clip(RoundedCornerShape(16.dp))
                         .background(Color(0xFFEEF2FF))
                         .bounceClick(scaleDown = 0.90f, onClick = onSpeakSentence)
-                        .padding(horizontal = 9.dp, vertical = 4.dp)
+                        .padding(horizontal = 10.dp, vertical = 5.dp)
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
@@ -645,7 +541,7 @@ private fun VocabExampleCard(
                 lineHeight = 22.sp
             )
 
-            Spacer(modifier = Modifier.height(3.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
             Text(
                 text = word.examplePinyin,
@@ -697,7 +593,7 @@ private fun VocabCompoundsCard(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = BorderStroke(1.dp, Color(0xFFE2E8F0)),
+        border = BorderStroke(0.5.dp, Color(0xFFE2E8F0).copy(alpha = 0.7f)),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -749,7 +645,10 @@ private fun VocabCompoundsCard(
                         .padding(vertical = 4.dp)
                         .clip(RoundedCornerShape(12.dp))
                         .background(Color(0xFFF8FAFC))
-                        .border(BorderStroke(1.dp, Color(0xFFF1F5F9)), RoundedCornerShape(12.dp))
+                        .border(
+                            BorderStroke(0.5.dp, Color(0xFFE2E8F0).copy(alpha = 0.5f)),
+                            RoundedCornerShape(12.dp)
+                        )
                         .padding(horizontal = 12.dp, vertical = 9.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
@@ -786,7 +685,7 @@ private fun VocabCompoundsCard(
                             .size(30.dp)
                             .clip(CircleShape)
                             .background(Color.White)
-                            .border(BorderStroke(1.dp, Color(0xFFE2E8F0)), CircleShape)
+                            .border(BorderStroke(0.5.dp, Color(0xFFE2E8F0)), CircleShape)
                             .bounceClick(scaleDown = 0.88f) { onSpeakCompound(item.hanzi) },
                         contentAlignment = Alignment.Center
                     ) {
@@ -808,8 +707,8 @@ private fun VocabExamStrategyCard(word: VocabWordItem) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFFBEB)),
-        border = BorderStroke(1.dp, Color(0xFFFDE68A)),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFFDF5)),
+        border = BorderStroke(0.5.dp, Color(0xFFFDE68A).copy(alpha = 0.7f)),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -822,7 +721,7 @@ private fun VocabExamStrategyCard(word: VocabWordItem) {
                 )
                 Spacer(modifier = Modifier.width(7.dp))
                 Text(
-                    text = "Chiến thuật phòng thi HSK cho từ \"${word.hanzi}\":",
+                    text = "Chiến thuật phòng thi HSK:",
                     fontFamily = PlusJakartaSans,
                     fontSize = 12.5.sp,
                     fontWeight = FontWeight.Bold,

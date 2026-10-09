@@ -139,26 +139,27 @@ fun VocabHeaderBar(
 }
 
 /**
- * Collapsing Header chuyên dụng cho Màn Tổng quan Từ Vựng (Chuẩn Apple Books / Spotify Library):
- * - Khi ở đỉnh (progress = 0): Chiều cao 110dp, Tiêu đề to 22sp "Kho Từ Vựng HSK", Subtitle đầy đủ, nút Thêm từ viên nhộng.
- * - Khi cuộn (progress -> 1): Co mượt về 58dp, tiêu đề to scale trượt lên TopBar, nút Thêm từ co gọn thành nút tròn (+).
- * - Khi cuộn sâu: Dừng đóng và ghim cố định ở độ cao 58dp (Sticky Pinned), nền kính mờ trắng đục liền mạch.
+ * Collapsing Header chuyên dụng cho Màn Tổng quan Từ Vựng:
+ * - Đồng bộ 100% màu nền cùng màu với Body (#F6F8FB), liền mạch tuyệt đối.
+ * - Khi ở đỉnh (progress = 0): Chiều cao 106dp, Tiêu đề to 22sp "Kho Từ Vựng HSK", Subtitle mô tả.
+ * - Khi cuộn (progress -> 1): Co mượt về 56dp, tiêu đề to scale trượt lên TopBar.
+ * - Khi cuộn sâu: Dừng đóng và ghim cố định ở độ cao 56dp (Sticky Pinned), che chắn nội dung cuộn bên dưới mượt mà.
  */
 @Composable
 fun CollapsingVocabHeaderBar(
     collapseProgress: Float,
-    onSearchClick: () -> Unit,
-    onAddVocabClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onSearchClick: (() -> Unit)? = null,
+    onAddVocabClick: (() -> Unit)? = null
 ) {
     val progress = collapseProgress.coerceIn(0f, 1f)
-    val headerHeight = lerp(110.dp, 58.dp, progress)
+    val headerHeight = lerp(106.dp, 56.dp, progress)
 
     Box(
         modifier = modifier
             .fillMaxWidth()
             .height(headerHeight)
-            .background(Color.White.copy(alpha = progress * 0.98f))
+            .background(Color(0xFFF6F8FB))
     ) {
         // ── 1. KHỐI EXPANDED TITLE (Tiêu đề to 22sp + Subtitle) ──
         if (progress < 0.95f) {
@@ -196,17 +197,16 @@ fun CollapsingVocabHeaderBar(
             }
         }
 
-        // ── 2. THANH STICKY ACTION BAR TRÊN ĐỈNH (Cao 58dp) ──
+        // ── 2. THANH STICKY ACTION BAR TRÊN ĐỈNH (Cao 56dp) ──
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(58.dp)
+                .height(56.dp)
                 .align(Alignment.TopCenter)
                 .padding(horizontal = 16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            // Bên trái khi Collapsed: Tiêu đề mini (17sp) mờ hiện dần khi progress > 0.35
+            // Tiêu đề mini (17sp) mờ hiện dần khi progress > 0.35
             val collapsedTitleAlpha = ((progress - 0.35f) / 0.65f).coerceIn(0f, 1f)
 
             Text(
@@ -220,73 +220,6 @@ fun CollapsingVocabHeaderBar(
                     alpha = collapsedTitleAlpha
                 }
             )
-
-            // Bên phải: Cụm nút (Kính lúp + Thêm từ)
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                // Nút Kính lúp tra cứu (Bento 38dp)
-                Box(
-                    modifier = Modifier
-                        .size(38.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(Color.White)
-                        .border(BorderStroke(0.5.dp, BorderSubtle), RoundedCornerShape(12.dp))
-                        .bounceClick(scaleDown = 0.90f, onClick = onSearchClick),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_search),
-                        contentDescription = "Search Vocab",
-                        tint = BrandIndigoLight,
-                        modifier = Modifier.size(17.dp)
-                    )
-                }
-
-                // Nút Thêm từ: Khi Expanded thì là pill "Thêm từ", khi Collapsed thì co gọn thành icon (+)
-                val isPill = progress < 0.5f
-
-                Box(
-                    modifier = Modifier
-                        .height(38.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(
-                            Brush.horizontalGradient(
-                                listOf(PrimaryIndigo, Color(0xFF4F46E5))
-                            )
-                        )
-                        .border(
-                            BorderStroke(0.5.dp, Color(0xFF818CF8).copy(alpha = 0.45f)),
-                            RoundedCornerShape(12.dp)
-                        )
-                        .bounceClick(scaleDown = 0.92f, onClick = onAddVocabClick)
-                        .padding(horizontal = if (isPill) 11.dp else 10.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = "Add",
-                            tint = Color.White,
-                            modifier = Modifier.size(16.dp)
-                        )
-                        if (isPill) {
-                            Spacer(modifier = Modifier.width(3.dp))
-                            Text(
-                                text = "Thêm từ",
-                                fontFamily = PlusJakartaSans,
-                                fontSize = 11.5.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White
-                            )
-                        }
-                    }
-                }
-            }
         }
     }
 }

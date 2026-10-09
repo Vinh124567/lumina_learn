@@ -348,15 +348,9 @@ fun VocabularyScreen(
                         }
                     }
 
-                    // ── COLLAPSING STICKY HEADER (Chuẩn Apple Books / Spotify Library) ──
+                    // ── COLLAPSING STICKY HEADER (Cùng màu với Body, liền mạch tuyệt đối) ──
                     CollapsingVocabHeaderBar(
                         collapseProgress = vocabCollapseProgress,
-                        onSearchClick = {
-                            selectedHskDetailData = com.example.luminalearn.presentation.vocabulary.component.HSK_LEVEL_INFOS.firstOrNull()
-                        },
-                        onAddVocabClick = {
-                            viewModel.processIntent(VocabularyUiIntent.SetAddVocabSheetVisible(true))
-                        },
                         modifier = Modifier.align(Alignment.TopCenter)
                     )
                 }

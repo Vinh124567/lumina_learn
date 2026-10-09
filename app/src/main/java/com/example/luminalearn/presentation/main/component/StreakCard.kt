@@ -279,7 +279,9 @@ fun StreakCard(
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 13.5.sp
                                 ),
-                                color = Color.White
+                                color = Color.White,
+                                maxLines = 1,
+                                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                             )
                         }
                     }

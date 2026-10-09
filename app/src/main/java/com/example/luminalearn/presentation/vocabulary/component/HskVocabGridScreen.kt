@@ -25,6 +25,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -36,6 +37,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -48,6 +50,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -129,6 +132,7 @@ fun HskVocabGridScreen(
     var searchQuery by remember { mutableStateOf("") }
     var selectedHskLevelNumber by remember(hskData.levelNumber) { mutableIntStateOf(hskData.levelNumber) }
     var selectedFilterIndex by remember { mutableIntStateOf(0) }
+    var isGridView by remember { mutableStateOf(true) }
 
     val currentHskData = remember(selectedHskLevelNumber) {
         HSK_LEVEL_INFOS.find { it.levelNumber == selectedHskLevelNumber } ?: hskData
@@ -153,9 +157,6 @@ fun HskVocabGridScreen(
     val srsEnrolledCount = remember(levelWords) { levelWords.count { it.isInSrs } }
     val dueInLevelCount = remember(levelWords) { levelWords.count { it.isDueToday } }
     val customCount = remember(levelWords) { levelWords.count { it.isCustom } }
-    val progressPercent = remember(levelWords.size, masteredCount) {
-        if (levelWords.isNotEmpty()) (masteredCount * 100 / levelWords.size) else 0
-    }
 
     val filterOptions = remember(levelWords.size, masteredCount, srsEnrolledCount, dueInLevelCount, customCount) {
         listOf(
@@ -222,12 +223,17 @@ fun HskVocabGridScreen(
         displayWords.drop(startIndex).take(PAGE_SIZE)
     }
 
+    val gridState = rememberLazyGridState()
+    LaunchedEffect(safeCurrentPage) {
+        gridState.animateScrollToItem(0)
+    }
+
     Column(
         modifier = modifier
             .fillMaxSize()
             .background(Color(0xFFF6F8FB))
     ) {
-        // ── 1. APP BAR THANH LỊCH TÍCH HỢP TIẾN ĐỘ & NÚT THÊM TỪ ──
+        // ── 1. APP BAR THANH LỊCH & NÚT THÊM TỪ ──
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -252,25 +258,43 @@ fun HskVocabGridScreen(
 
             Spacer(modifier = Modifier.width(4.dp))
 
-            // Tiêu đề + Tiến độ thu gọn
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = if (selectedHskLevelNumber == 0) "Tất cả từ vựng" else currentHskData.stageName,
-                    fontFamily = PlusJakartaSans,
-                    fontSize = 17.5.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = Color(0xFF0F172A),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Text(
-                    text = "Tiến độ: $masteredCount/${levelWords.size} từ đã thuộc • $progressPercent%",
-                    fontFamily = PlusJakartaSans,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Color(0xFF64748B)
+            // Tiêu đề màn hình
+            Text(
+                text = if (selectedHskLevelNumber == 0) "Tất cả từ vựng" else currentHskData.stageName,
+                fontFamily = PlusJakartaSans,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.ExtraBold,
+                color = Color(0xFF0F172A),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f)
+            )
+
+            // Nút chuyển đổi chế độ xem (Lưới 2 cột <-> Danh sách 1 cột)
+            Box(
+                modifier = Modifier
+                    .size(34.dp)
+                    .clip(CircleShape)
+                    .background(Color.White)
+                    .border(BorderStroke(0.5.dp, Color(0xFFE2E8F0)), CircleShape)
+                    .bounceClick(scaleDown = 0.88f) {
+                        isGridView = !isGridView
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(
+                        if (isGridView) R.drawable.ic_view_list else R.drawable.ic_view_grid
+                    ),
+                    contentDescription = stringResource(
+                        if (isGridView) R.string.content_desc_switch_to_list else R.string.content_desc_switch_to_grid
+                    ),
+                    tint = Color(0xFF475569),
+                    modifier = Modifier.size(16.dp)
                 )
             }
+
+            Spacer(modifier = Modifier.width(8.dp))
 
             // Nút + Thêm từ nhanh
             Box(
@@ -542,15 +566,16 @@ fun HskVocabGridScreen(
             }
         } else {
             LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
+                columns = GridCells.Fixed(if (isGridView) 2 else 1),
+                state = gridState,
                 contentPadding = PaddingValues(
                     start = 16.dp,
                     end = 16.dp,
                     top = 6.dp,
                     bottom = 140.dp
                 ),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp),
                 modifier = Modifier.fillMaxSize()
             ) {
                 items(
@@ -559,19 +584,30 @@ fun HskVocabGridScreen(
                 ) { wordItem ->
                     val wordAccent = getWordLevelAccent(wordItem.hskLevel, currentHskData.accentColor)
 
-                    VocabGridCard(
-                        item = wordItem,
-                        accentColor = wordAccent,
-                        onSpeak = onSpeakWord,
-                        onToggleMastered = { onToggleMastered(wordItem.id) },
-                        onToggleEnrollSrs = { onToggleEnrollSrs(wordItem.id) },
-                        onClick = { onOpenWordDetail(wordItem) }
-                    )
+                    if (isGridView) {
+                        VocabGridCard(
+                            item = wordItem,
+                            accentColor = wordAccent,
+                            onSpeak = onSpeakWord,
+                            onToggleMastered = { onToggleMastered(wordItem.id) },
+                            onToggleEnrollSrs = { onToggleEnrollSrs(wordItem.id) },
+                            onClick = { onOpenWordDetail(wordItem) }
+                        )
+                    } else {
+                        VocabListCard(
+                            item = wordItem,
+                            accentColor = wordAccent,
+                            onSpeak = onSpeakWord,
+                            onToggleMastered = { onToggleMastered(wordItem.id) },
+                            onToggleEnrollSrs = { onToggleEnrollSrs(wordItem.id) },
+                            onClick = { onOpenWordDetail(wordItem) }
+                        )
+                    }
                 }
 
                 // ── THANH PHÂN TRANG PAGINATION BAR DƯỚI CÙNG (10 TỪ/TRANG) ──
                 if (totalPages > 1 || totalFilteredWords > 0) {
-                    item(span = { GridItemSpan(2) }, key = "pagination_bar") {
+                    item(span = { GridItemSpan(if (isGridView) 2 else 1) }, key = "pagination_bar") {
                         PaginationBar(
                             currentPage = safeCurrentPage,
                             totalPages = totalPages,
@@ -611,7 +647,7 @@ private fun VocabGridCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .height(172.dp)
+            .height(176.dp)
             .bounceClick(scaleDown = 0.96f, onClick = onClick),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
@@ -734,11 +770,11 @@ private fun VocabGridCard(
                 Text(
                     text = item.meaning,
                     fontFamily = PlusJakartaSans,
-                    fontSize = 11.5.sp,
-                    lineHeight = 15.sp,
+                    fontSize = 11.sp,
+                    lineHeight = 14.5.sp,
                     fontWeight = FontWeight.Medium,
                     color = Color(0xFF334155),
-                    maxLines = 1,
+                    maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f)
                 )
@@ -753,7 +789,7 @@ private fun VocabGridCard(
                     val isInSrs = item.isInSrs
                     Box(
                         modifier = Modifier
-                            .size(24.dp)
+                            .size(28.dp)
                             .clip(CircleShape)
                             .background(
                                 if (isInSrs) Color(0xFFFEF3C7)
@@ -766,14 +802,14 @@ private fun VocabGridCard(
                             painter = painterResource(R.drawable.ic_bolt),
                             contentDescription = if (isInSrs) "Đang ôn SRS" else "Thêm SRS",
                             tint = if (isInSrs) Color(0xFFD97706) else Color(0xFF94A3B8),
-                            modifier = Modifier.size(11.dp)
+                            modifier = Modifier.size(13.dp)
                         )
                     }
 
                     // Nút đánh dấu Đã thuộc / Chưa thuộc
                     Box(
                         modifier = Modifier
-                            .size(24.dp)
+                            .size(28.dp)
                             .clip(CircleShape)
                             .background(
                                 if (item.isMastered) Color(0xFFDCFCE7)
@@ -787,15 +823,214 @@ private fun VocabGridCard(
                                 painter = painterResource(R.drawable.ic_check),
                                 contentDescription = "Đã thuộc",
                                 tint = Color(0xFF059669),
-                                modifier = Modifier.size(11.dp)
+                                modifier = Modifier.size(13.dp)
                             )
                         } else {
                             Box(
                                 modifier = Modifier
-                                    .size(8.dp)
+                                    .size(9.dp)
                                     .border(1.dp, Color(0xFF94A3B8), CircleShape)
                             )
                         }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Thẻ từ vựng hiển thị dạng List 1 cột nằm ngang:
+ * - Bên trái: Khối chữ Hán to rõ trên nền nhẹ.
+ * - Ở giữa: Pinyin, loại từ, nghĩa tiếng Việt.
+ * - Bên phải: Nút Loa phát âm, nút SRS và nút Đánh dấu thuộc.
+ */
+@Composable
+private fun VocabListCard(
+    item: VocabWordItem,
+    accentColor: Color,
+    onSpeak: (String) -> Unit,
+    onToggleMastered: () -> Unit,
+    onToggleEnrollSrs: () -> Unit,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .bounceClick(scaleDown = 0.98f, onClick = onClick),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = if (item.isMastered) Color(0xFFF9FDFB) else Color.White
+        ),
+        border = BorderStroke(
+            0.5.dp,
+            if (item.isMastered) Color(0xFF10B981).copy(alpha = 0.35f)
+            else Color(0xFFE2E8F0).copy(alpha = 0.6f)
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // ── 1. Khối Hán tự bên trái ──
+            Box(
+                modifier = Modifier
+                    .size(52.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(accentColor.copy(alpha = 0.08f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = item.hanzi,
+                    fontFamily = PlusJakartaSans,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = Color(0xFF0F172A),
+                    textAlign = TextAlign.Center,
+                    maxLines = 1
+                )
+            }
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            // ── 2. Nội dung ở giữa: Pinyin, Hán Việt & Nghĩa ──
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.Center
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Text(
+                        text = item.pinyin,
+                        fontFamily = PlusJakartaSans,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = accentColor,
+                        maxLines = 1
+                    )
+
+                    if (item.partOfSpeech.isNotBlank()) {
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(4.dp))
+                                .background(Color(0xFFF1F5F9))
+                                .padding(horizontal = 5.dp, vertical = 1.5.dp)
+                        ) {
+                            Text(
+                                text = item.partOfSpeech,
+                                fontFamily = PlusJakartaSans,
+                                fontSize = 9.5.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = Color(0xFF64748B)
+                            )
+                        }
+                    }
+
+                    if (item.hanViet.isNotBlank()) {
+                        Text(
+                            text = item.hanViet,
+                            fontFamily = PlusJakartaSans,
+                            fontSize = 11.5.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = Color(0xFF94A3B8),
+                            maxLines = 1
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(3.dp))
+
+                Text(
+                    text = item.meaning,
+                    fontFamily = PlusJakartaSans,
+                    fontSize = 12.sp,
+                    lineHeight = 16.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Color(0xFF334155),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            // ── 3. Cụm nút tác vụ bên phải: Loa, SRS, Đã thuộc ──
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(5.dp)
+            ) {
+                // Nút loa phát âm
+                Box(
+                    modifier = Modifier
+                        .size(28.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xFFF8FAFC))
+                        .border(BorderStroke(0.5.dp, Color(0xFFE2E8F0)), CircleShape)
+                        .bounceClick(scaleDown = 0.85f) {
+                            onSpeak(item.hanzi)
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_speaker),
+                        contentDescription = "Phát âm",
+                        tint = Color(0xFF475569),
+                        modifier = Modifier.size(13.dp)
+                    )
+                }
+
+                // Nút SRS
+                val isInSrs = item.isInSrs
+                Box(
+                    modifier = Modifier
+                        .size(28.dp)
+                        .clip(CircleShape)
+                        .background(
+                            if (isInSrs) Color(0xFFFEF3C7)
+                            else Color(0xFFF1F5F9)
+                        )
+                        .bounceClick(scaleDown = 0.85f, onClick = onToggleEnrollSrs),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_bolt),
+                        contentDescription = if (isInSrs) "Đang ôn SRS" else "Thêm SRS",
+                        tint = if (isInSrs) Color(0xFFD97706) else Color(0xFF94A3B8),
+                        modifier = Modifier.size(13.dp)
+                    )
+                }
+
+                // Nút Đã thuộc
+                Box(
+                    modifier = Modifier
+                        .size(28.dp)
+                        .clip(CircleShape)
+                        .background(
+                            if (item.isMastered) Color(0xFFDCFCE7)
+                            else Color(0xFFF1F5F9)
+                        )
+                        .bounceClick(scaleDown = 0.85f, onClick = onToggleMastered),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (item.isMastered) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_check),
+                            contentDescription = "Đã thuộc",
+                            tint = Color(0xFF059669),
+                            modifier = Modifier.size(13.dp)
+                        )
+                    } else {
+                        Box(
+                            modifier = Modifier
+                                .size(9.dp)
+                                .border(1.dp, Color(0xFF94A3B8), CircleShape)
+                        )
                     }
                 }
             }

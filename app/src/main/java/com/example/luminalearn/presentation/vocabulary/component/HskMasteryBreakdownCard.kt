@@ -55,8 +55,16 @@ fun HskMasteryBreakdownCard(
             val levelWords = vocabList.filter { it.hskLevel.contains("HSK ${levelInfo.levelNumber}", ignoreCase = true) }
             val masteredInLevel = levelWords.count { it.isMastered }
             val totalInLevel = if (levelWords.isNotEmpty()) levelWords.size else levelInfo.standardWordCount
-            val pct = if (totalInLevel > 0) (masteredInLevel * 100 / totalInLevel).coerceIn(0, 100) else 0
-            Triple(levelInfo, masteredInLevel to totalInLevel, pct)
+            val pctString = formatPercentString(masteredInLevel, totalInLevel)
+            Triple(levelInfo, masteredInLevel to totalInLevel, pctString)
+        }
+    }
+
+    val formattedTotalProgress = remember(masteredCount, totalCount, progressPercent) {
+        if (masteredCount > 0 && totalCount > 0) {
+            formatPercentString(masteredCount, totalCount)
+        } else {
+            "$progressPercent%"
         }
     }
 
@@ -88,7 +96,7 @@ fun HskMasteryBreakdownCard(
                     )
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
-                        text = "Đã làm chủ $masteredCount/$totalCount từ ($progressPercent%)",
+                        text = "Đã làm chủ $masteredCount/$totalCount từ ($formattedTotalProgress)",
                         fontFamily = PlusJakartaSans,
                         fontSize = 10.5.sp,
                         color = TextMuted
@@ -124,12 +132,12 @@ fun HskMasteryBreakdownCard(
                     modifier = Modifier.weight(1f),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    hskStats.take(3).forEach { (levelInfo, counts, pct) ->
+                    hskStats.take(3).forEach { (levelInfo, counts, pctString) ->
                         HskLevelProgressRow(
                             levelInfo = levelInfo,
                             mastered = counts.first,
                             total = counts.second,
-                            percent = pct,
+                            percentStr = pctString,
                             onClick = { onOpenHskLevel(levelInfo) }
                         )
                     }
@@ -140,12 +148,12 @@ fun HskMasteryBreakdownCard(
                     modifier = Modifier.weight(1f),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    hskStats.drop(3).forEach { (levelInfo, counts, pct) ->
+                    hskStats.drop(3).forEach { (levelInfo, counts, pctString) ->
                         HskLevelProgressRow(
                             levelInfo = levelInfo,
                             mastered = counts.first,
                             total = counts.second,
-                            percent = pct,
+                            percentStr = pctString,
                             onClick = { onOpenHskLevel(levelInfo) }
                         )
                     }
@@ -160,7 +168,7 @@ private fun HskLevelProgressRow(
     levelInfo: HskLevelCardData,
     mastered: Int,
     total: Int,
-    percent: Int,
+    percentStr: String,
     onClick: () -> Unit
 ) {
     Column(
@@ -200,7 +208,7 @@ private fun HskLevelProgressRow(
             }
 
             Text(
-                text = "$percent%",
+                text = percentStr,
                 fontFamily = PlusJakartaSans,
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Bold,
@@ -218,7 +226,8 @@ private fun HskLevelProgressRow(
                 .clip(RoundedCornerShape(2.dp))
                 .background(Color(0xFFF1F5F9))
         ) {
-            val fraction = (percent / 100f).coerceIn(0f, 1f)
+            val rawFraction = if (total > 0) (mastered.toFloat() / total).coerceIn(0f, 1f) else 0f
+            val fraction = if (mastered > 0) maxOf(rawFraction, 0.035f) else 0f
             Box(
                 modifier = Modifier
                     .fillMaxWidth(fraction)
@@ -229,3 +238,15 @@ private fun HskLevelProgressRow(
         }
     }
 }
+
+private fun formatPercentString(mastered: Int, total: Int): String {
+    if (mastered <= 0 || total <= 0) return "0%"
+    val pct = (mastered.toDouble() / total) * 100.0
+    return when {
+        pct >= 100.0 -> "100%"
+        pct >= 10.0 -> "${pct.toInt()}%"
+        pct >= 0.1 -> String.format(java.util.Locale.US, "%.1f%%", pct)
+        else -> "<0.1%"
+    }
+}
+

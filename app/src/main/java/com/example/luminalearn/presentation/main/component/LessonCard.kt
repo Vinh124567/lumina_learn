@@ -128,7 +128,9 @@ fun LessonCard(
                         fontSize = 17.sp,
                         lineHeight = 23.sp
                     ),
-                    color = Color.White
+                    color = Color.White,
+                    maxLines = 1,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                 )
 
                 Spacer(modifier = Modifier.height(4.dp))
@@ -140,7 +142,9 @@ fun LessonCard(
                         fontSize = 12.5.sp,
                         lineHeight = 18.sp
                     ),
-                    color = Color(0xFFCBD5E1)
+                    color = Color(0xFFCBD5E1),
+                    maxLines = 2,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                 )
 
                 Spacer(modifier = Modifier.height(14.dp))
@@ -185,7 +189,9 @@ fun LessonCard(
                                 text = stringResource(R.string.btn_start_arrow),
                                 color = PrimaryIndigo,
                                 fontSize = 12.sp,
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                             )
                         }
                     }

@@ -15,10 +15,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -93,14 +93,18 @@ fun MainScreen(
         }
     }
 
-    val scrollState = rememberScrollState()
+    val lazyListState = rememberLazyListState()
     val density = LocalDensity.current
     val collapseThresholdPx = with(density) { 80.dp.toPx() }
     val collapseProgress by remember {
         derivedStateOf {
-            if (collapseThresholdPx > 0) {
-                (scrollState.value / collapseThresholdPx).coerceIn(0f, 1f)
-            } else 0f
+            if (lazyListState.firstVisibleItemIndex > 0) {
+                1f
+            } else if (collapseThresholdPx > 0) {
+                (lazyListState.firstVisibleItemScrollOffset / collapseThresholdPx).coerceIn(0f, 1f)
+            } else {
+                0f
+            }
         }
     }
 
@@ -110,176 +114,215 @@ fun MainScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(scrollState)
+            LazyColumn(
+                state = lazyListState,
+                modifier = Modifier.fillMaxSize()
             ) {
                 // Khoảng đệm đỉnh bằng đúng chiều cao mở rộng của Large Header (138dp) + 8dp thở
-                Spacer(modifier = Modifier.height(146.dp))
+                item(key = "top_header_spacer", contentType = "spacer") {
+                    Spacer(modifier = Modifier.height(146.dp))
+                }
 
                 // ── 1. HERO CARD: TÂM ĐIỂM BÀI HỌC HSK HIỆN TẠI ──
-                HeroLessonCard(
-                    lesson = uiState.recommendedLessons.firstOrNull(),
-                    onStartLessonClick = { lessonId -> viewModel.loadLesson(lessonId) },
-                    onViewAllLessonsClick = onNavigateToLesson,
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .staggeredEntrance(index = 1)
-                )
+                item(key = "hero_lesson_card", contentType = "hero_card") {
+                    HeroLessonCard(
+                        lesson = uiState.recommendedLessons.firstOrNull(),
+                        onStartLessonClick = { lessonId -> viewModel.loadLesson(lessonId) },
+                        onViewAllLessonsClick = onNavigateToLesson,
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .staggeredEntrance(index = 1)
+                    )
+                }
 
-                Spacer(modifier = Modifier.height(18.dp))
+                item(key = "spacer_hero_dock", contentType = "spacer") {
+                    Spacer(modifier = Modifier.height(18.dp))
+                }
 
                 // ── 2. MICRO-DOCK: HÀNG PHÍM TẮT LUYỆN TẬP VI MÔ ──
-                MainSectionHeader(
-                    title = stringResource(R.string.section_quick_shortcuts),
-                    subtitle = stringResource(R.string.section_quick_shortcuts_subtitle),
-                    accentColors = listOf(Color(0xFF6366F1), Color(0xFF00F2FE)),
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .staggeredEntrance(index = 2)
-                )
+                item(key = "quick_action_dock", contentType = "dock_section") {
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        MainSectionHeader(
+                            title = stringResource(R.string.section_quick_shortcuts),
+                            subtitle = stringResource(R.string.section_quick_shortcuts_subtitle),
+                            accentColors = listOf(Color(0xFF6366F1), Color(0xFF00F2FE)),
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .staggeredEntrance(index = 2)
+                        )
 
-                Spacer(modifier = Modifier.height(12.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
 
-                QuickActionBar(
-                    onRoleplayClick = onNavigateToSparkAi,
-                    onPinyinClick = onNavigateToLesson,
-                    onVocabClick = { navController.navigate(AppDestination.Vocabulary.route) },
-                    onRadicalsClick = onNavigateToLesson,
-                    onChallengeClick = {
-                        confettiTrigger++
-                        Toast.makeText(
-                            context,
-                            context.getString(R.string.msg_challenge_completed),
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    },
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .staggeredEntrance(index = 2)
-                )
+                        QuickActionBar(
+                            onRoleplayClick = onNavigateToSparkAi,
+                            onPinyinClick = onNavigateToLesson,
+                            onVocabClick = { navController.navigate(AppDestination.Vocabulary.route) },
+                            onRadicalsClick = onNavigateToLesson,
+                            onChallengeClick = {
+                                confettiTrigger++
+                                Toast.makeText(
+                                    context,
+                                    context.getString(R.string.msg_challenge_completed),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            },
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .staggeredEntrance(index = 2)
+                        )
+                    }
+                }
 
-                Spacer(modifier = Modifier.height(20.dp))
+                item(key = "spacer_dock_duo", contentType = "spacer") {
+                    Spacer(modifier = Modifier.height(20.dp))
+                }
 
                 // ── 3. KHỐI CHỈ SỐ KÉP: MỤC TIÊU & CHUỖI STREAK SONG HÀNH (1:1) ──
-                MainSectionHeader(
-                    title = stringResource(R.string.section_daily_overview),
-                    subtitle = stringResource(R.string.section_daily_overview_subtitle),
-                    accentColors = listOf(Color(0xFFFF9800), Color(0xFFEA580C)),
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .staggeredEntrance(index = 3)
-                )
+                item(key = "daily_progress_duo", contentType = "overview_section") {
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        MainSectionHeader(
+                            title = stringResource(R.string.section_daily_overview),
+                            subtitle = stringResource(R.string.section_daily_overview_subtitle),
+                            accentColors = listOf(Color(0xFFFF9800), Color(0xFFEA580C)),
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .staggeredEntrance(index = 3)
+                        )
 
-                Spacer(modifier = Modifier.height(12.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
 
-                DailyProgressDuo(
-                    currentMinutes = 10,
-                    targetMinutes = 10,
-                    bonusSparks = 30,
-                    streakDays = 5,
-                    checkedDays = listOf(true, true, true, true, true, false, false),
-                    onStartLessonClick = onNavigateToLesson,
-                    onClaimStreakClick = {
-                        confettiTrigger++
-                        Toast.makeText(
-                            context,
-                            context.getString(R.string.toast_streak_bonus_claimed, 30),
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    },
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .staggeredEntrance(index = 3)
-                )
+                        DailyProgressDuo(
+                            currentMinutes = 10,
+                            targetMinutes = 10,
+                            bonusSparks = 30,
+                            streakDays = 5,
+                            checkedDays = listOf(true, true, true, true, true, false, false),
+                            onStartLessonClick = onNavigateToLesson,
+                            onClaimStreakClick = {
+                                confettiTrigger++
+                                Toast.makeText(
+                                    context,
+                                    context.getString(R.string.toast_streak_bonus_claimed, 30),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            },
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .staggeredEntrance(index = 3)
+                        )
+                    }
+                }
 
-                Spacer(modifier = Modifier.height(20.dp))
+                item(key = "spacer_duo_lessons", contentType = "spacer") {
+                    Spacer(modifier = Modifier.height(20.dp))
+                }
 
                 // ── 4. SÂN KHẤU BÀI HỌC 3D COVER FLOW (CUỘN NGANG NHẤP NHÔ) ──
-                RecommendedLessonsSection(
-                    isLoading = uiState.isRecommendedLessonsLoading && uiState.recommendedLessons.isEmpty(),
-                    lessons = uiState.recommendedLessons,
-                    onViewAllClick = onNavigateToLesson,
-                    onStartLessonClick = { lessonId -> viewModel.loadLesson(lessonId) },
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .staggeredEntrance(index = 4)
-                )
+                item(key = "recommended_lessons_flow", contentType = "lessons_flow") {
+                    RecommendedLessonsSection(
+                        isLoading = uiState.isRecommendedLessonsLoading && uiState.recommendedLessons.isEmpty(),
+                        lessons = uiState.recommendedLessons,
+                        onViewAllClick = onNavigateToLesson,
+                        onStartLessonClick = { lessonId -> viewModel.loadLesson(lessonId) },
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .staggeredEntrance(index = 4)
+                    )
+                }
 
-                Spacer(modifier = Modifier.height(20.dp))
+                item(key = "spacer_lessons_ai", contentType = "spacer") {
+                    Spacer(modifier = Modifier.height(20.dp))
+                }
 
                 // ── 5. AI SPOTLIGHT BANNER: PHÒNG LAB HỘI THOẠI BẢN XỨ ──
-                MainSectionHeader(
-                    title = stringResource(R.string.section_ai_spotlight),
-                    subtitle = stringResource(R.string.section_ai_spotlight_subtitle),
-                    accentColors = listOf(Color(0xFF6366F1), Color(0xFF00F2FE)),
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .staggeredEntrance(index = 5)
-                )
+                item(key = "ai_spotlight_banner", contentType = "ai_section") {
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        MainSectionHeader(
+                            title = stringResource(R.string.section_ai_spotlight),
+                            subtitle = stringResource(R.string.section_ai_spotlight_subtitle),
+                            accentColors = listOf(Color(0xFF6366F1), Color(0xFF00F2FE)),
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .staggeredEntrance(index = 5)
+                        )
 
-                Spacer(modifier = Modifier.height(12.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
 
-                AiRoleplayDialogueCard(
-                    onStartRoleplayClick = onNavigateToSparkAi,
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .staggeredEntrance(index = 5)
-                )
+                        AiRoleplayDialogueCard(
+                            onStartRoleplayClick = onNavigateToSparkAi,
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .staggeredEntrance(index = 5)
+                        )
+                    }
+                }
 
-                Spacer(modifier = Modifier.height(20.dp))
+                item(key = "spacer_ai_challenge", contentType = "spacer") {
+                    Spacer(modifier = Modifier.height(20.dp))
+                }
 
                 // ── 6. THỬ THÁCH SPARK ──
-                MainSectionHeader(
-                    title = stringResource(R.string.section_spark_challenge),
-                    subtitle = stringResource(R.string.section_spark_challenge_subtitle),
-                    accentColors = listOf(Color(0xFFF59E0B), Color(0xFFEF4444)),
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .staggeredEntrance(index = 6)
-                )
+                item(key = "spark_challenge_card", contentType = "challenge_section") {
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        MainSectionHeader(
+                            title = stringResource(R.string.section_spark_challenge),
+                            subtitle = stringResource(R.string.section_spark_challenge_subtitle),
+                            accentColors = listOf(Color(0xFFF59E0B), Color(0xFFEF4444)),
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .staggeredEntrance(index = 6)
+                        )
 
-                Spacer(modifier = Modifier.height(12.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
 
-                SparkChallengeCard(
-                    bonusSparks = 20,
-                    onCompleteClick = {
-                        confettiTrigger++
-                        Toast.makeText(
-                            context,
-                            context.getString(R.string.msg_challenge_completed),
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    },
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .staggeredEntrance(index = 6)
-                )
+                        SparkChallengeCard(
+                            bonusSparks = 20,
+                            onCompleteClick = {
+                                confettiTrigger++
+                                Toast.makeText(
+                                    context,
+                                    context.getString(R.string.msg_challenge_completed),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            },
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .staggeredEntrance(index = 6)
+                        )
+                    }
+                }
 
-                Spacer(modifier = Modifier.height(20.dp))
+                item(key = "spacer_challenge_wisdom", contentType = "spacer") {
+                    Spacer(modifier = Modifier.height(20.dp))
+                }
 
                 // ── 7. GÓC DANH NGÔN CẢM HỨNG ──
-                MainSectionHeader(
-                    title = stringResource(R.string.section_daily_wisdom),
-                    subtitle = stringResource(R.string.section_daily_wisdom_subtitle),
-                    accentColors = listOf(Color(0xFF10B981), Color(0xFF06B6D4)),
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .staggeredEntrance(index = 7)
-                )
+                item(key = "daily_wisdom_card", contentType = "wisdom_section") {
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        MainSectionHeader(
+                            title = stringResource(R.string.section_daily_wisdom),
+                            subtitle = stringResource(R.string.section_daily_wisdom_subtitle),
+                            accentColors = listOf(Color(0xFF10B981), Color(0xFF06B6D4)),
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .staggeredEntrance(index = 7)
+                        )
 
-                Spacer(modifier = Modifier.height(12.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
 
-                DailyWisdomCard(
-                    wisdom = uiState.dailyWisdom,
-                    onRefreshClick = { viewModel.refreshDailyWisdom() },
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .staggeredEntrance(index = 7)
-                )
+                        DailyWisdomCard(
+                            wisdom = uiState.dailyWisdom,
+                            onRefreshClick = { viewModel.refreshDailyWisdom() },
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .staggeredEntrance(index = 7)
+                        )
+                    }
+                }
 
-                Spacer(modifier = Modifier.height(130.dp))
+                item(key = "bottom_spacer", contentType = "spacer") {
+                    Spacer(modifier = Modifier.height(130.dp))
+                }
             }
 
             // ── TOPBAR COLLAPSING STICKY: Tự động co dần và dừng đóng cố định ở mép trên màn hình ──
@@ -375,6 +418,7 @@ private fun RecommendedLessonsSection(
             Column(modifier = Modifier.fillMaxWidth()) {
                 HorizontalPager(
                     state = pagerState,
+                    key = { lessons[it].id },
                     contentPadding = PaddingValues(horizontal = 24.dp),
                     pageSpacing = 14.dp,
                     modifier = Modifier.fillMaxWidth()

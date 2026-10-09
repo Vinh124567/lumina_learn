@@ -172,7 +172,9 @@ fun HeroLessonCard(
                             text = stringResource(R.string.bento_hero_btn_resume),
                             color = Color.White,
                             fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
                 }

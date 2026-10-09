@@ -99,7 +99,7 @@ fun DailyWisdomCard(
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 13.dp)
             ) {
-                // Header Row: Badge bên trái + Tác giả & Nút đổi bên phải
+                // Header Row: Badge bên trái + Nút đổi bên phải
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -124,47 +124,34 @@ fun DailyWisdomCard(
                         )
                     }
 
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        val authorName = wisdom?.author ?: author
-                        Text(
-                            text = formatAuthor(authorName),
-                            fontFamily = PlusJakartaSans,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 11.5.sp,
-                            color = GoldBadgeText
-                        )
-
-                        Surface(
-                            shape = CircleShape,
-                            color = Color.White.copy(alpha = 0.12f),
-                            modifier = Modifier
-                                .size(28.dp)
-                                .clip(CircleShape)
-                                .border(
-                                    BorderStroke(0.8.dp, Color.White.copy(alpha = 0.2f)),
-                                    shape = CircleShape
-                                )
-                                .bounceClick(scaleDown = 0.9f) {
-                                    rotationAngle += 360f
-                                    onRefreshClick()
-                                }
-                        ) {
-                            Box(
-                                contentAlignment = Alignment.Center,
-                                modifier = Modifier.fillMaxWidth()
-                            ) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_refresh),
-                                    contentDescription = stringResource(R.string.cd_refresh),
-                                    tint = Color.White,
-                                    modifier = Modifier
-                                        .size(13.dp)
-                                        .rotate(animatedRotation)
-                                )
+                    // Nút đổi châm ngôn tròn luôn nổi bật bên góc phải
+                    Surface(
+                        shape = CircleShape,
+                        color = Color.White.copy(alpha = 0.12f),
+                        modifier = Modifier
+                            .size(28.dp)
+                            .clip(CircleShape)
+                            .border(
+                                BorderStroke(0.8.dp, Color.White.copy(alpha = 0.2f)),
+                                shape = CircleShape
+                            )
+                            .bounceClick(scaleDown = 0.9f) {
+                                rotationAngle += 360f
+                                onRefreshClick()
                             }
+                    ) {
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_refresh),
+                                contentDescription = stringResource(R.string.cd_refresh),
+                                tint = Color.White,
+                                modifier = Modifier
+                                    .size(13.dp)
+                                    .rotate(animatedRotation)
+                            )
                         }
                     }
                 }
@@ -173,53 +160,89 @@ fun DailyWisdomCard(
 
                 // Content: Chữ Hán nổi bật
                 if (wisdom != null && wisdom.chinese.isNotBlank()) {
-                    Row(
+                    Column(
                         modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        verticalArrangement = Arrangement.spacedBy(3.dp)
                     ) {
+                        // 1. Chữ Hán
                         Text(
                             text = wisdom.chinese,
                             fontFamily = PlusJakartaSans,
                             fontWeight = FontWeight.ExtraBold,
                             fontSize = 17.5.sp,
+                            lineHeight = 24.sp,
                             color = Color.White
                         )
 
+                        // 2. Pinyin riêng một dòng rõ ràng, không bị chen lấn
                         if (wisdom.pinyin.isNotBlank()) {
                             Text(
                                 text = wisdom.pinyin,
                                 fontFamily = PlusJakartaSans,
                                 fontWeight = FontWeight.SemiBold,
                                 fontSize = 11.5.sp,
+                                lineHeight = 16.sp,
                                 color = MintTextColor
                             )
                         }
-                    }
 
-                    Spacer(modifier = Modifier.height(4.dp))
+                        Spacer(modifier = Modifier.height(2.dp))
 
-                    val meaningText = wisdom.vietnamese.ifBlank { wisdom.meaning }
-                    if (meaningText.isNotBlank()) {
-                        Text(
-                            text = "“$meaningText”",
-                            fontFamily = PlusJakartaSans,
-                            fontWeight = FontWeight.Normal,
-                            fontSize = 12.5.sp,
-                            lineHeight = 17.sp,
-                            color = Color(0xFFE0E7FF)
-                        )
+                        // 3. Nghĩa tiếng Việt
+                        val meaningText = wisdom.vietnamese.ifBlank { wisdom.meaning }
+                        if (meaningText.isNotBlank()) {
+                            Text(
+                                text = "“$meaningText”",
+                                fontFamily = PlusJakartaSans,
+                                fontWeight = FontWeight.Normal,
+                                fontSize = 12.5.sp,
+                                lineHeight = 18.sp,
+                                color = Color(0xFFE0E7FF)
+                            )
+                        }
+
+                        // 4. Tác giả đặt ở chân danh ngôn căn phải trang trọng
+                        val authorName = wisdom.author.ifBlank { author }
+                        if (authorName.isNotBlank()) {
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text(
+                                text = formatAuthor(authorName),
+                                fontFamily = PlusJakartaSans,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 11.sp,
+                                color = GoldBadgeText,
+                                modifier = Modifier.align(Alignment.End),
+                                maxLines = 1,
+                                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                            )
+                        }
                     }
                 } else {
-                    Text(
-                        text = quote,
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = 13.5.sp,
-                            lineHeight = 19.sp
-                        ),
-                        color = Color.White
-                    )
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        Text(
+                            text = quote,
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 13.5.sp,
+                                lineHeight = 19.sp
+                            ),
+                            color = Color.White
+                        )
+
+                        if (author.isNotBlank()) {
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = formatAuthor(author),
+                                fontFamily = PlusJakartaSans,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 11.sp,
+                                color = GoldBadgeText,
+                                modifier = Modifier.align(Alignment.End),
+                                maxLines = 1,
+                                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                            )
+                        }
+                    }
                 }
             }
         }

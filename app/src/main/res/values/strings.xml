@@ -68,7 +68,7 @@
     <string name="streak_active">Đang duy trì</string>
     <string name="streak_flame_title_format">%1$d Ngày Cháy Lửa Liên Tiếp!</string>
     <string name="streak_subtitle">Duy trì thói quen học mỗi ngày để bảo vệ chuỗi streak và nhân đôi phần thưởng.</string>
-    <string name="btn_claim_streak">Nhận Thưởng Chuỗi Hôm Nay</string>
+    <string name="btn_claim_streak">Claim Streak</string>
     <string name="msg_streak_claimed">Streak check-in claimed!</string>
 
     <!-- Daily Spark Challenge Card -->
@@ -201,4 +201,8 @@
 
     <string name="hub_tab_bento">⚡ Bento Grid</string>
     <string name="toast_streak_bonus_claimed">Congratulations! You earned +%1$d Sparks.</string>
+
+    <!-- Vocab View Mode -->
+    <string name="content_desc_switch_to_list">Switch to list view</string>
+    <string name="content_desc_switch_to_grid">Switch to grid view</string>
 </resources>

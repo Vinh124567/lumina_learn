@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -39,6 +40,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -77,22 +79,23 @@ fun VocabDetailDialog(
         properties = DialogProperties(
             usePlatformDefaultWidth = false,
             dismissOnBackPress = true,
-            dismissOnClickOutside = false
+            dismissOnClickOutside = true
         )
     ) {
         Surface(
-            modifier = modifier.fillMaxSize(),
+            modifier = modifier
+                .fillMaxWidth(0.93f)
+                .fillMaxHeight(0.88f)
+                .shadow(elevation = 20.dp, shape = RoundedCornerShape(26.dp)),
+            shape = RoundedCornerShape(26.dp),
             color = Color(0xFFF6F8FB)
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .statusBarsPadding()
+                modifier = Modifier.fillMaxSize()
             ) {
-                // ── 1. Top Header Bar (Nút quay lại, Tiêu đề, Badges & Nút SRS) ──
+                // ── 1. Top Header Bar (Tiêu đề, Badges & Nút đóng) ──
                 DialogTopHeader(
                     word = word,
-                    onToggleEnrollSrs = { onToggleEnrollSrs(word.id) },
                     onDismiss = onDismiss
                 )
 
@@ -136,10 +139,10 @@ fun VocabDetailDialog(
                     }
                 }
 
-                // ── 4. Thanh Bottom Bar cố định (Nghe lại & Đánh dấu thuộc từ) ──
+                // ── 4. Thanh Bottom Bar tập trung: Ôn SRS & Đánh dấu thuộc từ ──
                 DialogBottomBar(
                     word = word,
-                    onSpeak = { onSpeak(word.hanzi) },
+                    onToggleEnrollSrs = { onToggleEnrollSrs(word.id) },
                     onToggleMastered = { onToggleMastered(word.id) }
                 )
             }
@@ -150,114 +153,74 @@ fun VocabDetailDialog(
 @Composable
 private fun DialogTopHeader(
     word: VocabWordItem,
-    onToggleEnrollSrs: () -> Unit,
     onDismiss: () -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 10.dp),
+            .padding(start = 18.dp, end = 14.dp, top = 16.dp, bottom = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        // Bên trái: Nút quay lại dạng tròn + Tiêu đề
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.weight(1f, fill = false)
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(38.dp)
-                    .clip(CircleShape)
-                    .background(Color.White)
-                    .border(BorderStroke(1.dp, Color(0xFFE2E8F0)), CircleShape)
-                    .bounceClick(scaleDown = 0.88f, onClick = onDismiss),
-                contentAlignment = Alignment.Center
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = "Chi tiết từ vựng",
+                fontFamily = PlusJakartaSans,
+                fontSize = 17.sp,
+                fontWeight = FontWeight.ExtraBold,
+                color = Color(0xFF0F172A),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            Spacer(modifier = Modifier.height(2.dp))
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(5.dp)
             ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_chevron_left),
-                    contentDescription = "Quay lại",
-                    tint = Color(0xFF0F172A),
-                    modifier = Modifier.size(22.dp)
-                )
-            }
-
-            Spacer(modifier = Modifier.width(10.dp))
-
-            Column {
                 Text(
-                    text = "Chi tiết từ vựng",
-                    fontFamily = PlusJakartaSans,
-                    fontSize = 17.5.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = Color(0xFF0F172A),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    Text(
-                        text = word.hskLevel,
-                        fontFamily = PlusJakartaSans,
-                        fontSize = 11.5.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = VocabColors.BrandPrimary
-                    )
-                    Text(
-                        text = "•",
-                        fontSize = 10.sp,
-                        color = Color(0xFF94A3B8)
-                    )
-                    Text(
-                        text = word.topic,
-                        fontFamily = PlusJakartaSans,
-                        fontSize = 11.5.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color(0xFF64748B),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.width(8.dp))
-
-        // Cụm action bên phải: Nút Bật/Tắt Ôn SRS
-        val isInSrs = word.isInSrs
-        Box(
-            modifier = Modifier
-                .clip(RoundedCornerShape(10.dp))
-                .background(if (isInSrs) Color(0xFFFEF3C7) else Color.White)
-                .border(
-                    BorderStroke(
-                        1.dp,
-                        if (isInSrs) Color(0xFFF59E0B).copy(alpha = 0.5f) else Color(0xFFE2E8F0)
-                    ),
-                    RoundedCornerShape(10.dp)
-                )
-                .bounceClick(scaleDown = 0.90f, onClick = onToggleEnrollSrs)
-                .padding(horizontal = 10.dp, vertical = 6.dp)
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_bolt),
-                    contentDescription = null,
-                    tint = if (isInSrs) Color(0xFFD97706) else Color(0xFF64748B),
-                    modifier = Modifier.size(13.dp)
-                )
-                Spacer(modifier = Modifier.width(5.dp))
-                Text(
-                    text = if (isInSrs) "Đang ôn SRS" else "+ Ôn SRS",
+                    text = word.hskLevel,
                     fontFamily = PlusJakartaSans,
                     fontSize = 11.5.sp,
                     fontWeight = FontWeight.Bold,
-                    color = if (isInSrs) Color(0xFFD97706) else Color(0xFF334155)
+                    color = VocabColors.BrandPrimary
+                )
+                Text(
+                    text = "•",
+                    fontSize = 10.sp,
+                    color = Color(0xFF94A3B8)
+                )
+                Text(
+                    text = word.topic,
+                    fontFamily = PlusJakartaSans,
+                    fontSize = 11.5.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Color(0xFF64748B),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
+        }
+
+        Spacer(modifier = Modifier.width(10.dp))
+
+        // Nút Đóng (X) tròn thanh lịch
+        Box(
+            modifier = Modifier
+                .size(32.dp)
+                .clip(CircleShape)
+                .background(Color.White)
+                .border(BorderStroke(0.5.dp, Color(0xFFE2E8F0)), CircleShape)
+                .bounceClick(scaleDown = 0.88f, onClick = onDismiss),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_close),
+                contentDescription = "Đóng",
+                tint = Color(0xFF64748B),
+                modifier = Modifier.size(15.dp)
+            )
         }
     }
 }
@@ -306,13 +269,13 @@ private fun DialogTabRow(
                     .background(bgAnimation)
                     .border(
                         BorderStroke(
-                            1.dp,
-                            if (isSelected) VocabColors.BrandPrimary else Color(0xFFE2E8F0)
+                            0.5.dp,
+                            if (isSelected) Color.Transparent else Color(0xFFE2E8F0)
                         ),
                         RoundedCornerShape(12.dp)
                     )
                     .bounceClick(scaleDown = 0.94f) { onSelectTab(item.index) }
-                    .padding(horizontal = 12.dp, vertical = 7.dp),
+                    .padding(horizontal = 13.dp, vertical = 7.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Row(
@@ -343,32 +306,39 @@ private fun DialogTabRow(
 @Composable
 private fun DialogBottomBar(
     word: VocabWordItem,
-    onSpeak: () -> Unit,
+    onToggleEnrollSrs: () -> Unit,
     onToggleMastered: () -> Unit
 ) {
+    val isInSrs = word.isInSrs
+    val isMastered = word.isMastered
+
     Surface(
         modifier = Modifier.fillMaxWidth(),
         color = Color.White,
-        shadowElevation = 8.dp
+        shape = RoundedCornerShape(bottomStart = 26.dp, bottomEnd = 26.dp),
+        shadowElevation = 6.dp
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .border(BorderStroke(1.dp, Color(0xFFE2E8F0)))
-                .navigationBarsPadding()
-                .padding(horizontal = 16.dp, vertical = 10.dp),
+                .border(
+                    BorderStroke(0.5.dp, Color(0xFFE2E8F0).copy(alpha = 0.6f)),
+                    RoundedCornerShape(bottomStart = 26.dp, bottomEnd = 26.dp)
+                )
+                .padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            // Nút Nghe lại
+            // Nút Bật/Tắt Ôn SRS
             Box(
                 modifier = Modifier
+                    .weight(1f)
                     .height(44.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(Color(0xFFF8FAFC))
-                    .border(BorderStroke(1.2.dp, Color(0xFFE2E8F0)), RoundedCornerShape(12.dp))
-                .bounceClick(scaleDown = 0.94f, onClick = onSpeak)
-                    .padding(horizontal = 14.dp),
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(
+                        if (isInSrs) Color(0xFFFEF3C7) else Color(0xFFF1F5F9)
+                    )
+                    .bounceClick(scaleDown = 0.94f, onClick = onToggleEnrollSrs),
                 contentAlignment = Alignment.Center
             ) {
                 Row(
@@ -376,33 +346,32 @@ private fun DialogBottomBar(
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_speaker),
+                        painter = painterResource(id = R.drawable.ic_bolt),
                         contentDescription = null,
-                        tint = VocabColors.BrandPrimary,
+                        tint = if (isInSrs) Color(0xFFD97706) else Color(0xFF64748B),
                         modifier = Modifier.size(15.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
-                        text = "Nghe (${word.pinyin})",
+                        text = if (isInSrs) "Đang ôn SRS" else "+ Ôn SRS",
                         fontFamily = PlusJakartaSans,
                         fontSize = 12.5.sp,
                         fontWeight = FontWeight.Bold,
-                        color = VocabColors.BrandPrimary,
+                        color = if (isInSrs) Color(0xFFD97706) else Color(0xFF475569),
                         maxLines = 1
                     )
                 }
             }
 
-            // Nút Thuộc từ này (+5 Tia Sáng)
-            val isMastered = word.isMastered
+            // Nút Đánh dấu Đã thuộc
             val btnBgColor = if (isMastered) Color(0xFF059669) else VocabColors.BrandPrimary
             val btnText = if (isMastered) "✓ Đã thuộc từ này" else "✓ Thuộc từ này (+5)"
 
             Box(
                 modifier = Modifier
-                    .weight(1f)
+                    .weight(1.3f)
                     .height(44.dp)
-                    .clip(RoundedCornerShape(12.dp))
+                    .clip(RoundedCornerShape(14.dp))
                     .background(btnBgColor)
                     .bounceClick(scaleDown = 0.94f, onClick = onToggleMastered),
                 contentAlignment = Alignment.Center
