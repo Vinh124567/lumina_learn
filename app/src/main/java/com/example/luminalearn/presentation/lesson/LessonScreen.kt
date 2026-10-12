@@ -2,6 +2,11 @@ package com.example.luminalearn.presentation.lesson
 
 import android.speech.tts.TextToSpeech
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -58,17 +63,22 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.luminalearn.R
 import com.example.luminalearn.core.ui.effect.bounceClick
 import com.example.luminalearn.presentation.common.LessonCardShimmerItem
+import com.example.luminalearn.presentation.lesson.component.BossExamDialog
+import com.example.luminalearn.presentation.lesson.component.ChestRewardDialog
 import com.example.luminalearn.presentation.lesson.component.ChineseLessonData
 import com.example.luminalearn.presentation.lesson.component.CollapsingLessonHeaderBar
+import com.example.luminalearn.presentation.lesson.component.HeartRefillModal
+import com.example.luminalearn.presentation.lesson.component.HskGrammarVaultModal
 import com.example.luminalearn.presentation.lesson.component.LessonAction
 import com.example.luminalearn.presentation.lesson.component.LessonCardItem
+import com.example.luminalearn.presentation.lesson.component.LessonCatalogArchiveView
 import com.example.luminalearn.presentation.lesson.component.LessonDetailDialog
-import com.example.luminalearn.presentation.lesson.component.LessonFilterRow
 import com.example.luminalearn.presentation.lesson.component.LessonJourneyMapView
 import com.example.luminalearn.presentation.lesson.component.LessonPreviewModal
-import com.example.luminalearn.presentation.lesson.component.LessonSearchBar
-import com.example.luminalearn.presentation.lesson.component.LessonTimelineListView
+import com.example.luminalearn.presentation.lesson.component.QuickReviewModal
+import com.example.luminalearn.presentation.lesson.component.SkillRadarModal
 import com.example.luminalearn.presentation.lesson.component.ToneCardData
+import com.example.luminalearn.presentation.lesson.component.UnitHandbookModal
 import com.example.luminalearn.presentation.vocabulary.component.PaginationBar
 import com.example.luminalearn.ui.theme.PlusJakartaSans
 import kotlinx.coroutines.launch
@@ -109,6 +119,71 @@ fun LessonScreen(
     var activeLesson by remember { mutableStateOf<ChineseLessonData?>(null) }
     var currentSlideCard by remember { mutableStateOf<ToneCardData?>(null) }
     var previewModalLesson by remember { mutableStateOf<ChineseLessonData?>(null) }
+    var chestRewardUnitNumber by remember { mutableStateOf<Int?>(null) }
+    var selectedHandbookUnit by remember {
+        mutableStateOf<Triple<Int, String, List<ChineseLessonData>>?>(null)
+    }
+    var quickReviewLesson by remember { mutableStateOf<ChineseLessonData?>(null) }
+    var isBossExamOpen by remember { mutableStateOf(false) }
+    var examQuestions by remember {
+        mutableStateOf<List<com.example.luminalearn.presentation.lesson.component.BossQuestion>>(emptyList())
+    }
+    var isExamLoading by remember { mutableStateOf(false) }
+    var examErrorMessage by remember { mutableStateOf<String?>(null) }
+
+    var reviewQuestions by remember {
+        mutableStateOf<List<com.example.luminalearn.data.model.QuickReviewQuestionDto>>(emptyList())
+    }
+    var isReviewLoading by remember { mutableStateOf(false) }
+    var reviewErrorMessage by remember { mutableStateOf<String?>(null) }
+
+    var isHeartModalOpen by remember { mutableStateOf(false) }
+    var isAnalyticsModalOpen by remember { mutableStateOf(false) }
+    var isGrammarVaultOpen by remember { mutableStateOf(false) }
+
+    LaunchedEffect(isGrammarVaultOpen) {
+        if (isGrammarVaultOpen && uiState.grammarStructures.isEmpty()) {
+            lessonViewModel.loadGrammarStructures()
+        }
+    }
+
+    LaunchedEffect(isBossExamOpen, uiState.selectedHskLevel) {
+        if (isBossExamOpen) {
+            isExamLoading = true
+            examErrorMessage = null
+            lessonViewModel.loadExamQuestions(
+                level = uiState.selectedHskLevel,
+                onSuccess = { list ->
+                    examQuestions = list
+                    isExamLoading = false
+                },
+                onError = { err ->
+                    examErrorMessage = err
+                    isExamLoading = false
+                }
+            )
+        }
+    }
+
+    LaunchedEffect(quickReviewLesson) {
+        val lesson = quickReviewLesson
+        if (lesson != null) {
+            isReviewLoading = true
+            reviewErrorMessage = null
+            reviewQuestions = emptyList()
+            lessonViewModel.loadReviewQuestions(
+                lessonId = lesson.id,
+                onSuccess = { list ->
+                    reviewQuestions = list
+                    isReviewLoading = false
+                },
+                onError = { err ->
+                    reviewErrorMessage = err
+                    isReviewLoading = false
+                }
+            )
+        }
+    }
 
     // Chế độ xem: true -> Bản đồ lộ trình phiêu lưu, false -> Danh sách thẻ bài học
     var isJourneyView by rememberSaveable { mutableStateOf(true) }
@@ -143,6 +218,37 @@ fun LessonScreen(
             onSelectLessonForPreview = { lesson ->
                 previewModalLesson = lesson
             },
+            onOpenChest = { unitNumber, isUnlocked ->
+                if (isUnlocked) {
+                    chestRewardUnitNumber = unitNumber
+                } else {
+                    Toast.makeText(
+                        context,
+                        "Hoàn thành các bài học trong Phần $unitNumber để mở rương phần thưởng!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            },
+            onOpenHandbook = { unitNum, title, unitLessons ->
+                selectedHandbookUnit = Triple(unitNum, title, unitLessons)
+            },
+            onStartBossExam = { levelName, isUnlocked ->
+                if (isUnlocked) {
+                    isBossExamOpen = true
+                } else {
+                    Toast.makeText(
+                        context,
+                        "Hãy hoàn thành tất cả bài học trong $levelName để mở Cổng Thi Vượt Cấp!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            },
+            onQuickReview = { lesson ->
+                quickReviewLesson = lesson
+            },
+            onOpenHearts = { isHeartModalOpen = true },
+            onOpenAnalytics = { isAnalyticsModalOpen = true },
+            onOpenGrammarVault = { isGrammarVaultOpen = true },
             actions = LessonActionCallbacks(
                 onSelectHskLevel = lessonViewModel::selectHskLevel,
                 onSearchQueryChange = lessonViewModel::updateSearchQuery,
@@ -151,7 +257,15 @@ fun LessonScreen(
                 onRetry = lessonViewModel::loadLessons,
                 onSpeak = speakText,
                 onStartLesson = { lesson ->
-                    if (lesson.slides.isNotEmpty()) {
+                    val hearts = uiState.heartStatus?.currentHearts ?: 5
+                    if (hearts <= 0) {
+                        isHeartModalOpen = true
+                        Toast.makeText(
+                            context,
+                            "Bạn đã hết tim! Hãy nạp tim bằng Sparks hoặc ôn bài cũ để hồi phục nhé ❤️",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else if (lesson.slides.isNotEmpty()) {
                         activeLesson = lesson
                         currentSlideCard = lesson.slides.first()
                     } else {
@@ -171,22 +285,131 @@ fun LessonScreen(
                 lesson = lesson,
                 onStartLesson = {
                     val targetLesson = previewModalLesson
-                    previewModalLesson = null
-                    targetLesson?.let {
-                        if (it.slides.isNotEmpty()) {
-                            activeLesson = it
-                            currentSlideCard = it.slides.first()
-                        } else {
-                            Toast.makeText(
-                                context,
-                                "Bài học \"${it.title}\" đang hoàn thiện slide thực hành",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                    val hearts = uiState.heartStatus?.currentHearts ?: 5
+                    if (hearts <= 0) {
+                        previewModalLesson = null
+                        isHeartModalOpen = true
+                        Toast.makeText(
+                            context,
+                            "Bạn đã hết tim! Hãy nạp tim bằng Sparks hoặc ôn bài cũ để hồi phục nhé ❤️",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+                        previewModalLesson = null
+                        targetLesson?.let {
+                            if (it.slides.isNotEmpty()) {
+                                activeLesson = it
+                                currentSlideCard = it.slides.first()
+                            } else {
+                                Toast.makeText(
+                                    context,
+                                    "Bài học \"${it.title}\" đang hoàn thiện slide thực hành",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
                         }
                     }
                 },
                 onDismiss = { previewModalLesson = null },
                 onSpeak = speakText
+            )
+        }
+
+        // Modal Sổ tay kiến thức tóm tắt của từng Unit
+        selectedHandbookUnit?.let { (unitNum, title, unitLessons) ->
+            UnitHandbookModal(
+                unitNumber = unitNum,
+                unitTitle = title,
+                lessons = unitLessons,
+                onSpeak = speakText,
+                onDismiss = { selectedHandbookUnit = null }
+            )
+        }
+
+        // Modal Ôn tập nhanh Cắt đứt quên lãng (Spaced Repetition)
+        quickReviewLesson?.let { lesson ->
+            QuickReviewModal(
+                lesson = lesson,
+                questions = reviewQuestions,
+                isLoading = isReviewLoading,
+                errorMessage = reviewErrorMessage,
+                onCompleted = { lessonId ->
+                    lessonViewModel.submitReview(
+                        lessonId = lessonId,
+                        onSuccess = { sparksBonus, newStars, message ->
+                            quickReviewLesson = null
+                            Toast.makeText(
+                                context,
+                                message.ifBlank { "Hàn gắn trạm thành công! +$sparksBonus Sparks đã được cộng 🎉" },
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        },
+                        onError = { err ->
+                            Toast.makeText(context, err, Toast.LENGTH_SHORT).show()
+                        }
+                    )
+                },
+                onDismiss = { quickReviewLesson = null }
+            )
+        }
+
+        // Dialog mở rương báu nhận thưởng Sparks & EXP
+        chestRewardUnitNumber?.let { unitNum ->
+            ChestRewardDialog(
+                unitNumber = unitNum,
+                sparksEarned = 50,
+                expEarned = 100,
+                onClaim = {
+                    lessonViewModel.claimChest(
+                        unitNumber = unitNum,
+                        onSuccess = { sparks, exp ->
+                            Toast.makeText(
+                                context,
+                                "Chúc mừng! Bạn đã nhận được +$sparks Sparks và +$exp EXP từ máy chủ 🎉",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        },
+                        onError = { error ->
+                            Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
+                        }
+                    )
+                },
+                onDismiss = { chestRewardUnitNumber = null }
+            )
+        }
+
+        // Dialog bài thi vượt cấp Boss Checkpoint
+        if (isBossExamOpen) {
+            BossExamDialog(
+                levelName = uiState.selectedHskLevel.uppercase(),
+                questions = examQuestions,
+                isLoading = isExamLoading,
+                errorMessage = examErrorMessage,
+                onRetry = {
+                    isExamLoading = true
+                    examErrorMessage = null
+                    lessonViewModel.loadExamQuestions(
+                        level = uiState.selectedHskLevel,
+                        onSuccess = { list ->
+                            examQuestions = list
+                            isExamLoading = false
+                        },
+                        onError = { err ->
+                            examErrorMessage = err
+                            isExamLoading = false
+                        }
+                    )
+                },
+                onDismiss = { isBossExamOpen = false },
+                onPassExam = {
+                    isBossExamOpen = false
+                    Toast.makeText(context, "Chúc mừng bạn đã vượt cấp thành công! Mở khóa HSK 2! 🏆", Toast.LENGTH_LONG).show()
+                    lessonViewModel.selectHskLevel("HSK 2")
+                },
+                onSpeak = speakText,
+                onWrongAnswer = {
+                    lessonViewModel.consumeHeart()
+                }
             )
         }
 
@@ -200,11 +423,77 @@ fun LessonScreen(
                     activeLesson = null
                 },
                 onCardChange = { currentSlideCard = it },
-                onComplete = {
+                onComplete = { stars ->
+                    val completedLessonId = activeLesson?.id
                     currentSlideCard = null
                     activeLesson = null
-                    Toast.makeText(context, "Chúc mừng bạn đã hoàn thành xuất sắc bài học!", Toast.LENGTH_SHORT).show()
+                    if (!completedLessonId.isNullOrBlank()) {
+                        lessonViewModel.completeLesson(completedLessonId, stars)
+                    }
+                    Toast.makeText(context, "Chúc mừng bạn đã hoàn thành bài học đạt $stars sao! 🎉", Toast.LENGTH_SHORT).show()
                 }
+            )
+        }
+
+        // Modal Quản lý và Nạp Tim / Năng Lượng
+        if (isHeartModalOpen) {
+            val hearts = uiState.heartStatus ?: com.example.luminalearn.data.model.HeartStatusDto(
+                currentHearts = 5,
+                maxHearts = 5,
+                nextRefillMinutes = 0,
+                sparksRefillCost = 50,
+                message = ""
+            )
+            HeartRefillModal(
+                heartStatus = hearts,
+                onRefillWithSparks = {
+                    lessonViewModel.refillHearts(
+                        onSuccess = { msg ->
+                            isHeartModalOpen = false
+                            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                        },
+                        onError = { err ->
+                            Toast.makeText(context, err, Toast.LENGTH_SHORT).show()
+                        }
+                    )
+                },
+                onPracticeToEarn = {
+                    isHeartModalOpen = false
+                    Toast.makeText(
+                        context,
+                        "Hãy chọn một bài học đã qua để ôn tập và hồi tim miễn phí!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                },
+                onDismiss = { isHeartModalOpen = false }
+            )
+        }
+
+        // Modal Biểu đồ Radar 5 Kỹ Năng & Thống kê cá nhân
+        if (isAnalyticsModalOpen) {
+            val analyticsData = uiState.analytics ?: com.example.luminalearn.data.model.AnalyticsSummaryDto(
+                totalLessonsCompleted = uiState.allLessons.count { it.isCompleted },
+                totalStars = uiState.allLessons.sumOf { it.stars },
+                masteredVocabsCount = uiState.allLessons.sumOf { it.coreVocabularies.size },
+                accuracyPercentage = 85,
+                radarScores = com.example.luminalearn.data.model.SkillRadarScoreDto()
+            )
+            SkillRadarModal(
+                analytics = analyticsData,
+                onDismiss = { isAnalyticsModalOpen = false }
+            )
+        }
+
+        // Modal Cẩm nang Ngữ pháp chuẩn HSK
+        if (isGrammarVaultOpen) {
+            HskGrammarVaultModal(
+                grammarList = uiState.grammarStructures,
+                isLoading = uiState.isGrammarLoading,
+                onFilterLevel = { level ->
+                    lessonViewModel.loadGrammarStructures(level)
+                },
+                onSpeak = speakText,
+                onDismiss = { isGrammarVaultOpen = false }
             )
         }
     }
@@ -217,6 +506,13 @@ private fun LessonMainContent(
     isJourneyView: Boolean,
     onToggleJourneyView: (Boolean) -> Unit,
     onSelectLessonForPreview: (ChineseLessonData) -> Unit,
+    onOpenChest: (unitNumber: Int, isUnlocked: Boolean) -> Unit,
+    onOpenHandbook: (unitNumber: Int, unitTitle: String, lessons: List<ChineseLessonData>) -> Unit,
+    onStartBossExam: (levelName: String, isUnlocked: Boolean) -> Unit,
+    onQuickReview: (ChineseLessonData) -> Unit,
+    onOpenHearts: () -> Unit,
+    onOpenAnalytics: () -> Unit,
+    onOpenGrammarVault: () -> Unit,
     actions: LessonActionCallbacks
 ) {
     val listState = rememberLazyListState()
@@ -274,53 +570,26 @@ private fun LessonMainContent(
                     item(key = "journey_map_view", contentType = "journey_map") {
                         JourneyViewSection(
                             uiState = uiState,
-                            onSelectLesson = onSelectLessonForPreview
+                            onSelectLesson = onSelectLessonForPreview,
+                            onOpenChest = onOpenChest,
+                            onOpenHandbook = onOpenHandbook,
+                            onStartBossExam = onStartBossExam,
+                            onQuickReview = onQuickReview
                         )
                     }
                 } else {
-                    // === CHẾ ĐỘ DANH SÁCH BÀI HỌC (TIMELINE STEPPER DETAIL) ===
-                    item(key = "lesson_search_bar", contentType = "search_bar") {
-                        LessonSearchBar(
-                            query = uiState.searchQuery,
-                            onQueryChange = actions.onSearchQueryChange
+                    // === CHẾ ĐỘ DANH SÁCH BÀI HỌC (ARCHIVE CATALOG VIEW) ===
+                    item(key = "lesson_catalog_archive", contentType = "catalog_archive") {
+                        LessonCatalogArchiveView(
+                            searchQuery = uiState.searchQuery,
+                            onSearchQueryChange = actions.onSearchQueryChange,
+                            categories = FILTER_CATEGORIES,
+                            selectedCategory = uiState.selectedCategory,
+                            onCategorySelect = actions.onSelectCategory,
+                            lessons = uiState.filteredLessons,
+                            isLoading = uiState.isLoading,
+                            onSelectLesson = onSelectLessonForPreview
                         )
-                    }
-
-                    item(key = "lesson_filter_row", contentType = "filter_row") {
-                        LessonFilterRow(
-                            filters = FILTER_CATEGORIES,
-                            selectedFilter = uiState.selectedCategory,
-                            onFilterSelect = actions.onSelectCategory
-                        )
-                    }
-
-                    item(key = "lesson_timeline_list", contentType = "timeline_list") {
-                        when {
-                            uiState.isLoading && uiState.allLessons.isEmpty() -> {
-                                Column(
-                                    verticalArrangement = Arrangement.spacedBy(14.dp),
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    repeat(3) {
-                                        LessonCardShimmerItem()
-                                    }
-                                }
-                            }
-                            uiState.filteredLessons.isEmpty() -> {
-                                val isFiltering = uiState.searchQuery.isNotBlank() || uiState.selectedCategory != "Tất cả"
-                                LessonEmptyState(
-                                    title = if (isFiltering) "Không tìm thấy bài học phù hợp" else "Chưa có bài học nào",
-                                    subtitle = if (isFiltering) "Thử tìm kiếm với từ khóa khác hoặc đổi bộ lọc" else "Vuốt xuống để làm mới danh sách bài học"
-                                )
-                            }
-                            else -> {
-                                LessonTimelineListView(
-                                    lessons = uiState.filteredLessons,
-                                    onSelectLesson = onSelectLessonForPreview,
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                            }
-                        }
                     }
                 }
             }
@@ -338,7 +607,13 @@ private fun LessonMainContent(
             CollapsingLessonHeaderBar(
                 collapseProgress = lessonCollapseProgress,
                 isJourneyView = isJourneyView,
-                onToggleJourneyView = onToggleJourneyView
+                onToggleJourneyView = onToggleJourneyView,
+                isOfflineMode = uiState.isOfflineMode,
+                currentHearts = uiState.heartStatus?.currentHearts ?: 5,
+                maxHearts = uiState.heartStatus?.maxHearts ?: 5,
+                onOpenHearts = onOpenHearts,
+                onOpenAnalytics = onOpenAnalytics,
+                onOpenGrammarVault = onOpenGrammarVault
             )
 
             // Dải thẻ chip HSK ghim cố định tại đây khi cuộn, đảm bảo luôn nhìn thấy và chọn được
@@ -363,6 +638,55 @@ private fun LessonMainContent(
                         .height(0.5.dp)
                         .background(BorderSubtle.copy(alpha = lessonCollapseProgress))
                 )
+            }
+        }
+
+        // ── 4. NÚT NỔI "VỀ BÀI ĐANG HỌC" (QUICK RESUME FAB) ──
+        val showJumpFab by remember {
+            derivedStateOf {
+                isJourneyView && (listState.firstVisibleItemIndex > 0 || listState.firstVisibleItemScrollOffset > 300)
+            }
+        }
+
+        AnimatedVisibility(
+            visible = showJumpFab,
+            enter = fadeIn() + scaleIn(),
+            exit = fadeOut() + scaleOut(),
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(end = 20.dp, bottom = 100.dp)
+        ) {
+            Surface(
+                modifier = Modifier
+                    .bounceClick()
+                    .clickable {
+                        coroutineScope.launch {
+                            listState.animateScrollToItem(0)
+                        }
+                    },
+                shape = RoundedCornerShape(24.dp),
+                color = PrimaryIndigo,
+                shadowElevation = 6.dp
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 9.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_nav_roadmap),
+                        contentDescription = "Về đầu lộ trình",
+                        tint = Color.White,
+                        modifier = Modifier.size(15.dp)
+                    )
+                    Text(
+                        text = "Về bài đang học",
+                        fontFamily = PlusJakartaSans,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                }
             }
         }
     }
@@ -441,7 +765,11 @@ private fun HskLevelCapsuleSelector(
 @Composable
 private fun JourneyViewSection(
     uiState: LessonUiState,
-    onSelectLesson: (ChineseLessonData) -> Unit
+    onSelectLesson: (ChineseLessonData) -> Unit,
+    onOpenChest: (unitNumber: Int, isUnlocked: Boolean) -> Unit,
+    onOpenHandbook: (unitNumber: Int, unitTitle: String, lessons: List<ChineseLessonData>) -> Unit,
+    onStartBossExam: (levelName: String, isUnlocked: Boolean) -> Unit,
+    onQuickReview: (ChineseLessonData) -> Unit
 ) {
     when {
         uiState.isLoading && uiState.allLessons.isEmpty() -> {
@@ -454,7 +782,7 @@ private fun JourneyViewSection(
                 }
             }
         }
-        uiState.filteredLessons.isEmpty() -> {
+        uiState.currentLevelLessons.isEmpty() -> {
             LessonEmptyState(
                 title = "Chưa có bài học trong cấp độ này",
                 subtitle = "Vui lòng chọn cấp độ HSK khác hoặc thử lại sau"
@@ -462,8 +790,13 @@ private fun JourneyViewSection(
         }
         else -> {
             LessonJourneyMapView(
-                lessons = uiState.filteredLessons,
+                lessons = uiState.currentLevelLessons,
+                backendUnits = uiState.backendUnits,
                 onSelectLesson = onSelectLesson,
+                onOpenChest = onOpenChest,
+                onOpenHandbook = onOpenHandbook,
+                onStartBossExam = onStartBossExam,
+                onQuickReview = onQuickReview,
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -611,7 +944,7 @@ private fun LessonInteractiveDialog(
     lesson: ChineseLessonData,
     onDismiss: () -> Unit,
     onCardChange: (ToneCardData?) -> Unit,
-    onComplete: () -> Unit
+    onComplete: (Int) -> Unit
 ) {
     LessonDetailDialog(
         toneCardData = currentCard,
@@ -628,7 +961,8 @@ private fun LessonInteractiveDialog(
                     onCardChange(lesson.slides.getOrNull(prevIndex))
                 }
             },
-            onComplete = onComplete
+            onComplete = { onComplete(3) },
+            onCompleteWithStars = { stars -> onComplete(stars) }
         )
     )
 }

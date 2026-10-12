@@ -3,6 +3,7 @@ package com.example.luminalearn.presentation.vocabulary
 import android.content.Context
 import androidx.lifecycle.viewModelScope
 import com.example.luminalearn.core.base.BaseViewModel
+import com.example.luminalearn.data.local.LessonCacheManager
 import com.example.luminalearn.data.local.SrsManager
 import com.example.luminalearn.data.remote.RetrofitClient
 import com.example.luminalearn.presentation.vocabulary.model.HskLevelFilter
@@ -306,49 +307,84 @@ class VocabularyViewModel : BaseViewModel<VocabularyUiState, VocabularyUiIntent,
         }
     }
 
+    private fun mapDtoToItem(dto: com.example.luminalearn.data.model.VocabularyDto): VocabWordItem {
+        return VocabWordItem(
+            id = dto.id,
+            hanzi = dto.hanzi,
+            pinyin = dto.pinyin,
+            hanViet = dto.hanViet,
+            meaning = dto.meaning,
+            partOfSpeech = dto.partOfSpeech,
+            topic = dto.topic,
+            radical = dto.radical,
+            strokes = dto.strokes,
+            exampleHanzi = dto.exampleHanzi,
+            examplePinyin = dto.examplePinyin,
+            exampleMeaning = dto.exampleMeaning,
+            hskLevel = dto.hskLevel,
+            targetScore = dto.targetScore,
+            isMastered = dto.isMastered,
+            userId = dto.userId,
+            srsState = srsManager?.syncWithBackend(
+                wordId = dto.id,
+                beRep = dto.srsRepetition,
+                beInterval = dto.srsIntervalDays,
+                beEase = dto.srsEaseFactor,
+                beNextReview = dto.nextReviewTimeMillis,
+                beLastReview = dto.lastReviewTimeMillis
+            ) ?: SrsWordState(dto.id)
+        )
+    }
+
+    private fun fallbackFromLocalCache(queryTopic: String?, queryHsk: String?) {
+        val cached = LessonCacheManager.getCachedVocabularies()
+        if (!cached.isNullOrEmpty()) {
+            var filtered = cached
+            if (!queryHsk.isNullOrBlank()) {
+                filtered = filtered.filter { it.hskLevel.equals(queryHsk, ignoreCase = true) }
+            }
+            if (!queryTopic.isNullOrBlank()) {
+                filtered = filtered.filter { it.topic.equals(queryTopic, ignoreCase = true) }
+            }
+            val list = filtered.map { mapDtoToItem(it) }
+            val customCount = list.count { it.isCustom }
+            val updatedTopics = currentState.topics.map { topic ->
+                if (topic.id == "custom" || topic.name.contains("tự thêm")) {
+                    topic.copy(count = customCount)
+                } else {
+                    topic
+                }
+            }
+            setState { copy(vocabList = list, topics = updatedTopics) }
+            if (currentState.selectedMode == VocabStudyMode.REFLEX) {
+                startReflexQuiz()
+            }
+        } else {
+            setState { copy(vocabList = emptyList()) }
+        }
+    }
+
     private fun fetchVocabularies(topicName: String, hskLevel: String?) {
         viewModelScope.launch {
             setState { copy(isLoadingVocab = true) }
+            val isAllTopic = topicName == VocabConstants.ALL_TOPICS ||
+                    topicName == "Tất cả chủ đề" ||
+                    topicName.equals("all", ignoreCase = true)
+            val isCustomTopic = topicName.contains("tự thêm") || topicName.contains("tôi tự thêm") || topicName.contains("từ của tôi") || topicName == "custom"
+            val queryTopic = if (isAllTopic || isCustomTopic) null else topicName
+            val queryHsk = if (hskLevel == VocabConstants.ALL_LEVELS) null else hskLevel
+
             try {
-                val isAllTopic = topicName == VocabConstants.ALL_TOPICS ||
-                        topicName == "Tất cả chủ đề" ||
-                        topicName.equals("all", ignoreCase = true)
-                val isCustomTopic = topicName.contains("tự thêm") || topicName.contains("tôi tự thêm") || topicName.contains("từ của tôi") || topicName == "custom"
-                val queryTopic = if (isAllTopic || isCustomTopic) null else topicName
-                val queryHsk = if (hskLevel == VocabConstants.ALL_LEVELS) null else hskLevel
                 val response = RetrofitClient.vocabularyApiService.getVocabularies(
                     topic = queryTopic,
                     hskLevel = queryHsk
                 )
                 if (response.isSuccessful && response.body()?.data != null) {
-                    val remoteList = response.body()!!.data!!.map { dto ->
-                        VocabWordItem(
-                            id = dto.id,
-                            hanzi = dto.hanzi,
-                            pinyin = dto.pinyin,
-                            hanViet = dto.hanViet,
-                            meaning = dto.meaning,
-                            partOfSpeech = dto.partOfSpeech,
-                            topic = dto.topic,
-                            radical = dto.radical,
-                            strokes = dto.strokes,
-                            exampleHanzi = dto.exampleHanzi,
-                            examplePinyin = dto.examplePinyin,
-                            exampleMeaning = dto.exampleMeaning,
-                            hskLevel = dto.hskLevel,
-                            targetScore = dto.targetScore,
-                            isMastered = dto.isMastered,
-                            userId = dto.userId,
-                            srsState = srsManager?.syncWithBackend(
-                                wordId = dto.id,
-                                beRep = dto.srsRepetition,
-                                beInterval = dto.srsIntervalDays,
-                                beEase = dto.srsEaseFactor,
-                                beNextReview = dto.nextReviewTimeMillis,
-                                beLastReview = dto.lastReviewTimeMillis
-                            ) ?: SrsWordState(dto.id)
-                        )
+                    val dtoList = response.body()!!.data!!
+                    if (queryTopic == null && queryHsk == null) {
+                        LessonCacheManager.cacheVocabularies(dtoList)
                     }
+                    val remoteList = dtoList.map { mapDtoToItem(it) }
                     val customCount = remoteList.count { it.isCustom }
                     val updatedTopics = currentState.topics.map { topic ->
                         if (topic.id == "custom" || topic.name.contains("tự thêm")) {
@@ -362,11 +398,11 @@ class VocabularyViewModel : BaseViewModel<VocabularyUiState, VocabularyUiIntent,
                         startReflexQuiz()
                     }
                 } else {
-                    setState { copy(vocabList = emptyList()) }
+                    fallbackFromLocalCache(queryTopic, queryHsk)
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                setState { copy(vocabList = emptyList()) }
+                fallbackFromLocalCache(queryTopic, queryHsk)
             } finally {
                 setState { copy(isLoadingVocab = false) }
             }

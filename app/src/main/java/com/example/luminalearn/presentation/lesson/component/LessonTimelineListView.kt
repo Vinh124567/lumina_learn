@@ -111,7 +111,7 @@ fun LessonTimelineListView(
             val isChestNext = (index + 1) % 3 == 0 && hasNextItem
 
             val connectorType = when (status) {
-                JourneyNodeStatus.COMPLETED -> ListSpineConnectorType.COMPLETED
+                JourneyNodeStatus.COMPLETED, JourneyNodeStatus.NEEDS_REVIEW -> ListSpineConnectorType.COMPLETED
                 JourneyNodeStatus.CURRENT -> ListSpineConnectorType.ACTIVE_FLOW
                 JourneyNodeStatus.LOCKED -> ListSpineConnectorType.LOCKED
             }
@@ -435,7 +435,7 @@ private fun StationNodeOrb(
                     )
                 }
             }
-            JourneyNodeStatus.COMPLETED -> {
+            JourneyNodeStatus.COMPLETED, JourneyNodeStatus.NEEDS_REVIEW -> {
                 Row(
                     modifier = Modifier.padding(bottom = 2.dp),
                     horizontalArrangement = Arrangement.spacedBy(1.dp)
@@ -452,7 +452,7 @@ private fun StationNodeOrb(
 
         val orbSize = when (status) {
             JourneyNodeStatus.CURRENT -> (56.dp * breathingScale)
-            JourneyNodeStatus.COMPLETED -> 52.dp
+            JourneyNodeStatus.COMPLETED, JourneyNodeStatus.NEEDS_REVIEW -> 52.dp
             JourneyNodeStatus.LOCKED -> 48.dp
         }
 
@@ -501,7 +501,7 @@ private fun StationNodeOrb(
                     }
                 }
 
-                JourneyNodeStatus.COMPLETED -> {
+                JourneyNodeStatus.COMPLETED, JourneyNodeStatus.NEEDS_REVIEW -> {
                     Box(
                         modifier = Modifier
                             .size(48.dp)
@@ -509,14 +509,21 @@ private fun StationNodeOrb(
                             .clip(CircleShape)
                             .background(
                                 Brush.linearGradient(
-                                    listOf(SuccessGreen, Color(0xFF059669))
+                                    if (status == JourneyNodeStatus.NEEDS_REVIEW) {
+                                        listOf(Color(0xFFFBBF24), Color(0xFFF59E0B))
+                                    } else {
+                                        listOf(SuccessGreen, Color(0xFF059669))
+                                    }
                                 )
                             )
-                            .border(BorderStroke(1.8.dp, Color(0xFFD1FAE5)), CircleShape),
+                            .border(
+                                BorderStroke(1.8.dp, if (status == JourneyNodeStatus.NEEDS_REVIEW) Color(0xFFFEF3C7) else Color(0xFFD1FAE5)),
+                                CircleShape
+                            ),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "✓",
+                            text = if (status == JourneyNodeStatus.NEEDS_REVIEW) "⚡" else "✓",
                             fontSize = 18.sp,
                             fontWeight = FontWeight.ExtraBold,
                             color = Color.White
@@ -600,7 +607,7 @@ private fun StationDetailCard(
             .shadow(
                 elevation = when (status) {
                     JourneyNodeStatus.CURRENT -> 10.dp
-                    JourneyNodeStatus.COMPLETED -> 4.dp
+                    JourneyNodeStatus.COMPLETED, JourneyNodeStatus.NEEDS_REVIEW -> 4.dp
                     JourneyNodeStatus.LOCKED -> 1.5.dp
                 },
                 shape = RoundedCornerShape(22.dp),
@@ -615,12 +622,13 @@ private fun StationDetailCard(
         border = BorderStroke(
             width = when (status) {
                 JourneyNodeStatus.CURRENT -> 1.5.dp
-                JourneyNodeStatus.COMPLETED -> 0.8.dp
+                JourneyNodeStatus.COMPLETED, JourneyNodeStatus.NEEDS_REVIEW -> 0.8.dp
                 JourneyNodeStatus.LOCKED -> 0.5.dp
             },
             color = when (status) {
                 JourneyNodeStatus.CURRENT -> BrandPurple
                 JourneyNodeStatus.COMPLETED -> SuccessGreen.copy(alpha = 0.4f)
+                JourneyNodeStatus.NEEDS_REVIEW -> Color(0xFFF59E0B)
                 JourneyNodeStatus.LOCKED -> BorderHairline
             }
         )
@@ -636,6 +644,7 @@ private fun StationDetailCard(
                         when (status) {
                             JourneyNodeStatus.CURRENT -> BrandPurple
                             JourneyNodeStatus.COMPLETED -> SuccessGreen
+                            JourneyNodeStatus.NEEDS_REVIEW -> Color(0xFFF59E0B)
                             JourneyNodeStatus.LOCKED -> Color(0xFFCBD5E1)
                         }
                     )
@@ -783,17 +792,17 @@ private fun StationDetailCard(
                                 }
                             }
                         }
-                        JourneyNodeStatus.COMPLETED -> {
+                        JourneyNodeStatus.COMPLETED, JourneyNodeStatus.NEEDS_REVIEW -> {
                             Surface(
                                 shape = RoundedCornerShape(8.dp),
-                                color = Color(0xFFDCFCE7)
+                                color = if (status == JourneyNodeStatus.NEEDS_REVIEW) Color(0xFFFEF3C7) else Color(0xFFDCFCE7)
                             ) {
                                 Text(
-                                    text = "Đã xong ✓",
+                                    text = if (status == JourneyNodeStatus.NEEDS_REVIEW) "Ôn tập ⚡" else "Đã xong ✓",
                                     fontFamily = PlusJakartaSans,
                                     fontSize = 10.5.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color(0xFF15803D),
+                                    color = if (status == JourneyNodeStatus.NEEDS_REVIEW) Color(0xFFD97706) else Color(0xFF15803D),
                                     modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp)
                                 )
                             }

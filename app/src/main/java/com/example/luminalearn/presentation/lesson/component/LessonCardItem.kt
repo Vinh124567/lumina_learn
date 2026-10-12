@@ -84,6 +84,7 @@ data class ChineseLessonData(
     val description: String = "",
     val durationMins: Int = 0,
     val sparks: Int = 0,
+    val stars: Int = 0,
     val isCompleted: Boolean = false,
     val totalSlides: Int = 0,
     val slides: List<ToneCardData> = emptyList(),
@@ -93,7 +94,8 @@ data class ChineseLessonData(
     val grammarStructures: List<GrammarStructureData> = emptyList(),
     val dialogueContext: String = "",
     val dialogues: List<LessonDialogueData> = emptyList(),
-    val coreVocabularies: List<LessonCoreVocabData> = emptyList()
+    val coreVocabularies: List<LessonCoreVocabData> = emptyList(),
+    val needsReview: Boolean = false
 )
 
 @Composable

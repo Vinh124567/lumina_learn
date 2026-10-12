@@ -1,5 +1,6 @@
 package com.example.luminalearn.presentation.container
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
@@ -7,33 +8,49 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.compose.ui.res.stringResource
 import com.example.luminalearn.R
+import com.example.luminalearn.core.util.NetworkMonitor
 import com.example.luminalearn.presentation.common.AppBottomBar
+import com.example.luminalearn.presentation.lesson.LessonScreen
 import com.example.luminalearn.presentation.main.AppDestination
 import com.example.luminalearn.presentation.main.MainScreen
-import com.example.luminalearn.presentation.lesson.LessonScreen
 import com.example.luminalearn.presentation.spark_ai_lab.SparkAILab
 import com.example.luminalearn.presentation.vocabulary.VocabularyScreen
+import com.example.luminalearn.ui.theme.PlusJakartaSans
 
 /**
  * Màn hình cha (Container) sau khi đăng nhập thành công.
@@ -63,6 +80,8 @@ fun MainContainerScreen(
             }
         }
     }
+
+    val isOnline by com.example.luminalearn.core.util.NetworkMonitor.isOnline.collectAsState()
 
     Box(
         modifier = modifier.fillMaxSize()
@@ -112,7 +131,51 @@ fun MainContainerScreen(
             }
 
             composable(AppDestination.Reward.route) {
-                PlaceholderScreen(title = stringResource(R.string.placeholder_rewards))
+                com.example.luminalearn.presentation.reward.WeeklyLeaderboardScreen(
+                    onNavigateToLesson = { navigateToTab(AppDestination.Lesson.route) }
+                )
+            }
+        }
+
+        // ── CHỈ BÁO NGOẠI TUYẾN TOÀN CỤC (GLOBAL OFFLINE FLOATING PILL) ──
+        AnimatedVisibility(
+            visible = !isOnline,
+            enter = slideInVertically(initialOffsetY = { -it }) + fadeIn(),
+            exit = slideOutVertically(targetOffsetY = { -it }) + fadeOut(),
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .statusBarsPadding()
+                .padding(top = 10.dp)
+                .zIndex(99f)
+        ) {
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(Color(0xFF0F172A).copy(alpha = 0.92f))
+                    .border(
+                        BorderStroke(0.5.dp, Color(0xFF38BDF8).copy(alpha = 0.6f)),
+                        RoundedCornerShape(20.dp)
+                    )
+                    .padding(horizontal = 14.dp, vertical = 6.dp)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(7.dp)
+                            .clip(CircleShape)
+                            .background(Color(0xFF38BDF8))
+                    )
+                    Text(
+                        text = stringResource(R.string.global_offline_indicator_msg),
+                        fontFamily = PlusJakartaSans,
+                        fontSize = 11.5.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color.White
+                    )
+                }
             }
         }
 

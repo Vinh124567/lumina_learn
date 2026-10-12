@@ -11,6 +11,8 @@ import com.example.luminalearn.ui.theme.LuminaLearnTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        com.example.luminalearn.data.local.LessonCacheManager.init(this)
+        com.example.luminalearn.core.util.NetworkMonitor.init(this)
         enableEdgeToEdge()
         setContent {
             LuminaLearnTheme {

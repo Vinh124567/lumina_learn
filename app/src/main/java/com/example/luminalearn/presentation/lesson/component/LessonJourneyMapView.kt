@@ -10,6 +10,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -50,7 +51,10 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.example.luminalearn.R
 import com.example.luminalearn.core.ui.effect.bounceClick
+import com.example.luminalearn.core.util.GameSoundHelper
 import com.example.luminalearn.ui.theme.PlusJakartaSans
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 
 private val BrandPurple = Color(0xFF6366F1)
 private val BrandIndigoDark = Color(0xFF4F46E5)
@@ -68,7 +72,8 @@ private val StationColumnWidth = 96.dp
 enum class JourneyNodeStatus {
     COMPLETED,
     CURRENT,
-    LOCKED
+    LOCKED,
+    NEEDS_REVIEW
 }
 
 /**
@@ -121,7 +126,12 @@ private enum class ConnectorLineType {
 @Composable
 fun LessonJourneyMapView(
     lessons: List<ChineseLessonData>,
+    backendUnits: List<com.example.luminalearn.data.model.JourneyUnitDto> = emptyList(),
     onSelectLesson: (ChineseLessonData) -> Unit,
+    onOpenChest: (unitNumber: Int, isUnlocked: Boolean) -> Unit = { _, _ -> },
+    onOpenHandbook: (unitNumber: Int, unitTitle: String, lessons: List<ChineseLessonData>) -> Unit = { _, _, _ -> },
+    onStartBossExam: (levelName: String, isUnlocked: Boolean) -> Unit = { _, _ -> },
+    onQuickReview: (ChineseLessonData) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     if (lessons.isEmpty()) {
@@ -141,6 +151,8 @@ fun LessonJourneyMapView(
         return
     }
 
+    val haptic = LocalHapticFeedback.current
+
     val firstUncompletedIndex = remember(lessons) {
         val idx = lessons.indexOfFirst { !it.isCompleted }
         if (idx >= 0) idx else lessons.size - 1
@@ -151,8 +163,8 @@ fun LessonJourneyMapView(
     val currentLevel = lessons.firstOrNull()?.level ?: "HSK"
 
     // Nhóm bài học thành các Unit (mỗi Unit gồm 3 bài học)
-    val units = remember(lessons) {
-        buildJourneyUnits(lessons)
+    val units = remember(lessons, backendUnits) {
+        buildJourneyUnits(lessons, backendUnits)
     }
 
     Column(
@@ -181,6 +193,7 @@ fun LessonJourneyMapView(
                 unitData = unitData,
                 completedCount = unitCompletedCount,
                 totalCount = unitLessons.size,
+                onOpenHandbook = onOpenHandbook,
                 modifier = Modifier.padding(bottom = 18.dp)
             )
 
@@ -189,6 +202,7 @@ fun LessonJourneyMapView(
             unitLessons.forEach { lesson ->
                 globalLessonIndex++
                 val status = when {
+                    lesson.needsReview -> JourneyNodeStatus.NEEDS_REVIEW
                     (globalLessonIndex - 1) < firstUncompletedIndex -> JourneyNodeStatus.COMPLETED
                     (globalLessonIndex - 1) == firstUncompletedIndex -> JourneyNodeStatus.CURRENT
                     else -> JourneyNodeStatus.LOCKED
@@ -230,14 +244,26 @@ fun LessonJourneyMapView(
                                 lessonIndex = station.lessonIndex,
                                 lesson = station.lesson,
                                 status = station.status,
-                                onClick = { onSelectLesson(station.lesson) }
+                                onClick = {
+                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                    GameSoundHelper.playClick()
+                                    if (station.status == JourneyNodeStatus.NEEDS_REVIEW) {
+                                        onQuickReview(station.lesson)
+                                    } else {
+                                        onSelectLesson(station.lesson)
+                                    }
+                                }
                             )
                         }
                         is JourneyStationItem.Chest -> {
                             Tactile3DChestNode(
                                 chestIndex = station.chestIndex,
                                 isUnlocked = station.isUnlocked,
-                                onClick = { onSelectLesson(station.linkedLesson) }
+                                onClick = {
+                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                    GameSoundHelper.playClick()
+                                    onOpenChest(unitData.unitNumber, station.isUnlocked)
+                                }
                             )
                         }
                     }
@@ -296,7 +322,9 @@ fun LessonJourneyMapView(
                 totalCount = totalCount,
                 isUnlocked = completedCount == totalCount,
                 onClick = {
-                    lessons.lastOrNull()?.let { onSelectLesson(it) }
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    GameSoundHelper.playClick()
+                    onStartBossExam(currentLevel, completedCount == totalCount)
                 }
             )
         }
@@ -308,21 +336,22 @@ fun LessonJourneyMapView(
 /**
  * Xây dựng danh sách Unit thông minh từ danh sách bài học
  */
-private fun buildJourneyUnits(lessons: List<ChineseLessonData>): List<JourneyUnitData> {
-    val unitThemes = listOf(
-        Triple("CỬA NGÕ PHÁT ÂM", "Làm quen Pinyin, 4 thanh điệu & chào hỏi cơ bản", "🗣️") to (Color(0xFF4F46E5) to Color(0xFF6366F1)),
-        Triple("GIAO TIẾP HÀNG NGÀY", "Số đếm, làm quen bạn mới & hỏi thăm sức khỏe", "💬") to (Color(0xFF0D9488) to Color(0xFF10B981)),
-        Triple("MUA SẮM & ĐỜI SỐNG", "Hỏi giá tiền, đi chợ & các món ăn phổ biến", "🛍️") to (Color(0xFFD97706) to Color(0xFFF59E0B)),
-        Triple("THỜI GIAN & HẸN HÒ", "Ngày tháng, giờ giấc & các hoạt động cuối tuần", "⏰") to (Color(0xFF0284C7) to Color(0xFF06B6D4)),
-        Triple("CHINH PHỤC NÂNG CAO", "Mở rộng vốn từ vựng & cấu trúc ngữ pháp chặng cuối", "🌟") to (Color(0xFF7C3AED) to Color(0xFFA855F7))
-    )
-
+private fun buildJourneyUnits(
+    lessons: List<ChineseLessonData>,
+    backendUnits: List<com.example.luminalearn.data.model.JourneyUnitDto> = emptyList()
+): List<JourneyUnitData> {
     val chunkedLessons = lessons.chunked(3)
     return chunkedLessons.mapIndexed { index, lessonGroup ->
-        val themeIndex = index % unitThemes.size
-        val (meta, colors) = unitThemes[themeIndex]
-        val (title, desc, emoji) = meta
-        val (primary, secondary) = colors
+        val beUnit = backendUnits.getOrNull(index)
+        val title = beUnit?.title ?: "PHẦN ${index + 1}"
+        val desc = beUnit?.description ?: "Kiến thức trọng tâm phần ${index + 1}"
+        val emoji = beUnit?.icon ?: "🗣️"
+        val primary = try {
+            if (beUnit != null) Color(android.graphics.Color.parseColor(beUnit.gradientStart)) else Color(0xFF4F46E5)
+        } catch (_: Exception) { Color(0xFF4F46E5) }
+        val secondary = try {
+            if (beUnit != null) Color(android.graphics.Color.parseColor(beUnit.gradientEnd)) else Color(0xFF6366F1)
+        } catch (_: Exception) { Color(0xFF6366F1) }
 
         JourneyUnitData(
             unitNumber = index + 1,
@@ -390,6 +419,7 @@ private fun UnitSectionBannerCard(
     unitData: JourneyUnitData,
     completedCount: Int,
     totalCount: Int,
+    onOpenHandbook: (unitNumber: Int, unitTitle: String, lessons: List<ChineseLessonData>) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val isUnitDone = completedCount == totalCount
@@ -468,18 +498,54 @@ private fun UnitSectionBannerCard(
                     )
                 }
 
-                Spacer(modifier = Modifier.width(12.dp))
+                Spacer(modifier = Modifier.width(10.dp))
 
-                // Icon huy hiệu đại diện cho chương
-                Box(
-                    modifier = Modifier
-                        .size(46.dp)
-                        .clip(CircleShape)
-                        .background(Color.White.copy(alpha = 0.20f))
-                        .border(BorderStroke(1.5.dp, Color.White.copy(alpha = 0.40f)), CircleShape),
-                    contentAlignment = Alignment.Center
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text(text = unitData.iconEmoji, fontSize = 22.sp)
+                    // Nút mở Sổ tay tóm tắt kiến thức Unit
+                    Surface(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(12.dp))
+                            .clickable {
+                                onOpenHandbook(
+                                    unitData.unitNumber,
+                                    unitData.title,
+                                    unitData.lessons
+                                )
+                            },
+                        shape = RoundedCornerShape(12.dp),
+                        color = Color.White.copy(alpha = 0.22f),
+                        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.35f))
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Text(text = "📖", fontSize = 12.sp)
+                            Text(
+                                text = "Sổ tay",
+                                fontFamily = PlusJakartaSans,
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
+                        }
+                    }
+
+                    // Icon huy hiệu đại diện cho chương
+                    Box(
+                        modifier = Modifier
+                            .size(42.dp)
+                            .clip(CircleShape)
+                            .background(Color.White.copy(alpha = 0.20f))
+                            .border(BorderStroke(1.5.dp, Color.White.copy(alpha = 0.40f)), CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(text = unitData.iconEmoji, fontSize = 20.sp)
+                    }
                 }
             }
         }
@@ -515,8 +581,46 @@ private fun Tactile3DLessonNode(
         verticalArrangement = Arrangement.Center,
         modifier = Modifier.width(StationColumnWidth)
     ) {
-        // Tag "BẮT ĐẦU" nổi trên đỉnh nút đang học
+        // Tag "BẮT ĐẦU" kèm Mascot dẫn đường nổi trên đỉnh nút đang học
         if (status == JourneyNodeStatus.CURRENT) {
+            val mascotBobOffset by infiniteTransition.animateFloat(
+                initialValue = 0f,
+                targetValue = -5f,
+                animationSpec = infiniteRepeatable(
+                    animation = tween(600, easing = FastOutSlowInEasing),
+                    repeatMode = RepeatMode.Reverse
+                ),
+                label = "mascotBob"
+            )
+
+            // Mascot Avatar chỉ đường nhún nhảy
+            Box(
+                modifier = Modifier
+                    .offset(y = mascotBobOffset.dp)
+                    .padding(bottom = 3.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Surface(
+                    shape = CircleShape,
+                    color = Color.White,
+                    shadowElevation = 3.dp,
+                    border = BorderStroke(1.dp, Color(0xFF818CF8))
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(24.dp)
+                            .background(
+                                Brush.radialGradient(
+                                    listOf(Color(0xFFEEF2FF), Color(0xFFC7D2FE))
+                                )
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(text = "🦜", fontSize = 13.sp)
+                    }
+                }
+            }
+
             Surface(
                 shape = RoundedCornerShape(12.dp),
                 color = BrandPurple,
@@ -534,12 +638,19 @@ private fun Tactile3DLessonNode(
                 )
             }
         } else if (status == JourneyNodeStatus.COMPLETED) {
+            val earnedStars = if (lesson.stars > 0) lesson.stars.coerceIn(1, 3) else 3
             Row(
                 horizontalArrangement = Arrangement.spacedBy(1.5.dp),
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(bottom = 4.dp)
             ) {
-                repeat(3) {
-                    Text(text = "⭐", fontSize = 10.sp)
+                for (i in 1..3) {
+                    val isEarned = i <= earnedStars
+                    Text(
+                        text = if (isEarned) "⭐" else "☆",
+                        fontSize = 10.sp,
+                        color = if (isEarned) Color(0xFFF59E0B) else Color(0xFF94A3B8)
+                    )
                 }
             }
         } else {
@@ -549,11 +660,13 @@ private fun Tactile3DLessonNode(
         // Kích thước nút và độ dày 3D
         val orbSize = when (status) {
             JourneyNodeStatus.CURRENT -> 70.dp
+            JourneyNodeStatus.NEEDS_REVIEW -> 64.dp
             JourneyNodeStatus.COMPLETED -> 62.dp
             JourneyNodeStatus.LOCKED -> 56.dp
         }
         val depth = when (status) {
             JourneyNodeStatus.CURRENT -> 8.dp
+            JourneyNodeStatus.NEEDS_REVIEW -> 7.dp
             JourneyNodeStatus.COMPLETED -> 7.dp
             JourneyNodeStatus.LOCKED -> 6.dp
         }
@@ -565,8 +678,9 @@ private fun Tactile3DLessonNode(
                 .bounceClick(scaleDown = 0.93f, onClick = onClick),
             contentAlignment = Alignment.TopCenter
         ) {
-            // Hào quang phát sáng cho bài đang học
-            if (status == JourneyNodeStatus.CURRENT) {
+            // Hào quang phát sáng cho bài đang học hoặc cần ôn tập
+            if (status == JourneyNodeStatus.CURRENT || status == JourneyNodeStatus.NEEDS_REVIEW) {
+                val auraColor = if (status == JourneyNodeStatus.CURRENT) BrandPurple else Color(0xFFF59E0B)
                 Box(
                     modifier = Modifier
                         .size(orbSize + 16.dp)
@@ -574,8 +688,7 @@ private fun Tactile3DLessonNode(
                         .background(
                             Brush.radialGradient(
                                 listOf(
-                                    BrandPurple.copy(alpha = breathingAlpha),
-                                    BrandCyan.copy(alpha = breathingAlpha * 0.5f),
+                                    auraColor.copy(alpha = breathingAlpha),
                                     Color.Transparent
                                 )
                             )
@@ -586,6 +699,7 @@ private fun Tactile3DLessonNode(
             // 1. LỚP ĐÁY 3D EXTRUSION (Tạo chiều sâu vật lý)
             val bottomColor = when (status) {
                 JourneyNodeStatus.CURRENT -> Color(0xFF3730A3)
+                JourneyNodeStatus.NEEDS_REVIEW -> Color(0xFFB45309)
                 JourneyNodeStatus.COMPLETED -> Color(0xFF047857)
                 JourneyNodeStatus.LOCKED -> Color(0xFFCBD5E1)
             }
@@ -618,6 +732,28 @@ private fun Tactile3DLessonNode(
                             contentDescription = "Bắt đầu học",
                             tint = Color.White,
                             modifier = Modifier.size(26.dp)
+                        )
+                    }
+                }
+
+                JourneyNodeStatus.NEEDS_REVIEW -> {
+                    Box(
+                        modifier = Modifier
+                            .size(orbSize)
+                            .clip(CircleShape)
+                            .background(
+                                Brush.linearGradient(
+                                    listOf(Color(0xFFFBBF24), Color(0xFFF59E0B), Color(0xFFD97706))
+                                )
+                            )
+                            .border(BorderStroke(2.5.dp, Color(0xFFFEF3C7)), CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "⚡",
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Black,
+                            color = Color.White
                         )
                     }
                 }
@@ -679,27 +815,45 @@ private fun Tactile3DLessonNode(
 
         Spacer(modifier = Modifier.height(6.dp))
 
-        // Nhãn tên bài dưới chân nút
-        Surface(
-            shape = RoundedCornerShape(10.dp),
-            color = if (status == JourneyNodeStatus.CURRENT) BrandPurple.copy(alpha = 0.10f) else Color.White,
-            border = BorderStroke(
-                0.8.dp,
-                if (status == JourneyNodeStatus.CURRENT) BrandPurple.copy(alpha = 0.35f) else BorderHairline
-            )
-        ) {
-            Text(
-                text = "Bài %02d".format(lessonIndex),
-                fontFamily = PlusJakartaSans,
-                fontSize = 10.sp,
-                fontWeight = FontWeight.Bold,
-                color = when (status) {
-                    JourneyNodeStatus.CURRENT -> BrandPurple
-                    JourneyNodeStatus.COMPLETED -> SuccessGreen
-                    JourneyNodeStatus.LOCKED -> TextMuted
-                },
-                modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.5.dp)
-            )
+        // Nhãn tên bài hoặc nhãn ôn tập dưới chân nút
+        if (status == JourneyNodeStatus.NEEDS_REVIEW) {
+            Surface(
+                shape = RoundedCornerShape(10.dp),
+                color = Color(0xFFFEF3C7),
+                border = BorderStroke(0.8.dp, Color(0xFFF59E0B))
+            ) {
+                Text(
+                    text = "ÔN TẬP +15 ✨",
+                    fontFamily = PlusJakartaSans,
+                    fontSize = 9.5.sp,
+                    fontWeight = FontWeight.Black,
+                    color = Color(0xFFD97706),
+                    modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.dp)
+                )
+            }
+        } else {
+            Surface(
+                shape = RoundedCornerShape(10.dp),
+                color = if (status == JourneyNodeStatus.CURRENT) BrandPurple.copy(alpha = 0.10f) else Color.White,
+                border = BorderStroke(
+                    0.8.dp,
+                    if (status == JourneyNodeStatus.CURRENT) BrandPurple.copy(alpha = 0.35f) else BorderHairline
+                )
+            ) {
+                Text(
+                    text = "Bài %02d".format(lessonIndex),
+                    fontFamily = PlusJakartaSans,
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = when (status) {
+                        JourneyNodeStatus.CURRENT -> BrandPurple
+                        JourneyNodeStatus.COMPLETED -> SuccessGreen
+                        JourneyNodeStatus.NEEDS_REVIEW -> Color(0xFFD97706)
+                        JourneyNodeStatus.LOCKED -> TextMuted
+                    },
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.5.dp)
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(10.dp))

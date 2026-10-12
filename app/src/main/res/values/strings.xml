@@ -205,4 +205,10 @@
     <!-- Vocab View Mode -->
     <string name="content_desc_switch_to_list">Switch to list view</string>
     <string name="content_desc_switch_to_grid">Switch to grid view</string>
+
+    <!-- Offline Mode -->
+    <string name="offline_badge">⚡ Ngoại tuyến</string>
+    <string name="offline_badge_mini">⚡ Offline</string>
+    <string name="offline_subtitle">Đang dùng bộ nhớ đệm an toàn • Đầy đủ bài học</string>
+    <string name="global_offline_indicator_msg">⚡ Chế độ ngoại tuyến • Dữ liệu đã lưu sẵn để học</string>
 </resources>

@@ -20,6 +20,7 @@ fun Modifier.bounceClick(
     scaleDown: Float = 0.96f,
     onClick: (() -> Unit)? = null
 ): Modifier = composed {
+    val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
     var isPressed by remember { mutableStateOf(false) }
     val scale by animateFloatAsState(
         targetValue = if (isPressed) scaleDown else 1f,
@@ -40,6 +41,7 @@ fun Modifier.bounceClick(
                 onPress = {
                     isPressed = true
                     try {
+                        haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
                         tryAwaitRelease()
                     } finally {
                         isPressed = false

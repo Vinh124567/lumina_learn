@@ -52,7 +52,8 @@ import com.example.luminalearn.ui.theme.PlusJakartaSans
 internal fun LessonSuccessContent(
     toneCardData: ToneCardData,
     sparksReward: Int,
-    action: LessonAction
+    action: LessonAction,
+    starsEarned: Int = 3
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -77,11 +78,32 @@ internal fun LessonSuccessContent(
             // 2. Huy hiệu vàng lấp lánh kèm Confetti trang trí
             SuccessCelebrationBadge()
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Đánh giá cấp độ thành thạo sao (Star Mastery)
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                for (i in 1..3) {
+                    val earned = i <= starsEarned
+                    Text(
+                        text = if (earned) "⭐" else "☆",
+                        fontSize = 28.sp,
+                        color = if (earned) Color(0xFFF59E0B) else Color(0xFFCBD5E1)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
 
             // 3. Tiêu đề chúc mừng
             Text(
-                text = "Hoàn thành bài học xuất sắc!",
+                text = when (starsEarned) {
+                    3 -> "Hoàn thành xuất sắc 3 Sao!"
+                    2 -> "Hoàn thành bài học 2 Sao!"
+                    else -> "Hoàn thành bài học 1 Sao!"
+                },
                 fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.ExtraBold,
                 fontSize = 20.5.sp,
@@ -89,7 +111,7 @@ internal fun LessonSuccessContent(
                 textAlign = TextAlign.Center
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
             // 4. Mô tả chi tiết kèm tên bài học và số Tia Sáng nhận được
             val congratulatoryText = buildAnnotatedString {
@@ -119,7 +141,7 @@ internal fun LessonSuccessContent(
 
             // 5. Nút Hoàn tất & Tiếp tục màu vàng hổ phách nổi bật
             Surface(
-                onClick = action.onComplete,
+                onClick = { action.onCompleteWithStars(starsEarned) },
                 shape = RoundedCornerShape(50),
                 color = Color(0xFFEBB15B),
                 shadowElevation = 2.dp,
