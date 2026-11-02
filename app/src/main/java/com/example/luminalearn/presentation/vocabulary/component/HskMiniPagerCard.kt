@@ -37,7 +37,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.luminalearn.core.ui.effect.CosmicStarfield
 import com.example.luminalearn.core.ui.effect.bounceClick
 import com.example.luminalearn.ui.theme.PlusJakartaSans
 
@@ -48,6 +47,13 @@ import com.example.luminalearn.ui.theme.PlusJakartaSans
  * - Gradient vũ trụ Cosmos chuyển màu tự động theo từng cấp độ.
  * - Hàng tab indicator chấm tròn hoạt họa đàn hồi ở đáy thẻ.
  */
+/**
+ * Thẻ Lộ trình HSK 1–6 phong cách Băng Game Retro (Cartridge Stage Pager):
+ * - Rộng tràn ngang với PixelCardBox viền đen 2dp, bóng cứng 3D 4dp.
+ * - Huy hiệu Hán tự khối vuông Pixel 8-bit sắc sảo (一, 二, 三, 四, 五, 六).
+ * - Badge STAGE X và thanh đo dung lượng từ phân đoạn pixel.
+ * - Nút bấm Arcade dập nổi [ VÀO MAP ▶ ].
+ */
 @Composable
 fun HskMiniPagerCard(
     hskLevels: List<HskLevelCardData>,
@@ -57,14 +63,16 @@ fun HskMiniPagerCard(
     val pagerState = rememberPagerState(pageCount = { hskLevels.size })
     val currentLevel = hskLevels.getOrNull(pagerState.currentPage) ?: hskLevels.first()
 
-    Card(
+    PixelCardBox(
         modifier = modifier
             .fillMaxWidth()
-            .height(108.dp),
-        shape = RoundedCornerShape(18.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-        border = BorderStroke(0.5.dp, currentLevel.accentColor.copy(alpha = 0.40f)),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            .height(130.dp),
+        backgroundColor = Color.White,
+        borderColor = PixelColors.BorderDark,
+        shadowColor = PixelColors.ShadowDark,
+        borderWidth = 2.dp,
+        shadowOffset = 4.dp,
+        cornerRadius = 8.dp
     ) {
         // HorizontalPager cuộn ngang qua các cấp độ HSK 1 - 6
         HorizontalPager(
@@ -72,147 +80,165 @@ fun HskMiniPagerCard(
             modifier = Modifier.fillMaxSize()
         ) { page ->
             val level = hskLevels[page]
+            val hanziNumber = when (level.levelNumber) {
+                1 -> "一"
+                2 -> "二"
+                3 -> "三"
+                4 -> "四"
+                5 -> "五"
+                6 -> "六"
+                else -> "级"
+            }
 
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Brush.linearGradient(level.gradientColors))
-                    .bounceClick(scaleDown = 0.98f) {
+                    .bounceClick(scaleDown = 0.985f) {
                         onOpenHskLevel(level)
                     }
+                    .padding(horizontal = 14.dp, vertical = 10.dp)
             ) {
-                // Hạt bụi sao vũ trụ nhẹ nhàng
-                CosmicStarfield(
-                    modifier = Modifier.matchParentSize(),
-                    particleCount = 18,
-                    focusCenterXRatio = 0.88f,
-                    focusCenterYRatio = 0.45f
-                )
-
                 Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 14.dp, vertical = 10.dp),
+                    modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
-                    // ── Thân thẻ ngang: Thông tin HSK bên trái + Nút hành động bên phải ──
+                    // ── Thân thẻ ngang: Huy hiệu HSK + Thông tin + Nút hành động ──
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // Cột thông tin bên trái
-                        Column(modifier = Modifier.weight(1f)) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        // Cụm thông tin & Huy hiệu bên trái
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(10.dp),
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            // Huy hiệu khối vuông Pixel Hán tự cấp độ
+                            Box(
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .clip(RoundedCornerShape(4.dp))
+                                    .background(level.badgeBgColor)
+                                    .border(
+                                        BorderStroke(1.8.dp, PixelColors.BorderDark),
+                                        RoundedCornerShape(4.dp)
+                                    ),
+                                contentAlignment = Alignment.Center
                             ) {
-                                // Badge HSK
-                                Box(
-                                    modifier = Modifier
-                                        .clip(RoundedCornerShape(6.dp))
-                                        .background(level.badgeBgColor)
-                                        .border(
-                                            BorderStroke(0.5.dp, level.accentColor.copy(alpha = 0.50f)),
-                                            RoundedCornerShape(6.dp)
-                                        )
-                                        .padding(horizontal = 7.dp, vertical = 2.dp)
+                                Text(
+                                    text = hanziNumber,
+                                    fontSize = 19.sp,
+                                    fontWeight = FontWeight.Black,
+                                    color = PixelColors.BorderDark
+                                )
+                            }
+
+                            // Cột text thông tin
+                            Column {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(6.dp)
                                 ) {
+                                    PixelBadge(
+                                        text = "STAGE ${level.levelNumber}",
+                                        backgroundColor = level.accentColor,
+                                        textColor = Color.White,
+                                        borderColor = PixelColors.BorderDark
+                                    )
+
                                     Text(
-                                        text = level.title,
+                                        text = level.stageName,
                                         fontFamily = PlusJakartaSans,
-                                        fontSize = 11.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = level.accentColor
+                                        fontSize = 13.sp,
+                                        fontWeight = FontWeight.Black,
+                                        color = PixelColors.BorderDark,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
                                     )
                                 }
 
+                                Spacer(modifier = Modifier.height(2.dp))
+
                                 Text(
-                                    text = level.stageName,
+                                    text = "${level.standardWordCount} từ chuẩn • ${level.targetScore}",
                                     fontFamily = PlusJakartaSans,
-                                    fontSize = 13.5.sp,
+                                    fontSize = 10.5.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color.White,
+                                    color = PixelColors.MutedText,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis
                                 )
                             }
-
-                            Spacer(modifier = Modifier.height(3.dp))
-
-                            Text(
-                                text = "${level.standardWordCount} từ chuẩn • ${level.targetScore}",
-                                fontFamily = PlusJakartaSans,
-                                fontSize = 10.5.sp,
-                                color = Color(0xFFCBD5E1),
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
                         }
 
-                        Spacer(modifier = Modifier.width(10.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
 
-                        // Nút hành động pill bên phải
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(10.dp))
-                                .background(level.accentColor.copy(alpha = 0.18f))
-                                .border(
-                                    BorderStroke(0.5.dp, level.accentColor.copy(alpha = 0.55f)),
-                                    RoundedCornerShape(10.dp)
-                                )
-                                .padding(horizontal = 10.dp, vertical = 6.dp)
-                        ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.Center
-                            ) {
-                                Text(
-                                    text = "Mở kho từ",
-                                    fontFamily = PlusJakartaSans,
-                                    fontSize = 10.5.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = level.accentColor
-                                )
-                                Spacer(modifier = Modifier.width(3.dp))
-                                Text(
-                                    text = "→",
-                                    fontSize = 11.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = level.accentColor
-                                )
-                            }
-                        }
+                        // Nút hành động Arcade bên phải
+                        PixelArcadeButton(
+                            text = "VÀO MAP ▶",
+                            onClick = { onOpenHskLevel(level) },
+                            backgroundColor = level.accentColor,
+                            textColor = Color.White,
+                            fontSize = 10f,
+                            contentPadding = 6.dp,
+                            shadowOffset = 2.5.dp
+                        )
                     }
 
-                    // ── Tab Indicator cuộn ngang ở đáy thẻ ──
+                    // ── Thanh tiến độ mini trực quan + Tab Indicator đáy thẻ ──
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(bottom = 1.dp),
-                        horizontalArrangement = Arrangement.Center,
+                            .padding(top = 2.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        repeat(hskLevels.size) { index ->
-                            val isSelected = pagerState.currentPage == index
-                            val dotWidth by animateDpAsState(
-                                targetValue = if (isSelected) 14.dp else 4.dp,
-                                animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
-                                label = "dotWidth"
-                            )
-                            val dotColor by animateColorAsState(
-                                targetValue = if (isSelected) level.accentColor else Color.White.copy(alpha = 0.25f),
-                                label = "dotColor"
-                            )
-
+                        // Thanh đo dung lượng từ chuẩn HSK phân đoạn pixel
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
                             Box(
                                 modifier = Modifier
-                                    .padding(horizontal = 2.dp)
-                                    .height(3.5.dp)
-                                    .width(dotWidth)
-                                    .clip(CircleShape)
-                                    .background(dotColor)
+                                    .width(72.dp)
+                                    .height(6.dp)
+                                    .clip(RoundedCornerShape(2.dp))
+                                    .background(Color(0xFFE4E4E7))
+                                    .border(BorderStroke(1.dp, PixelColors.BorderDark), RoundedCornerShape(2.dp))
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxHeight()
+                                        .fillMaxWidth(fraction = (level.levelNumber * 0.16f).coerceIn(0.16f, 1f))
+                                        .background(level.accentColor)
+                                )
+                            }
+                            Text(
+                                text = "BẬC ${level.levelNumber}/6",
+                                fontFamily = PlusJakartaSans,
+                                fontSize = 8.5.sp,
+                                fontWeight = FontWeight.Black,
+                                color = PixelColors.BorderDark
                             )
+                        }
+
+                        // Tab Indicator cuộn ngang dạng khối pixel
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            repeat(hskLevels.size) { index ->
+                                val isSelected = pagerState.currentPage == index
+                                Box(
+                                    modifier = Modifier
+                                        .height(5.dp)
+                                        .width(if (isSelected) 14.dp else 5.dp)
+                                        .clip(RoundedCornerShape(1.dp))
+                                        .background(if (isSelected) level.accentColor else Color(0xFFD4D4D8))
+                                        .border(BorderStroke(0.8.dp, PixelColors.BorderDark), RoundedCornerShape(1.dp))
+                                )
+                            }
                         }
                     }
                 }

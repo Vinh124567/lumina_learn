@@ -37,6 +37,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.luminalearn.R
 
+import com.example.luminalearn.presentation.vocabulary.component.PixelColors
+import com.example.luminalearn.presentation.vocabulary.component.PixelStepCornerShape
+
 data class RoleplayFilterOption(
     val id: String,
     val title: String,
@@ -49,11 +52,6 @@ val ROLEPLAY_FILTER_OPTIONS = listOf(
     RoleplayFilterOption("hsk23", "HSK 2–3 Giao tiếp", Color(0xFF3B82F6)),
     RoleplayFilterOption("hsk34", "HSK 3–4 Nâng cao", Color(0xFFF97316))
 )
-
-private val ActiveFilterBg = Color(0xFF4338CA)
-private val InactiveFilterBorder = Color(0xFFE2E8F0)
-private val SearchBgColor = Color(0xFFF8FAFC)
-private val TextDark = Color(0xFF334155)
 
 @Composable
 fun RoleplayFilterAndSearchBar(
@@ -92,7 +90,7 @@ fun RoleplayFilterAndSearchBar(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
                 SearchBarField(
                     searchQuery = searchQuery,
@@ -114,7 +112,7 @@ private fun FilterChipsRow(
 
     Row(
         modifier = modifier.horizontalScroll(scrollState),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         ROLEPLAY_FILTER_OPTIONS.forEach { option ->
@@ -128,51 +126,45 @@ private fun FilterChipsRow(
     }
 }
 
-private val ActiveFilterGradient = Brush.horizontalGradient(
-    listOf(Color(0xFF4F46E5), Color(0xFF6366F1))
-)
-
 @Composable
 private fun FilterChipItem(
     option: RoleplayFilterOption,
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
-    val bgModifier = if (isSelected) {
-        Modifier.background(ActiveFilterGradient)
-    } else {
-        Modifier.background(Color.White)
-    }
+    val chipShape = PixelStepCornerShape(2.dp)
 
     Box(
         modifier = Modifier
-            .clip(RoundedCornerShape(50.dp))
-            .then(bgModifier)
-            .then(
-                if (isSelected) Modifier
-                else Modifier.border(BorderStroke(1.dp, InactiveFilterBorder), RoundedCornerShape(50.dp))
+            .clip(chipShape)
+            .background(if (isSelected) PixelColors.PixelBlue else Color.White)
+            .border(
+                BorderStroke(
+                    if (isSelected) 1.2.dp else 1.dp,
+                    if (isSelected) PixelColors.BorderDark else Color(0xFFCBD5E1)
+                ),
+                chipShape
             )
             .clickable(onClick = onClick)
-            .padding(horizontal = 14.dp, vertical = 7.dp)
+            .padding(horizontal = 10.dp, vertical = 5.dp)
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
             if (option.dotColor != null) {
                 Box(
                     modifier = Modifier
-                        .size(8.dp)
-                        .clip(CircleShape)
-                        .background(option.dotColor)
+                        .size(6.dp)
+                        .clip(PixelStepCornerShape(1.dp))
+                        .background(if (isSelected) Color.White else option.dotColor)
                 )
-                Spacer(modifier = Modifier.width(7.dp))
+                Spacer(modifier = Modifier.width(5.dp))
             }
 
             Text(
                 text = option.title,
-                fontSize = 12.5.sp,
-                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                color = if (isSelected) Color.White else TextDark
+                fontSize = 11.5.sp,
+                fontWeight = if (isSelected) FontWeight.Black else FontWeight.Bold,
+                color = if (isSelected) Color.White else Color(0xFF334155),
+                letterSpacing = 0.2.sp
             )
         }
     }
@@ -184,47 +176,68 @@ private fun SearchBarField(
     onSearchChange: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Surface(
-        modifier = modifier,
-        shape = RoundedCornerShape(50.dp),
-        color = SearchBgColor,
-        border = BorderStroke(1.dp, InactiveFilterBorder)
+    val searchShape = PixelStepCornerShape(2.dp)
+
+    Box(
+        modifier = modifier
+            .clip(searchShape)
+            .background(Color.White)
+            .border(BorderStroke(1.2.dp, PixelColors.BorderDark), searchShape)
+            .padding(horizontal = 10.dp, vertical = 7.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp)
+            modifier = Modifier.fillMaxWidth()
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_search),
                 contentDescription = null,
-                tint = Color(0xFF94A3B8),
-                modifier = Modifier.size(16.dp)
+                tint = Color(0xFF64748B),
+                modifier = Modifier.size(15.dp)
             )
 
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(7.dp))
 
             BasicTextField(
                 value = searchQuery,
                 onValueChange = onSearchChange,
                 textStyle = TextStyle(
-                    fontSize = 13.sp,
-                    color = TextDark,
-                    fontWeight = FontWeight.Normal
+                    fontSize = 12.sp,
+                    color = Color(0xFF1E293B),
+                    fontWeight = FontWeight.Medium
                 ),
-                cursorBrush = SolidColor(ActiveFilterBg),
+                cursorBrush = SolidColor(PixelColors.PixelBlue),
                 singleLine = true,
                 decorationBox = { innerTextField ->
                     if (searchQuery.isEmpty()) {
                         Text(
-                            text = "Tìm kịch bản, nhân vật...",
+                            text = "Tìm kiếm kịch bản, nhân vật...",
                             color = Color(0xFF94A3B8),
-                            fontSize = 13.sp
+                            fontSize = 12.sp
                         )
                     }
                     innerTextField()
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.weight(1f)
             )
+
+            if (searchQuery.isNotEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .size(18.dp)
+                        .clip(PixelStepCornerShape(1.dp))
+                        .background(Color(0xFFE2E8F0))
+                        .clickable { onSearchChange("") },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "✕",
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Black,
+                        color = Color(0xFF475569)
+                    )
+                }
+            }
         }
     }
 }

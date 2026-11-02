@@ -304,21 +304,20 @@ fun DailyHanziSpotlightCard(
     val scope = rememberCoroutineScope()
     val rotationAngle = remember { Animatable(0f) }
 
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .bounceClick(scaleDown = 0.985f) {
-                onOpenDetail(currentData)
-            },
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = BorderStroke(0.5.dp, BorderSubtle),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    PixelCardBox(
+        modifier = modifier.fillMaxWidth(),
+        backgroundColor = Color(0xFFFFFBEB), // Nền kem retro GameBoy
+        borderColor = PixelColors.BorderDark,
+        shadowColor = PixelColors.ShadowDark,
+        borderWidth = 2.dp,
+        shadowOffset = 4.dp,
+        cornerRadius = 8.dp,
+        onClick = { onOpenDetail(currentData) }
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(14.dp)
         ) {
             // ── Header: Badge + Bộ thủ + Nút quay tròn đổi chữ ở góc ──
             Row(
@@ -326,41 +325,40 @@ fun DailyHanziSpotlightCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(6.dp))
-                        .background(Color(0xFFEEF2FF))
-                        .border(BorderStroke(0.5.dp, Color(0xFFC7D2FE)), RoundedCornerShape(6.dp))
-                        .padding(horizontal = 7.dp, vertical = 2.dp)
-                ) {
-                    Text(
-                        text = "✨ CHIẾT TỰ HÔM NAY",
-                        fontFamily = PlusJakartaSans,
-                        fontSize = 9.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = BrandIndigo
-                    )
-                }
+                PixelBadge(
+                    text = "✨ CHIẾT TỰ 8-BIT",
+                    backgroundColor = PixelColors.PixelYellow,
+                    textColor = PixelColors.BorderDark,
+                    borderColor = PixelColors.BorderDark
+                )
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text(
-                        text = currentData.radical,
-                        fontFamily = PlusJakartaSans,
-                        fontSize = 10.5.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = TextMuted
-                    )
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(3.dp))
+                            .background(Color.White)
+                            .border(BorderStroke(1.dp, PixelColors.BorderDark), RoundedCornerShape(3.dp))
+                            .padding(horizontal = 5.dp, vertical = 1.dp)
+                    ) {
+                        Text(
+                            text = currentData.radical,
+                            fontFamily = PlusJakartaSans,
+                            fontSize = 9.5.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = PixelColors.BorderDark
+                        )
+                    }
 
                     // Nút xoay tròn đổi chữ Hán
                     Box(
                         modifier = Modifier
                             .size(28.dp)
                             .clip(CircleShape)
-                            .background(Color(0xFFF1F5F9))
-                            .border(BorderStroke(0.5.dp, BorderSubtle), CircleShape)
+                            .background(PixelColors.PixelYellow)
+                            .border(BorderStroke(1.5.dp, PixelColors.BorderDark), CircleShape)
                             .bounceClick(scaleDown = 0.85f) {
                                 scope.launch {
                                     launch {
@@ -380,7 +378,7 @@ fun DailyHanziSpotlightCard(
                         Icon(
                             painter = painterResource(id = R.drawable.ic_refresh),
                             contentDescription = "Đổi chữ chiết tự",
-                            tint = BrandIndigo,
+                            tint = PixelColors.BorderDark,
                             modifier = Modifier
                                 .size(14.dp)
                                 .graphicsLayer {
@@ -391,7 +389,7 @@ fun DailyHanziSpotlightCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
             // ── Thân thẻ: AnimatedContent chuyển đổi mượt mà khi đổi chữ ──
             AnimatedContent(
@@ -406,61 +404,63 @@ fun DailyHanziSpotlightCard(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Khối chữ Hán lớn nổi bật
+                    // Khối chữ Hán lớn nổi bật kiểu Pixel Block
                     Box(
                         modifier = Modifier
-                            .size(68.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(Color(0xFFF8FAFC))
-                            .border(BorderStroke(0.5.dp, BorderSubtle), RoundedCornerShape(16.dp)),
+                            .size(64.dp)
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(Color.White)
+                            .border(BorderStroke(1.8.dp, PixelColors.BorderDark), RoundedCornerShape(6.dp)),
                         contentAlignment = Alignment.Center
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(
                                 text = data.hanzi,
-                                fontSize = 32.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = TextMain
+                                fontSize = 30.sp,
+                                fontWeight = FontWeight.Black,
+                                color = PixelColors.BorderDark
                             )
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
                                     text = data.pinyin,
                                     fontFamily = PlusJakartaSans,
-                                    fontSize = 10.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = BrandIndigo
+                                    fontSize = 9.5.sp,
+                                    fontWeight = FontWeight.Black,
+                                    color = Color(0xFFC2410C)
                                 )
                                 Spacer(modifier = Modifier.width(2.dp))
                                 Text(
                                     text = "[${data.hanViet}]",
                                     fontFamily = PlusJakartaSans,
-                                    fontSize = 9.5.sp,
-                                    color = TextMuted
+                                    fontSize = 9.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = PixelColors.MutedText
                                 )
                             }
                         }
                     }
 
-                    Spacer(modifier = Modifier.width(12.dp))
+                    Spacer(modifier = Modifier.width(10.dp))
 
                     // Câu chuyện chiết tự sâu sắc
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = data.story,
                             fontFamily = PlusJakartaSans,
-                            fontSize = 11.5.sp,
-                            color = Color(0xFF334155),
-                            lineHeight = 16.5.sp,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = Color(0xFF1E293B),
+                            lineHeight = 15.5.sp,
                             maxLines = 3,
                             overflow = TextOverflow.Ellipsis
                         )
-                        Spacer(modifier = Modifier.height(4.dp))
+                        Spacer(modifier = Modifier.height(3.dp))
                         Text(
                             text = data.words,
                             fontFamily = PlusJakartaSans,
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = BrandIndigo,
+                            fontSize = 9.5.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFFB45309),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -468,12 +468,13 @@ fun DailyHanziSpotlightCard(
 
                     Spacer(modifier = Modifier.width(8.dp))
 
-                    // Nút phát âm loa tròn
+                    // Nút phát âm loa tròn Pixel
                     Box(
                         modifier = Modifier
                             .size(34.dp)
-                            .clip(CircleShape)
-                            .background(Color(0xFFF1F5F9))
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(Color.White)
+                            .border(BorderStroke(1.5.dp, PixelColors.BorderDark), RoundedCornerShape(6.dp))
                             .bounceClick(scaleDown = 0.88f) {
                                 onSpeakWord(data.hanzi)
                             },
@@ -482,7 +483,7 @@ fun DailyHanziSpotlightCard(
                         Icon(
                             painter = painterResource(id = R.drawable.ic_speaker),
                             contentDescription = "Phát âm",
-                            tint = BrandIndigo,
+                            tint = PixelColors.BorderDark,
                             modifier = Modifier.size(15.dp)
                         )
                     }
@@ -498,18 +499,19 @@ fun DailyHanziSpotlightCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Chạm để xem chi tiết nét & câu ví dụ",
+                    text = "XEM CHI TIẾT NÉT & VÍ DỤ",
                     fontFamily = PlusJakartaSans,
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = BrandIndigo
+                    fontSize = 9.5.sp,
+                    fontWeight = FontWeight.Black,
+                    letterSpacing = 0.4.sp,
+                    color = PixelColors.BorderDark
                 )
                 Spacer(modifier = Modifier.width(3.dp))
                 Text(
-                    text = "→",
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = BrandIndigo
+                    text = "▶",
+                    fontSize = 9.sp,
+                    fontWeight = FontWeight.Black,
+                    color = PixelColors.BorderDark
                 )
             }
         }

@@ -5,8 +5,8 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -25,8 +26,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,9 +39,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -49,11 +50,15 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.luminalearn.R
+import com.example.luminalearn.core.ui.effect.bounceClick
 import com.example.luminalearn.core.util.GameSoundHelper
 import com.example.luminalearn.presentation.common.CelebrationEffect
+import com.example.luminalearn.presentation.vocabulary.component.PixelArcadeButton
+import com.example.luminalearn.presentation.vocabulary.component.PixelBadge
+import com.example.luminalearn.presentation.vocabulary.component.PixelCardBox
+import com.example.luminalearn.presentation.vocabulary.component.PixelColors
+import com.example.luminalearn.presentation.vocabulary.component.PixelSegmentedProgressBar
 import com.example.luminalearn.ui.theme.PlusJakartaSans
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.platform.LocalHapticFeedback
 
 data class BossQuestion(
     val id: Int,
@@ -67,7 +72,7 @@ data class BossQuestion(
 
 /**
  * Dialog Bài Thi Vượt Cấp HSK (Boss Checkpoint Exam)
- * Kiểm tra toàn diện kiến thức của toàn bộ Level để cấp chứng chỉ và mở khóa Level kế tiếp.
+ * Phong cách Retro 16-Bit Pixel Arcade / RPG Boss Fight: Viền đen 2dp, bóng cứng 3D, phím dập nổi.
  */
 @Composable
 fun BossExamDialog(
@@ -101,93 +106,34 @@ fun BossExamDialog(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.55f)),
+                .background(Color.Black.copy(alpha = 0.65f)),
             contentAlignment = Alignment.BottomCenter
         ) {
-            Surface(
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .fillMaxHeight(0.92f),
-                shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
-                color = Color.White,
-                shadowElevation = 20.dp
+                    .fillMaxHeight(0.94f)
+                    .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
+                    .background(PixelColors.ShadowDark)
+                    .padding(top = 4.dp)
             ) {
-                Column(
+                Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .navigationBarsPadding()
-                ) {
-                    // Thanh gạt Drag handle
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 10.dp, bottom = 6.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(width = 40.dp, height = 4.dp)
-                                .clip(CircleShape)
-                                .background(Color(0xFFE2E8F0))
+                        .clip(RoundedCornerShape(topStart = 18.dp, topEnd = 18.dp))
+                        .background(PixelColors.SurfaceLight)
+                        .border(
+                            width = 2.dp,
+                            color = PixelColors.BorderDark,
+                            shape = RoundedCornerShape(topStart = 18.dp, topEnd = 18.dp)
                         )
-                    }
-
-                    if (isLoading) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(32.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Text(text = "🏆", fontSize = 42.sp)
-                            Spacer(modifier = Modifier.height(16.dp))
-                            Text(
-                                text = "Đang tải đề thi từ máy chủ...",
-                                fontFamily = PlusJakartaSans,
-                                fontSize = 15.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFF4F46E5)
-                            )
-                        }
-                    } else if (!errorMessage.isNullOrBlank() || questions.isEmpty()) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(32.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Text(text = "⚠️", fontSize = 42.sp)
-                            Spacer(modifier = Modifier.height(16.dp))
-                            Text(
-                                text = errorMessage ?: "Chưa có đề thi cho cấp độ này trên máy chủ",
-                                fontFamily = PlusJakartaSans,
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                color = Color(0xFF64748B),
-                                textAlign = TextAlign.Center
-                            )
-                            Spacer(modifier = Modifier.height(20.dp))
-                            Surface(
-                                modifier = Modifier
-                                    .clickable(onClick = onRetry)
-                                    .padding(horizontal = 24.dp, vertical = 10.dp),
-                                shape = RoundedCornerShape(20.dp),
-                                color = Color(0xFF4F46E5)
-                            ) {
-                                Text(
-                                    text = "Thử lại 🔄",
-                                    fontFamily = PlusJakartaSans,
-                                    fontSize = 13.5.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.White,
-                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)
-                                )
-                            }
-                        }
-                    } else if (!isExamFinished) {
-                        // ── HEADER BÀI THI ──
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .navigationBarsPadding()
+                    ) {
+                        // ── 1. HEADER ARCADE CARTRIDGE ──
                         BossExamHeader(
                             levelName = levelName,
                             currentIndex = currentQuestionIndex + 1,
@@ -195,308 +141,345 @@ fun BossExamDialog(
                             onDismiss = onDismiss
                         )
 
-                        val currentQuestion = questions[currentQuestionIndex]
-                        val progress = (currentQuestionIndex + 1).toFloat() / questions.size
-
-                        // Thanh tiến độ bài thi
-                        LinearProgressIndicator(
-                            progress = { progress },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(4.dp),
-                            color = Color(0xFF6366F1),
-                            trackColor = Color(0xFFEEF2FF),
-                            strokeCap = StrokeCap.Round,
-                            drawStopIndicator = {}
-                        )
-
-                        // ── NỘI DUNG CÂU HỎI ──
-                        Column(
-                            modifier = Modifier
-                                .weight(1f)
-                                .fillMaxWidth()
-                                .padding(horizontal = 20.dp, vertical = 16.dp)
-                                .verticalScroll(rememberScrollState())
-                        ) {
-                            // Badge loại câu hỏi
-                            Surface(
-                                shape = RoundedCornerShape(8.dp),
-                                color = Color(0xFFEEF2FF),
-                                border = BorderStroke(0.6.dp, Color(0xFFC7D2FE))
+                        if (isLoading) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(32.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
                             ) {
+                                CircularProgressIndicator(
+                                    color = PixelColors.ArcadePurple,
+                                    strokeWidth = 3.dp,
+                                    modifier = Modifier.size(40.dp)
+                                )
+                                Spacer(modifier = Modifier.height(16.dp))
                                 Text(
-                                    text = currentQuestion.typeTitle,
+                                    text = "ĐANG TẢI ĐỀ THI TỪ MÁY CHỦ...",
                                     fontFamily = PlusJakartaSans,
-                                    fontSize = 11.sp,
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.Black,
+                                    color = PixelColors.ArcadePurple,
+                                    letterSpacing = 0.5.sp
+                                )
+                            }
+                        } else if (!errorMessage.isNullOrBlank() || questions.isEmpty()) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(32.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Text(text = "⚠️", fontSize = 44.sp)
+                                Spacer(modifier = Modifier.height(14.dp))
+                                Text(
+                                    text = errorMessage ?: "Chưa có đề thi cho cấp độ này trên máy chủ",
+                                    fontFamily = PlusJakartaSans,
+                                    fontSize = 13.5.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color(0xFF4F46E5),
-                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                                    color = PixelColors.TextDark,
+                                    textAlign = TextAlign.Center
+                                )
+                                Spacer(modifier = Modifier.height(20.dp))
+                                PixelArcadeButton(
+                                    text = "THỬ LẠI 🔄",
+                                    onClick = onRetry,
+                                    color = PixelColors.ArcadePurple,
+                                    height = 44.dp
+                                )
+                            }
+                        } else if (!isExamFinished) {
+                            val currentQuestion = questions[currentQuestionIndex]
+
+                            // Thanh tiến độ Pixel phân đoạn
+                            Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp)) {
+                                PixelSegmentedProgressBar(
+                                    current = currentQuestionIndex + 1,
+                                    total = questions.size,
+                                    activeColor = PixelColors.ArcadePurple,
+                                    height = 8.dp,
+                                    modifier = Modifier.fillMaxWidth()
                                 )
                             }
 
-                            Spacer(modifier = Modifier.height(14.dp))
-
-                            // Câu hỏi lớn
-                            Text(
-                                text = currentQuestion.question,
-                                fontFamily = PlusJakartaSans,
-                                fontSize = 21.sp,
-                                fontWeight = FontWeight.ExtraBold,
-                                color = Color(0xFF0F172A),
-                                lineHeight = 28.sp
-                            )
-
-                            if (!currentQuestion.pinyinHint.isNullOrBlank()) {
-                                Spacer(modifier = Modifier.height(6.dp))
+                            // ── 2. NỘI DUNG CÂU HỎI ──
+                            Column(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp, vertical = 10.dp)
+                                    .verticalScroll(rememberScrollState())
+                            ) {
+                                // Badge loại câu hỏi
                                 Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Text(
-                                        text = currentQuestion.pinyinHint,
-                                        fontFamily = PlusJakartaSans,
-                                        fontSize = 13.5.sp,
-                                        fontWeight = FontWeight.Medium,
-                                        color = Color(0xFF6366F1)
+                                    PixelBadge(
+                                        text = "⚔️ " + currentQuestion.typeTitle.uppercase(),
+                                        color = PixelColors.ArcadePurple,
+                                        textColor = Color.White
                                     )
-                                    if (onSpeak != null) {
-                                        Surface(
-                                            shape = CircleShape,
-                                            color = Color(0xFFEEF2FF),
-                                            modifier = Modifier
-                                                .size(26.dp)
-                                                .clickable { onSpeak(currentQuestion.question) }
-                                        ) {
-                                            Box(contentAlignment = Alignment.Center) {
-                                                Icon(
-                                                    painter = painterResource(id = R.drawable.ic_speaker),
-                                                    contentDescription = "Nghe phát âm",
-                                                    tint = Color(0xFF6366F1),
-                                                    modifier = Modifier.size(13.dp)
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                            Spacer(modifier = Modifier.height(24.dp))
-
-                            // Danh sách 4 đáp án lựa chọn
-                            currentQuestion.options.forEachIndexed { optIndex, optionText ->
-                                val isSelected = selectedOptionIndex == optIndex
-                                val isCorrect = optIndex == currentQuestion.correctIndex
-
-                                val (cardBg, cardBorder, textCol) = when {
-                                    isAnswerSubmitted && isCorrect -> Triple(
-                                        Color(0xFFDCFCE7),
-                                        Color(0xFF22C55E),
-                                        Color(0xFF15803D)
-                                    )
-                                    isAnswerSubmitted && isSelected && !isCorrect -> Triple(
-                                        Color(0xFFFEE2E2),
-                                        Color(0xFFEF4444),
-                                        Color(0xFFB91C1C)
-                                    )
-                                    isSelected -> Triple(
-                                        Color(0xFFEEF2FF),
-                                        Color(0xFF6366F1),
-                                        Color(0xFF4338CA)
-                                    )
-                                    else -> Triple(
-                                        Color(0xFFF8FAFC),
-                                        Color(0xFFE2E8F0),
-                                        Color(0xFF1E293B)
+                                    PixelBadge(
+                                        text = "👑 BOSS QUEST",
+                                        color = PixelColors.ArcadeAmber,
+                                        textColor = Color.White
                                     )
                                 }
 
-                                Surface(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(vertical = 5.dp)
-                                        .clickable(enabled = !isAnswerSubmitted) {
-                                            selectedOptionIndex = optIndex
-                                        },
-                                    shape = RoundedCornerShape(16.dp),
-                                    color = cardBg,
-                                    border = BorderStroke(if (isSelected || (isAnswerSubmitted && isCorrect)) 1.5.dp else 0.8.dp, cardBorder),
-                                    shadowElevation = if (isSelected) 2.dp else 0.dp
+                                Spacer(modifier = Modifier.height(12.dp))
+
+                                // Khung câu hỏi chính Pixel (Card lớn có 4 đinh tán ở các góc)
+                                PixelCardBox(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    backgroundColor = Color(0xFFFAF5FF),
+                                    borderColor = PixelColors.BorderDark,
+                                    shadowColor = PixelColors.ShadowDark,
+                                    cornerRadius = 12.dp,
+                                    showRivets = true
                                 ) {
-                                    Row(
+                                    Column(
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .padding(horizontal = 16.dp, vertical = 14.dp),
-                                        verticalAlignment = Alignment.CenterVertically
+                                            .padding(14.dp)
                                     ) {
-                                        val prefixLetter = ('A' + optIndex).toString()
-                                        Box(
-                                            modifier = Modifier
-                                                .size(28.dp)
-                                                .clip(CircleShape)
-                                                .background(
-                                                    if (isSelected || (isAnswerSubmitted && isCorrect)) cardBorder else Color(0xFFE2E8F0)
-                                                ),
-                                            contentAlignment = Alignment.Center
-                                        ) {
-                                            Text(
-                                                text = prefixLetter,
-                                                fontFamily = PlusJakartaSans,
-                                                fontSize = 12.sp,
-                                                fontWeight = FontWeight.Bold,
-                                                color = if (isSelected || (isAnswerSubmitted && isCorrect)) Color.White else Color(0xFF64748B)
-                                            )
-                                        }
-
-                                        Spacer(modifier = Modifier.width(12.dp))
-
                                         Text(
-                                            text = optionText,
+                                            text = currentQuestion.question,
                                             fontFamily = PlusJakartaSans,
-                                            fontSize = 14.5.sp,
-                                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                                            color = textCol,
-                                            modifier = Modifier.weight(1f)
+                                            fontSize = 19.sp,
+                                            fontWeight = FontWeight.Black,
+                                            color = PixelColors.TextDark,
+                                            lineHeight = 26.sp
                                         )
 
-                                        if (isAnswerSubmitted) {
-                                            if (isCorrect) {
-                                                Text(text = "✓", fontSize = 16.sp, fontWeight = FontWeight.Black, color = Color(0xFF15803D))
-                                            } else if (isSelected) {
-                                                Text(text = "✗", fontSize = 16.sp, fontWeight = FontWeight.Black, color = Color(0xFFB91C1C))
+                                        if (!currentQuestion.pinyinHint.isNullOrBlank()) {
+                                            Spacer(modifier = Modifier.height(8.dp))
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                            ) {
+                                                Text(
+                                                    text = currentQuestion.pinyinHint,
+                                                    fontFamily = PlusJakartaSans,
+                                                    fontSize = 14.sp,
+                                                    fontWeight = FontWeight.Bold,
+                                                    color = PixelColors.ArcadePurple
+                                                )
+                                                if (onSpeak != null) {
+                                                    Box(
+                                                        modifier = Modifier
+                                                            .size(28.dp)
+                                                            .clip(RoundedCornerShape(6.dp))
+                                                            .background(PixelColors.SurfaceDark)
+                                                            .border(1.2.dp, PixelColors.BorderDark, RoundedCornerShape(6.dp))
+                                                            .bounceClick { onSpeak(currentQuestion.question) },
+                                                        contentAlignment = Alignment.Center
+                                                    ) {
+                                                        Text(text = "🔊", fontSize = 12.sp)
+                                                    }
+                                                }
                                             }
                                         }
                                     }
                                 }
-                            }
 
-                            // Giải thích đáp án sau khi bấm nộp
-                            if (isAnswerSubmitted && currentQuestion.explanation.isNotBlank()) {
-                                Spacer(modifier = Modifier.height(14.dp))
-                                Surface(
-                                    shape = RoundedCornerShape(12.dp),
-                                    color = Color(0xFFF1F5F9),
-                                    border = BorderStroke(0.6.dp, Color(0xFFCBD5E1))
-                                ) {
-                                    Column(modifier = Modifier.padding(12.dp)) {
-                                        Text(
-                                            text = "💡 Giải thích:",
-                                            fontFamily = PlusJakartaSans,
-                                            fontSize = 11.5.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            color = Color(0xFF334155)
-                                        )
-                                        Spacer(modifier = Modifier.height(3.dp))
-                                        Text(
-                                            text = currentQuestion.explanation,
-                                            fontFamily = PlusJakartaSans,
-                                            fontSize = 12.5.sp,
-                                            color = Color(0xFF475569),
-                                            lineHeight = 17.sp
-                                        )
+                                Spacer(modifier = Modifier.height(16.dp))
+
+                                // Danh sách 4 đáp án Arcade Keys
+                                currentQuestion.options.forEachIndexed { optIndex, optionText ->
+                                    val isSelected = selectedOptionIndex == optIndex
+                                    val isCorrect = optIndex == currentQuestion.correctIndex
+
+                                    val (keyBgColor, keyTextColor) = when {
+                                        isAnswerSubmitted && isCorrect -> Pair(PixelColors.ArcadeGreen, Color.White)
+                                        isAnswerSubmitted && isSelected && !isCorrect -> Pair(PixelColors.ArcadeRed, Color.White)
+                                        isSelected -> Pair(PixelColors.ArcadePurple, Color.White)
+                                        else -> Pair(Color.White, PixelColors.TextDark)
+                                    }
+
+                                    val prefixLetter = ('A' + optIndex).toString()
+
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 4.5.dp)
+                                            .clip(RoundedCornerShape(10.dp))
+                                            .background(PixelColors.ShadowDark)
+                                            .padding(bottom = 2.5.dp)
+                                    ) {
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .clip(RoundedCornerShape(8.dp))
+                                                .background(keyBgColor)
+                                                .border(1.8.dp, PixelColors.BorderDark, RoundedCornerShape(8.dp))
+                                                .clickable(enabled = !isAnswerSubmitted) {
+                                                    selectedOptionIndex = optIndex
+                                                }
+                                                .padding(horizontal = 14.dp, vertical = 12.dp)
+                                        ) {
+                                            Row(
+                                                modifier = Modifier.fillMaxWidth(),
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                // Nút chữ cái A, B, C, D
+                                                Box(
+                                                    modifier = Modifier
+                                                        .size(26.dp)
+                                                        .clip(RoundedCornerShape(5.dp))
+                                                        .background(if (isSelected || (isAnswerSubmitted && isCorrect)) Color.White.copy(alpha = 0.25f) else Color(0xFFF1F5F9))
+                                                        .border(1.2.dp, PixelColors.BorderDark, RoundedCornerShape(5.dp)),
+                                                    contentAlignment = Alignment.Center
+                                                ) {
+                                                    Text(
+                                                        text = prefixLetter,
+                                                        fontFamily = PlusJakartaSans,
+                                                        fontSize = 12.sp,
+                                                        fontWeight = FontWeight.Black,
+                                                        color = if (isSelected || (isAnswerSubmitted && isCorrect)) Color.White else PixelColors.TextDark
+                                                    )
+                                                }
+
+                                                Spacer(modifier = Modifier.width(12.dp))
+
+                                                Text(
+                                                    text = optionText,
+                                                    fontFamily = PlusJakartaSans,
+                                                    fontSize = 14.5.sp,
+                                                    fontWeight = if (isSelected) FontWeight.Black else FontWeight.Bold,
+                                                    color = keyTextColor,
+                                                    modifier = Modifier.weight(1f)
+                                                )
+
+                                                if (isAnswerSubmitted) {
+                                                    if (isCorrect) {
+                                                        Text(text = "✓", fontSize = 16.sp, fontWeight = FontWeight.Black, color = Color.White)
+                                                    } else if (isSelected) {
+                                                        Text(text = "✗", fontSize = 16.sp, fontWeight = FontWeight.Black, color = Color.White)
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                // Khung giải thích pixel sau khi nộp bài
+                                if (isAnswerSubmitted && currentQuestion.explanation.isNotBlank()) {
+                                    Spacer(modifier = Modifier.height(14.dp))
+                                    PixelCardBox(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        backgroundColor = Color(0xFFFEF3C7),
+                                        borderColor = PixelColors.BorderDark,
+                                        shadowColor = PixelColors.ShadowDark,
+                                        cornerRadius = 10.dp
+                                    ) {
+                                        Column(modifier = Modifier.padding(12.dp)) {
+                                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                                Text(text = "💡", fontSize = 14.sp)
+                                                Spacer(modifier = Modifier.width(6.dp))
+                                                Text(
+                                                    text = "GIẢI THÍCH CHI TIẾT:",
+                                                    fontFamily = PlusJakartaSans,
+                                                    fontSize = 11.sp,
+                                                    fontWeight = FontWeight.Black,
+                                                    color = Color(0xFF92400E)
+                                                )
+                                            }
+                                            Spacer(modifier = Modifier.height(4.dp))
+                                            Text(
+                                                text = currentQuestion.explanation,
+                                                fontFamily = PlusJakartaSans,
+                                                fontSize = 12.5.sp,
+                                                fontWeight = FontWeight.Medium,
+                                                color = Color(0xFF78350F),
+                                                lineHeight = 18.sp
+                                            )
+                                        }
                                     }
                                 }
                             }
-                        }
 
-                        // ── THANH HÀNH ĐỘNG ĐÁY ──
-                        Surface(
-                            modifier = Modifier.fillMaxWidth(),
-                            color = Color.White,
-                            shadowElevation = 8.dp
-                        ) {
+                            // ── 3. THANH HÀNH ĐỘNG DƯỚI ĐÁY ──
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(horizontal = 20.dp, vertical = 12.dp)
+                                    .background(PixelColors.SurfaceLight)
+                                    .border(
+                                        width = 1.5.dp,
+                                        color = PixelColors.BorderDark,
+                                        shape = RoundedCornerShape(0.dp)
+                                    )
+                                    .padding(horizontal = 16.dp, vertical = 12.dp)
                             ) {
                                 if (!isAnswerSubmitted) {
                                     val isEnabled = selectedOptionIndex >= 0
-                                    Surface(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(48.dp)
-                                            .clickable(enabled = isEnabled) {
-                                                isAnswerSubmitted = true
-                                                if (selectedOptionIndex == currentQuestion.correctIndex) {
-                                                    correctAnswersCount++
-                                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                                    GameSoundHelper.playCorrect()
-                                                } else {
-                                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                                    GameSoundHelper.playIncorrect()
-                                                    onWrongAnswer?.invoke()
-                                                }
-                                            },
-                                        shape = RoundedCornerShape(24.dp),
-                                        color = if (isEnabled) Color(0xFF4F46E5) else Color(0xFFCBD5E1),
-                                        shadowElevation = if (isEnabled) 3.dp else 0.dp
-                                    ) {
-                                        Box(contentAlignment = Alignment.Center) {
-                                            Text(
-                                                text = "Kiểm tra đáp án",
-                                                fontFamily = PlusJakartaSans,
-                                                fontSize = 14.5.sp,
-                                                fontWeight = FontWeight.Bold,
-                                                color = Color.White
-                                            )
-                                        }
-                                    }
+                                    PixelArcadeButton(
+                                        text = "KIỂM TRA ĐÁP ÁN ▶",
+                                        onClick = {
+                                            isAnswerSubmitted = true
+                                            if (selectedOptionIndex == currentQuestion.correctIndex) {
+                                                correctAnswersCount++
+                                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                                GameSoundHelper.playCorrect()
+                                            } else {
+                                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                                GameSoundHelper.playIncorrect()
+                                                onWrongAnswer?.invoke()
+                                            }
+                                        },
+                                        color = if (isEnabled) PixelColors.ArcadePurple else PixelColors.SurfaceDark,
+                                        height = 48.dp,
+                                        fillMaxWidth = true,
+                                        modifier = Modifier.fillMaxWidth()
+                                    )
                                 } else {
                                     val isLastQuestion = currentQuestionIndex >= questions.size - 1
-                                    Surface(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(48.dp)
-                                            .clickable {
-                                                if (isLastQuestion) {
-                                                    isExamFinished = true
-                                                } else {
-                                                    currentQuestionIndex++
-                                                    selectedOptionIndex = -1
-                                                    isAnswerSubmitted = false
-                                                }
-                                            },
-                                        shape = RoundedCornerShape(24.dp),
-                                        color = if (isLastQuestion) Color(0xFFD97706) else Color(0xFF4F46E5),
-                                        shadowElevation = 3.dp
-                                    ) {
-                                        Box(contentAlignment = Alignment.Center) {
-                                            Text(
-                                                text = if (isLastQuestion) "Xem kết quả thi 🏆" else "Câu tiếp theo →",
-                                                fontFamily = PlusJakartaSans,
-                                                fontSize = 14.5.sp,
-                                                fontWeight = FontWeight.Bold,
-                                                color = Color.White
-                                            )
-                                        }
-                                    }
+                                    PixelArcadeButton(
+                                        text = if (isLastQuestion) "XEM KẾT QUẢ THI 🏆" else "CÂU TIẾP THEO ▶",
+                                        onClick = {
+                                            if (isLastQuestion) {
+                                                isExamFinished = true
+                                            } else {
+                                                currentQuestionIndex++
+                                                selectedOptionIndex = -1
+                                                isAnswerSubmitted = false
+                                            }
+                                        },
+                                        color = if (isLastQuestion) PixelColors.ArcadeAmber else PixelColors.ArcadePurple,
+                                        height = 48.dp,
+                                        fillMaxWidth = true,
+                                        modifier = Modifier.fillMaxWidth()
+                                    )
                                 }
                             }
-                        }
-                    } else {
-                        // ── MÀN HÌNH KẾT QUẢ THI (RESULT SUMMARY) ──
-                        val scorePercent = ((correctAnswersCount.toFloat() / questions.size) * 100).toInt()
-                        val isPassed = scorePercent >= 80
+                        } else {
+                            // ── 4. MÀN HÌNH KẾT QUẢ THI RETRO BOSS VICTORY / DEFEAT ──
+                            val scorePercent = ((correctAnswersCount.toFloat() / questions.size) * 100).toInt()
+                            val isPassed = scorePercent >= 80
 
-                        BossExamResultView(
-                            levelName = levelName,
-                            scorePercent = scorePercent,
-                            correctCount = correctAnswersCount,
-                            totalCount = questions.size,
-                            isPassed = isPassed,
-                            onRetry = {
-                                currentQuestionIndex = 0
-                                selectedOptionIndex = -1
-                                isAnswerSubmitted = false
-                                correctAnswersCount = 0
-                                isExamFinished = false
-                            },
-                            onClose = onDismiss,
-                            onPassAndUnlock = {
-                                onPassExam()
-                                onDismiss()
-                            }
-                        )
+                            BossExamResultView(
+                                levelName = levelName,
+                                scorePercent = scorePercent,
+                                correctCount = correctAnswersCount,
+                                totalCount = questions.size,
+                                isPassed = isPassed,
+                                onRetry = {
+                                    currentQuestionIndex = 0
+                                    selectedOptionIndex = -1
+                                    isAnswerSubmitted = false
+                                    correctAnswersCount = 0
+                                    isExamFinished = false
+                                },
+                                onClose = onDismiss,
+                                onPassAndUnlock = {
+                                    onPassExam()
+                                    onDismiss()
+                                }
+                            )
+                        }
                     }
                 }
             }
@@ -511,50 +494,61 @@ private fun BossExamHeader(
     totalCount: Int,
     onDismiss: () -> Unit
 ) {
-    Row(
+    Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+            .background(PixelColors.SurfaceDark)
+            .border(
+                width = 1.5.dp,
+                color = PixelColors.BorderDark,
+                shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
+            )
+            .padding(horizontal = 16.dp, vertical = 10.dp)
     ) {
         Row(
+            modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(text = "🏆", fontSize = 20.sp)
-            Column {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(text = "⚔️", fontSize = 22.sp)
+                Column {
+                    Text(
+                        text = "VƯỢT CẤP $levelName",
+                        fontFamily = PlusJakartaSans,
+                        fontSize = 14.5.sp,
+                        fontWeight = FontWeight.Black,
+                        color = PixelColors.TextLight
+                    )
+                    Text(
+                        text = "TIẾN TRÌNH: CÂU $currentIndex/$totalCount",
+                        fontFamily = PlusJakartaSans,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = PixelColors.ArcadeAmber
+                    )
+                }
+            }
+
+            Box(
+                modifier = Modifier
+                    .size(28.dp)
+                    .clip(RoundedCornerShape(6.dp))
+                    .background(Color.White.copy(alpha = 0.15f))
+                    .border(1.2.dp, PixelColors.BorderDark, RoundedCornerShape(6.dp))
+                    .bounceClick(onClick = onDismiss),
+                contentAlignment = Alignment.Center
+            ) {
                 Text(
-                    text = "Vượt Cấp $levelName",
-                    fontFamily = PlusJakartaSans,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = Color(0xFF0F172A)
-                )
-                Text(
-                    text = "Câu $currentIndex/$totalCount",
-                    fontFamily = PlusJakartaSans,
-                    fontSize = 11.5.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color(0xFF6366F1)
+                    text = "✕",
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Black,
+                    color = Color.White
                 )
             }
-        }
-
-        Box(
-            modifier = Modifier
-                .size(32.dp)
-                .clip(CircleShape)
-                .background(Color(0xFFF1F5F9))
-                .clickable(onClick = onDismiss),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_close),
-                contentDescription = "Đóng",
-                tint = Color(0xFF64748B),
-                modifier = Modifier.size(13.dp)
-            )
         }
     }
 }
@@ -582,39 +576,34 @@ private fun BossExamResultView(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 24.dp, vertical = 20.dp)
+                .padding(horizontal = 20.dp, vertical = 16.dp)
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Biểu tượng Cúp Vàng hoặc Huy hiệu cố gắng
+            // Biểu tượng pixel
             Box(
                 modifier = Modifier
-                    .size(96.dp)
-                    .clip(CircleShape)
-                    .background(
-                        if (isPassed) {
-                            Brush.radialGradient(listOf(Color(0xFFFEF08A), Color(0xFFFDE047)))
-                        } else {
-                            Brush.radialGradient(listOf(Color(0xFFF1F5F9), Color(0xFFE2E8F0)))
-                        }
-                    ),
+                    .size(88.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(if (isPassed) PixelColors.ArcadeAmber else PixelColors.SurfaceDark)
+                    .border(2.dp, PixelColors.BorderDark, RoundedCornerShape(16.dp)),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = if (isPassed) "🏆" else "💪",
+                    text = if (isPassed) "🏆" else "💀",
                     fontSize = 44.sp
                 )
             }
 
-            Spacer(modifier = Modifier.height(18.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = if (isPassed) "Chúc Mừng Vượt Cấp $levelName Thành Công!" else "Chưa Đạt Chuẩn Vượt Cấp $levelName",
+                text = if (isPassed) "★ VƯỢT CẤP $levelName THÀNH CÔNG! ★" else "CHƯA ĐẠT CHUẨN $levelName",
                 fontFamily = PlusJakartaSans,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = Color(0xFF0F172A),
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Black,
+                color = if (isPassed) PixelColors.ArcadeAmber else PixelColors.ArcadeRed,
                 textAlign = TextAlign.Center
             )
 
@@ -622,29 +611,31 @@ private fun BossExamResultView(
 
             Text(
                 text = if (isPassed)
-                    "Bạn đã xuất sắc vượt qua bài thi chuẩn hóa và sẵn sàng chinh phục các nấc thang cao hơn!"
+                    "Bạn đã xuất sắc đánh bại Boss đợt này và mở khóa chặng đường tiếp theo!"
                 else
-                    "Bạn cần đạt từ 80% trở lên (hiện đạt $scorePercent%). Hãy xem lại sổ tay hoặc ôn lại các bài học để thử sức lại nhé!",
+                    "Bạn cần đạt tối thiểu 80% để qua bài (hiện đạt $scorePercent%). Hãy ôn luyện lại sổ tay và thử sức lại nhé!",
                 fontFamily = PlusJakartaSans,
-                fontSize = 13.sp,
-                color = Color(0xFF64748B),
+                fontSize = 12.5.sp,
+                color = PixelColors.TextMuted,
                 textAlign = TextAlign.Center,
-                lineHeight = 19.sp
+                lineHeight = 18.sp
             )
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Khung thống kê điểm số
-            Surface(
-                shape = RoundedCornerShape(20.dp),
-                color = Color(0xFFF8FAFC),
-                border = BorderStroke(0.8.dp, Color(0xFFE2E8F0)),
-                modifier = Modifier.fillMaxWidth()
+            // Bảng điểm Pixel RPG
+            PixelCardBox(
+                modifier = Modifier.fillMaxWidth(),
+                backgroundColor = Color.White,
+                borderColor = PixelColors.BorderDark,
+                shadowColor = PixelColors.ShadowDark,
+                headerTitle = "BẢNG TỔNG KẾT THI",
+                headerColor = if (isPassed) PixelColors.ArcadeGreen else PixelColors.SurfaceDark
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 16.dp, horizontal = 12.dp),
+                        .padding(vertical = 12.dp, horizontal = 12.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -652,140 +643,106 @@ private fun BossExamResultView(
                         Text(
                             text = "$scorePercent%",
                             fontFamily = PlusJakartaSans,
-                            fontSize = 22.sp,
+                            fontSize = 20.sp,
                             fontWeight = FontWeight.Black,
-                            color = if (isPassed) Color(0xFF16A34A) else Color(0xFFEA580C)
+                            color = if (isPassed) PixelColors.ArcadeGreen else PixelColors.ArcadeRed
                         )
                         Text(
-                            text = "Độ chính xác",
+                            text = "ĐỘ CHUẨN",
                             fontFamily = PlusJakartaSans,
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = Color(0xFF64748B)
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = PixelColors.TextMuted
                         )
                     }
 
                     Box(
                         modifier = Modifier
-                            .width(1.dp)
-                            .height(32.dp)
-                            .background(Color(0xFFE2E8F0))
+                            .width(1.5.dp)
+                            .height(28.dp)
+                            .background(PixelColors.BorderDark)
                     )
 
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
                             text = "$correctCount/$totalCount",
                             fontFamily = PlusJakartaSans,
-                            fontSize = 22.sp,
+                            fontSize = 20.sp,
                             fontWeight = FontWeight.Black,
-                            color = Color(0xFF4F46E5)
+                            color = PixelColors.ArcadePurple
                         )
                         Text(
-                            text = "Câu đúng",
+                            text = "CÂU ĐÚNG",
                             fontFamily = PlusJakartaSans,
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = Color(0xFF64748B)
+                            fontSize = 10.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = PixelColors.TextMuted
                         )
                     }
 
                     if (isPassed) {
                         Box(
                             modifier = Modifier
-                                .width(1.dp)
-                                .height(32.dp)
-                                .background(Color(0xFFE2E8F0))
+                                .width(1.5.dp)
+                                .height(28.dp)
+                                .background(PixelColors.BorderDark)
                         )
 
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(
-                                text = "+200",
+                                text = "+200 ✨",
                                 fontFamily = PlusJakartaSans,
-                                fontSize = 22.sp,
+                                fontSize = 20.sp,
                                 fontWeight = FontWeight.Black,
-                                color = Color(0xFFD97706)
+                                color = PixelColors.ArcadeAmber
                             )
                             Text(
-                                text = "Tia Sáng Sparks",
+                                text = "SPARKS",
                                 fontFamily = PlusJakartaSans,
-                                fontSize = 11.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                color = Color(0xFF64748B)
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = PixelColors.TextMuted
                             )
                         }
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(28.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-            // Các nút hành động
+            // Nút hành động
             if (isPassed) {
-                Surface(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp)
-                        .clickable(onClick = onPassAndUnlock),
-                    shape = RoundedCornerShape(25.dp),
-                    color = Color(0xFF4F46E5),
-                    shadowElevation = 3.dp
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Text(
-                            text = "Nhận thưởng & Mở khóa cấp độ tiếp theo 🎉",
-                            fontFamily = PlusJakartaSans,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
-                    }
-                }
+                PixelArcadeButton(
+                    text = "🎁 NHẬN THƯỞNG & MỞ KHÓA NGAY",
+                    onClick = onPassAndUnlock,
+                    color = PixelColors.ArcadeAmber,
+                    height = 50.dp,
+                    fillMaxWidth = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
             } else {
-                Surface(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp)
-                        .clickable(onClick = onRetry),
-                    shape = RoundedCornerShape(25.dp),
-                    color = Color(0xFF4F46E5),
-                    shadowElevation = 3.dp
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Text(
-                            text = "Làm lại bài thi ngay 🔄",
-                            fontFamily = PlusJakartaSans,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
-                    }
-                }
+                PixelArcadeButton(
+                    text = "🔄 THỬ THÁCH LẠI NGAY",
+                    onClick = onRetry,
+                    color = PixelColors.ArcadePurple,
+                    height = 50.dp,
+                    fillMaxWidth = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                Surface(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp)
-                        .clickable(onClick = onClose),
-                    shape = RoundedCornerShape(24.dp),
-                    color = Color(0xFFF1F5F9),
-                    border = BorderStroke(0.6.dp, Color(0xFFE2E8F0))
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Text(
-                            text = "Ôn tập lại các bài học",
-                            fontFamily = PlusJakartaSans,
-                            fontSize = 13.5.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = Color(0xFF475569)
-                        )
-                    }
-                }
+                PixelArcadeButton(
+                    text = "ÔN TẬP LẠI BÀI HỌC",
+                    onClick = onClose,
+                    color = PixelColors.SurfaceDark,
+                    height = 44.dp,
+                    fillMaxWidth = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
         }
 
-        // Bắn pháo hoa rực rỡ khi vượt cấp thành công
         if (isPassed) {
             CelebrationEffect(
                 triggerKey = 2,

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -40,6 +41,17 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.luminalearn.R
 
+import com.example.luminalearn.presentation.vocabulary.component.PixelArcadeButton
+import com.example.luminalearn.presentation.vocabulary.component.PixelCardBox
+import com.example.luminalearn.presentation.vocabulary.component.PixelColors
+import com.example.luminalearn.presentation.vocabulary.component.PixelCornerStyle
+import com.example.luminalearn.presentation.vocabulary.component.PixelStepCornerShape
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.TextStyle
+
 data class ChatMessage(
     val id: String,
     val sender: String,
@@ -49,8 +61,6 @@ data class ChatMessage(
     val translation: String? = null,
     val feedback: String? = null
 )
-
-private val PrimaryIndigo = Color(0xFF4F46E5)
 
 @Composable
 fun RoleplayPracticeDialog(
@@ -77,94 +87,130 @@ fun RoleplayPracticeDialog(
         onDismissRequest = onDismiss,
         properties = DialogProperties(usePlatformDefaultWidth = false)
     ) {
-        Surface(
+        PixelCardBox(
             modifier = modifier
                 .fillMaxWidth(0.95f)
                 .height(640.dp),
-            shape = RoundedCornerShape(24.dp),
-            color = Color(0xFFF8FAFC)
+            backgroundColor = Color(0xFFF8FAFC),
+            headerTitle = "${scenario.iconEmoji} ${scenario.title.uppercase()}",
+            headerBadge = "LIVE DIALOGUE",
+            headerColor = PixelColors.PixelBlue,
+            cornerStyle = PixelCornerStyle.Rivets
         ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                DialogHeader(scenario = scenario, onClose = onDismiss)
-                Spacer(modifier = Modifier.height(12.dp))
-                MessageList(messages = messages, modifier = Modifier.weight(1f))
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(14.dp)
+            ) {
+                // Header phụ: Hiển thị phân vai & Nút Thoát
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "🤖 ${scenario.aiRole} × 🧑 ${scenario.userRole}",
+                        fontSize = 11.5.sp,
+                        fontWeight = FontWeight.Black,
+                        color = PixelColors.BorderDark
+                    )
+
+                    // Phím thoát pixel
+                    Box(
+                        modifier = Modifier
+                            .size(26.dp)
+                            .clip(PixelStepCornerShape(1.dp))
+                            .background(Color(0xFFEF4444))
+                            .border(BorderStroke(1.dp, PixelColors.BorderDark), PixelStepCornerShape(1.dp))
+                            .clickable(onClick = onDismiss),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "✕",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Black,
+                            color = Color.White
+                        )
+                    }
+                }
+
                 Spacer(modifier = Modifier.height(10.dp))
-                InputControls(
-                    inputText = inputText,
-                    onInputChange = { inputText = it },
-                    onSend = {
-                        if (inputText.isNotBlank()) {
-                            val userMsg = inputText.trim()
-                            messages.add(
-                                ChatMessage(
-                                    id = System.currentTimeMillis().toString(),
-                                    sender = scenario.userRole,
-                                    isAi = false,
-                                    text = userMsg
-                                )
-                            )
-                            inputText = ""
-                            messages.add(
-                                ChatMessage(
-                                    id = (System.currentTimeMillis() + 1).toString(),
-                                    sender = scenario.aiRole,
-                                    isAi = true,
-                                    text = "好的，没问题！糖度选半糖，去冰对吗？",
-                                    pinyin = "Hǎo de, méi wèntí! Tángdù xuǎn bàn táng, qù bīng duì ma?",
-                                    translation = "Dạ vâng được ạ! Mức đường nửa ngọt, không đá đúng không ạ?",
-                                    feedback = "✨ Lumina Native Polish: Câu nói tự nhiên, phát âm chuẩn ngữ điệu bản xứ!"
-                                )
+
+                // Danh sách tin nhắn thoại
+                MessageList(messages = messages, modifier = Modifier.weight(1f))
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                // Thanh nhập câu thoại & nút Gửi Arcade
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    val inputShape = PixelStepCornerShape(2.dp)
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(inputShape)
+                            .background(Color.White)
+                            .border(BorderStroke(1.2.dp, PixelColors.BorderDark), inputShape)
+                            .padding(horizontal = 10.dp, vertical = 9.dp),
+                        contentAlignment = Alignment.CenterStart
+                    ) {
+                        if (inputText.isEmpty()) {
+                            Text(
+                                text = "Nhập câu thoại tiếng Trung...",
+                                color = Color(0xFF94A3B8),
+                                fontSize = 12.sp
                             )
                         }
+
+                        BasicTextField(
+                            value = inputText,
+                            onValueChange = { inputText = it },
+                            textStyle = TextStyle(
+                                fontSize = 13.sp,
+                                color = PixelColors.BorderDark,
+                                fontWeight = FontWeight.Bold
+                            ),
+                            cursorBrush = SolidColor(PixelColors.PixelBlue),
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth()
+                        )
                     }
-                )
-            }
-        }
-    }
-}
 
-@Composable
-private fun DialogHeader(
-    scenario: RoleplayScenarioData,
-    onClose: () -> Unit
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(text = scenario.iconEmoji, fontSize = 24.sp)
-            Spacer(modifier = Modifier.width(8.dp))
-            Column {
-                Text(
-                    text = scenario.title,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF0F172A)
-                )
-                Text(
-                    text = "${scenario.aiRole} (AI) × ${scenario.userRole} (Bạn)",
-                    fontSize = 12.sp,
-                    color = Color(0xFF64748B)
-                )
-            }
-        }
+                    Spacer(modifier = Modifier.width(8.dp))
 
-        Box(
-            modifier = Modifier
-                .size(32.dp)
-                .clip(CircleShape)
-                .background(Color(0xFFE2E8F0))
-                .clickable(onClick = onClose),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_close),
-                contentDescription = "Đóng",
-                tint = Color(0xFF475569),
-                modifier = Modifier.size(16.dp)
-            )
+                    PixelArcadeButton(
+                        text = "GỬI ▶",
+                        color = PixelColors.PixelOrange,
+                        onClick = {
+                            if (inputText.isNotBlank()) {
+                                val userMsg = inputText.trim()
+                                messages.add(
+                                    ChatMessage(
+                                        id = System.currentTimeMillis().toString(),
+                                        sender = scenario.userRole,
+                                        isAi = false,
+                                        text = userMsg
+                                    )
+                                )
+                                inputText = ""
+                                messages.add(
+                                    ChatMessage(
+                                        id = (System.currentTimeMillis() + 1).toString(),
+                                        sender = scenario.aiRole,
+                                        isAi = true,
+                                        text = "好的，没问题！糖度选半糖，去冰对吗？",
+                                        pinyin = "Hǎo de, méi wèntí! Tángdù xuǎn bàn táng, qù bīng duì ma?",
+                                        translation = "Dạ vâng được ạ! Mức đường nửa ngọt, không đá đúng không ạ?",
+                                        feedback = "✨ Lumina Native Polish: Câu nói tự nhiên, ngữ điệu chuẩn bản xứ!"
+                                    )
+                                )
+                            }
+                        }
+                    )
+                }
+            }
         }
     }
 }
@@ -186,8 +232,7 @@ private fun MessageList(
 
 @Composable
 private fun ChatMessageBubble(message: ChatMessage) {
-    val bubbleColor = if (message.isAi) Color.White else PrimaryIndigo
-    val textColor = if (message.isAi) Color(0xFF1E293B) else Color.White
+    val bubbleShape = PixelStepCornerShape(2.dp)
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -195,87 +240,66 @@ private fun ChatMessageBubble(message: ChatMessage) {
     ) {
         Text(
             text = message.sender,
-            fontSize = 11.sp,
-            color = Color(0xFF94A3B8),
+            fontSize = 10.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF64748B),
             modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
         )
 
-        Surface(
-            shape = RoundedCornerShape(16.dp),
-            color = bubbleColor,
-            shadowElevation = 1.dp
+        Box(
+            modifier = Modifier
+                .clip(bubbleShape)
+                .background(if (message.isAi) Color.White else PixelColors.PixelBlue)
+                .border(
+                    BorderStroke(1.2.dp, PixelColors.BorderDark),
+                    bubbleShape
+                )
+                .padding(10.dp)
         ) {
-            Column(modifier = Modifier.padding(12.dp)) {
+            Column {
                 Text(
                     text = message.text,
                     fontSize = 14.5.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = textColor
+                    fontWeight = FontWeight.Black,
+                    color = if (message.isAi) PixelColors.BorderDark else Color.White
                 )
                 if (message.pinyin != null) {
                     Text(
                         text = message.pinyin,
-                        fontSize = 12.sp,
-                        color = Color(0xFF6366F1),
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF2563EB),
                         modifier = Modifier.padding(top = 2.dp)
                     )
                 }
                 if (message.translation != null) {
                     Text(
                         text = message.translation,
-                        fontSize = 12.sp,
-                        color = Color(0xFF64748B),
-                        modifier = Modifier.padding(top = 4.dp)
+                        fontSize = 11.sp,
+                        color = Color(0xFF475569),
+                        modifier = Modifier.padding(top = 3.dp)
                     )
                 }
             }
         }
 
         if (message.feedback != null) {
-            Surface(
-                shape = RoundedCornerShape(10.dp),
-                color = Color(0xFFEEF2FF),
-                modifier = Modifier.padding(top = 4.dp)
+            val fbShape = PixelStepCornerShape(1.5.dp)
+            Box(
+                modifier = Modifier
+                    .padding(top = 4.dp)
+                    .clip(fbShape)
+                    .background(Color(0xFFEDE9FE))
+                    .border(BorderStroke(1.dp, Color(0xFFC4B5FD)), fbShape)
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
             ) {
                 Text(
                     text = message.feedback,
-                    fontSize = 11.5.sp,
-                    color = Color(0xFF4338CA),
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                    fontSize = 10.5.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color(0xFF5B21B6)
                 )
             }
-        }
-    }
-}
-
-@Composable
-private fun InputControls(
-    inputText: String,
-    onInputChange: (String) -> Unit,
-    onSend: () -> Unit
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        OutlinedTextField(
-            value = inputText,
-            onValueChange = onInputChange,
-            placeholder = { Text("Nhập câu thoại tiếng Trung...", fontSize = 13.sp) },
-            shape = RoundedCornerShape(24.dp),
-            modifier = Modifier.weight(1f),
-            singleLine = true
-        )
-
-        Spacer(modifier = Modifier.width(8.dp))
-
-        Button(
-            onClick = onSend,
-            shape = CircleShape,
-            colors = ButtonDefaults.buttonColors(containerColor = PrimaryIndigo),
-            modifier = Modifier.size(48.dp)
-        ) {
-            Text("→", fontSize = 16.sp, fontWeight = FontWeight.Bold)
         }
     }
 }

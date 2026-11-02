@@ -42,11 +42,14 @@ fun TonePitchErrorCard(
     onRetry: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        color = Color(0xFFFEF2F2),
-        border = BorderStroke(1.dp, Color(0xFFFCA5A5))
+    PixelCardBox(
+        backgroundColor = Color(0xFFFEF2F2),
+        borderColor = PixelColors.BorderDark,
+        shadowColor = PixelColors.ShadowDark,
+        borderWidth = 1.5.dp,
+        shadowOffset = 3.dp,
+        cornerRadius = 6.dp,
+        modifier = modifier
     ) {
         Row(
             modifier = Modifier
@@ -60,21 +63,27 @@ fun TonePitchErrorCard(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.weight(1f)
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(36.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFFFEE2E2)),
-                    contentAlignment = Alignment.Center
+                PixelCardBox(
+                    backgroundColor = Color(0xFFFEE2E2),
+                    borderColor = PixelColors.BorderDark,
+                    shadowColor = PixelColors.ShadowDark,
+                    borderWidth = 1.2.dp,
+                    shadowOffset = 1.5.dp,
+                    cornerRadius = 4.dp
                 ) {
-                    Text(text = "⚠️", fontSize = 16.sp)
+                    Box(
+                        modifier = Modifier.size(34.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(text = "⚠️", fontSize = 16.sp)
+                    }
                 }
                 Column {
                     Text(
                         text = "Chưa nhận diện được giọng nói",
                         fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF991B1B)
+                        fontWeight = FontWeight.Black,
+                        color = PixelColors.BorderDark
                     )
                     Text(
                         text = errorMessage,
@@ -84,19 +93,20 @@ fun TonePitchErrorCard(
                     )
                 }
             }
-            Surface(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(8.dp))
-                    .clickable(onClick = onRetry),
-                shape = RoundedCornerShape(8.dp),
-                color = Color.White,
-                border = BorderStroke(1.dp, Color(0xFFFCA5A5))
+            PixelCardBox(
+                backgroundColor = Color.White,
+                borderColor = PixelColors.BorderDark,
+                shadowColor = PixelColors.ShadowDark,
+                borderWidth = 1.2.dp,
+                shadowOffset = 2.dp,
+                cornerRadius = 4.dp,
+                onClick = onRetry
             ) {
                 Text(
                     text = "Thử lại ↺",
                     fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF991B1B),
+                    fontWeight = FontWeight.Black,
+                    color = PixelColors.BorderDark,
                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp)
                 )
             }
@@ -186,11 +196,14 @@ fun TonePitchScoreCard(
     val score = speechSuccess.score
     val style = getScoreStyle(score)
 
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        color = Color.White,
-        border = BorderStroke(1.dp, VocabColors.BorderLight)
+    PixelCardBox(
+        backgroundColor = Color.White,
+        borderColor = PixelColors.BorderDark,
+        shadowColor = PixelColors.ShadowDark,
+        borderWidth = 1.5.dp,
+        shadowOffset = 3.dp,
+        cornerRadius = 6.dp,
+        modifier = modifier
     ) {
         Column(
             modifier = Modifier
@@ -234,19 +247,25 @@ private fun ScoreHeader(
             horizontalArrangement = Arrangement.spacedBy(10.dp),
             modifier = Modifier.weight(1f)
         ) {
-            Box(
-                modifier = Modifier
-                    .size(42.dp)
-                    .clip(CircleShape)
-                    .background(style.scoreColor),
-                contentAlignment = Alignment.Center
+            PixelCardBox(
+                backgroundColor = style.scoreColor,
+                borderColor = PixelColors.BorderDark,
+                shadowColor = PixelColors.ShadowDark,
+                borderWidth = 1.5.dp,
+                shadowOffset = 2.dp,
+                cornerRadius = 4.dp
             ) {
-                Text(
-                    text = "$score",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = Color.White
-                )
+                Box(
+                    modifier = Modifier.size(38.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "$score",
+                        fontSize = 17.sp,
+                        fontWeight = FontWeight.Black,
+                        color = Color.White
+                    )
+                }
             }
 
             Column(
@@ -256,8 +275,8 @@ private fun ScoreHeader(
                 Text(
                     text = "Tương đồng cao độ",
                     fontSize = 13.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = VocabColors.TextDark,
+                    fontWeight = FontWeight.Black,
+                    color = PixelColors.BorderDark,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -266,11 +285,13 @@ private fun ScoreHeader(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(6.dp))
-                            .background(style.badgeBgColor)
-                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                    PixelCardBox(
+                        backgroundColor = style.badgeBgColor,
+                        borderColor = PixelColors.BorderDark,
+                        shadowColor = PixelColors.ShadowDark,
+                        borderWidth = 1.dp,
+                        shadowOffset = 1.dp,
+                        cornerRadius = 3.dp
                     ) {
                         Text(
                             text = style.badgeText,
@@ -278,14 +299,16 @@ private fun ScoreHeader(
                             fontWeight = FontWeight.Bold,
                             color = style.badgeTextColor,
                             maxLines = 1,
-                            softWrap = false
+                            softWrap = false,
+                            modifier = Modifier.padding(horizontal = 5.dp, vertical = 2.dp)
                         )
                     }
 
                     Text(
                         text = "• Khớp: $score%",
                         fontSize = 11.sp,
-                        color = VocabColors.TextMuted,
+                        fontWeight = FontWeight.Bold,
+                        color = PixelColors.BorderDark.copy(alpha = 0.7f),
                         maxLines = 1,
                         softWrap = false
                     )
@@ -293,19 +316,20 @@ private fun ScoreHeader(
             }
         }
 
-        Surface(
-            modifier = Modifier
-                .clip(RoundedCornerShape(8.dp))
-                .clickable(onClick = onRetry),
-            shape = RoundedCornerShape(8.dp),
-            color = Color.White,
-            border = BorderStroke(1.dp, Color(0xFFCBD5E1))
+        PixelCardBox(
+            backgroundColor = Color.White,
+            borderColor = PixelColors.BorderDark,
+            shadowColor = PixelColors.ShadowDark,
+            borderWidth = 1.2.dp,
+            shadowOffset = 2.dp,
+            cornerRadius = 4.dp,
+            onClick = onRetry
         ) {
             Text(
                 text = "Thử lại ↺",
                 fontSize = 11.sp,
-                fontWeight = FontWeight.Bold,
-                color = VocabColors.TextDark,
+                fontWeight = FontWeight.Black,
+                color = PixelColors.BorderDark,
                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
                 maxLines = 1
             )
@@ -323,11 +347,14 @@ private fun FeedbackBox(
 ) {
     val iconRes = if (score >= 80) R.drawable.ic_sparkle else R.drawable.ic_mic
 
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(10.dp),
-        color = style.feedbackBgColor,
-        border = BorderStroke(1.dp, style.feedbackBorderColor)
+    PixelCardBox(
+        backgroundColor = style.feedbackBgColor,
+        borderColor = PixelColors.BorderDark,
+        shadowColor = PixelColors.ShadowDark,
+        borderWidth = 1.2.dp,
+        shadowOffset = 2.dp,
+        cornerRadius = 4.dp,
+        modifier = Modifier.fillMaxWidth()
     ) {
         Row(
             modifier = Modifier.padding(10.dp),
@@ -351,7 +378,7 @@ private fun FeedbackBox(
                 Text(
                     text = feedback,
                     fontSize = 11.sp,
-                    color = VocabColors.TextDark,
+                    color = PixelColors.BorderDark,
                     lineHeight = 15.sp
                 )
             }
@@ -370,7 +397,7 @@ private fun SpokenFeedbackText(
             append("Bạn đã đọc: ")
             withStyle(
                 SpanStyle(
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.Black,
                     color = if (score >= 80) Color(0xFF16A34A) else Color(0xFFDC2626)
                 )
             ) {
@@ -381,7 +408,7 @@ private fun SpokenFeedbackText(
             }
         },
         fontSize = 11.5.sp,
-        color = VocabColors.TextDark
+        color = PixelColors.BorderDark
     )
 }
 
@@ -411,11 +438,14 @@ private fun SyllableCard(
     sylInfo: SyllableScoreInfo,
     modifier: Modifier = Modifier
 ) {
-    Surface(
-        modifier = modifier,
-        shape = RoundedCornerShape(10.dp),
-        color = Color(0xFFF8FAFC),
-        border = BorderStroke(1.dp, Color(0xFFE2E8F0))
+    PixelCardBox(
+        backgroundColor = Color(0xFFF8FAFC),
+        borderColor = PixelColors.BorderDark,
+        shadowColor = PixelColors.ShadowDark,
+        borderWidth = 1.2.dp,
+        shadowOffset = 1.5.dp,
+        cornerRadius = 4.dp,
+        modifier = modifier
     ) {
         Column(
             modifier = Modifier.padding(8.dp),
@@ -429,28 +459,31 @@ private fun SyllableCard(
                 Text(
                     text = "${syl.hanzi} ${syl.pinyin}",
                     fontSize = 11.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = VocabColors.TextDark,
+                    fontWeight = FontWeight.Black,
+                    color = PixelColors.BorderDark,
                     maxLines = 1
                 )
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(4.dp))
-                        .background(sylInfo.badgeBg)
-                        .padding(horizontal = 4.dp, vertical = 1.dp)
+                PixelCardBox(
+                    backgroundColor = sylInfo.badgeBg,
+                    borderColor = PixelColors.BorderDark,
+                    shadowColor = PixelColors.ShadowDark,
+                    borderWidth = 1.dp,
+                    shadowOffset = 1.dp,
+                    cornerRadius = 3.dp
                 ) {
                     Text(
                         text = "${sylInfo.score}%",
                         fontSize = 9.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = sylInfo.badgeColor
+                        fontWeight = FontWeight.Black,
+                        color = sylInfo.badgeColor,
+                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
                     )
                 }
             }
             Text(
                 text = sylInfo.comment,
                 fontSize = 9.5.sp,
-                color = VocabColors.TextMuted,
+                color = PixelColors.BorderDark.copy(alpha = 0.7f),
                 maxLines = 1
             )
         }

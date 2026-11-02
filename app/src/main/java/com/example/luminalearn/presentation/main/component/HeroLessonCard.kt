@@ -2,12 +2,14 @@ package com.example.luminalearn.presentation.main.component
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -33,9 +35,20 @@ import com.example.luminalearn.R
 import com.example.luminalearn.core.ui.effect.bounceClick
 import com.example.luminalearn.data.model.LessonDto
 
+import com.example.luminalearn.presentation.vocabulary.component.PixelArcadeButton
+import com.example.luminalearn.presentation.vocabulary.component.PixelBadge
+import com.example.luminalearn.presentation.vocabulary.component.PixelCardBox
+import com.example.luminalearn.presentation.vocabulary.component.PixelColors
+import com.example.luminalearn.presentation.vocabulary.component.PixelCornerStyle
+import com.example.luminalearn.presentation.vocabulary.component.PixelStepCornerShape
+import com.example.luminalearn.ui.theme.PlusJakartaSans
+
 /**
- * Thẻ Hero Bài Học HSK Trọng Tâm trên cùng.
- * Thiết kế Midnight Indigo sang trọng với tiến độ học neon và nút học tiếp nổi bật.
+ * Thẻ Hero Bài Học HSK Trọng Tâm phong cách Pixel Art 8-bit Main Quest:
+ * - Khung PixelCardBox màu Xanh Cyber Cyan viền đen 2dp, bóng cứng 3D 4dp.
+ * - Badge [ ★ MAIN QUEST ] và nút [ ALL MAPS ▶ ].
+ * - Thanh đo tiến độ bài học phân đoạn pixel.
+ * - Phím bấm Arcade dập nổi [ RESUME ▶ ].
  */
 @Composable
 fun HeroLessonCard(
@@ -45,139 +58,112 @@ fun HeroLessonCard(
     modifier: Modifier = Modifier
 ) {
     val lessonId = lesson?.id ?: "1"
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .bounceClick(scaleDown = 0.98f) { onStartLessonClick(lessonId) },
-        shape = RoundedCornerShape(22.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-        border = BorderStroke(
-            1.2.dp,
-            Brush.linearGradient(
-                listOf(Color(0xFF00F2FE).copy(alpha = 0.6f), Color(0xFF6366F1).copy(alpha = 0.3f))
-            )
-        )
+
+    PixelCardBox(
+        modifier = modifier.fillMaxWidth(),
+        backgroundColor = Color(0xFF0284C7), // Xanh Cyber Cyan đậm đà
+        headerTitle = "⚔️ MAIN QUEST CARTRIDGE",
+        headerBadge = "👑 HSK 1",
+        headerColor = PixelColors.PixelYellow,
+        borderColor = PixelColors.BorderDark,
+        shadowColor = PixelColors.ShadowDark,
+        borderWidth = 2.dp,
+        shadowOffset = 4.dp,
+        showGrille = true,
+        cornerStyle = PixelCornerStyle.Rivets,
+        onClick = { onStartLessonClick(lessonId) }
     ) {
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(
-                    Brush.linearGradient(
-                        listOf(Color(0xFF0F1532), Color(0xFF161E48), Color(0xFF10132B))
-                    )
-                )
-                .padding(16.dp)
+                .padding(14.dp)
         ) {
-            Column {
+            // Hàng 1: Coin loot + EXP Badge + Nút xem tất cả bài học
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
-                    // Badge trạng thái
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .background(Color(0xFF00F2FE).copy(alpha = 0.15f), RoundedCornerShape(8.dp))
-                            .padding(horizontal = 8.dp, vertical = 4.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(6.dp)
-                                .background(Color(0xFF00F2FE), CircleShape)
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = stringResource(R.string.bento_hero_badge),
-                            color = Color(0xFF00F2FE),
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-
-                    // Nút xem tất cả
-                    Text(
-                        text = stringResource(R.string.bento_hero_all_lessons),
-                        color = Color(0xFF94A3B8),
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Medium,
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(6.dp))
-                            .clickable { onViewAllLessonsClick() }
-                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                    com.example.luminalearn.presentation.vocabulary.component.PixelCoinBadge(amount = 50)
+                    PixelBadge(
+                        text = "⭐ +100 EXP",
+                        backgroundColor = Color(0xFFFEF08A),
+                        textColor = PixelColors.BorderDark
                     )
                 }
 
-                Spacer(modifier = Modifier.height(10.dp))
+                val mapsShape = PixelStepCornerShape(1.8.dp)
+                Box(
+                    modifier = Modifier
+                        .clip(mapsShape)
+                        .background(Color.White)
+                        .border(BorderStroke(1.2.dp, PixelColors.BorderDark), mapsShape)
+                        .bounceClick(scaleDown = 0.92f) { onViewAllLessonsClick() }
+                        .padding(horizontal = 7.dp, vertical = 2.dp)
+                ) {
+                    Text(
+                        text = "ALL MAPS 🗺️",
+                        fontFamily = PlusJakartaSans,
+                        fontSize = 9.sp,
+                        fontWeight = FontWeight.Black,
+                        color = PixelColors.BorderDark
+                    )
+                }
+            }
 
+            Spacer(modifier = Modifier.height(10.dp))
+
+            // Tiêu đề bài học kèm icon cuộn thư 📜
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = "📜 ",
+                    fontSize = 15.sp
+                )
                 Text(
                     text = lesson?.title?.ifBlank { null } ?: stringResource(R.string.bento_hero_title),
+                    fontFamily = PlusJakartaSans,
                     color = Color.White,
-                    fontSize = 17.sp,
-                    fontWeight = FontWeight.Bold,
+                    fontSize = 16.5.sp,
+                    fontWeight = FontWeight.Black,
+                    letterSpacing = 0.2.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
+            }
 
-                Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
-                // Thanh tiến độ bài học
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = stringResource(R.string.bento_hero_progress),
-                            color = Color(0xFFCBD5E1),
-                            fontSize = 12.sp
-                        )
-                        Spacer(modifier = Modifier.height(6.dp))
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(6.dp)
-                                .clip(RoundedCornerShape(3.dp))
-                                .background(Color(0xFF1E293B))
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth(0.65f)
-                                    .height(6.dp)
-                                    .background(
-                                        Brush.horizontalGradient(
-                                            listOf(Color(0xFF00F2FE), Color(0xFF8B5CF6))
-                                        )
-                                    )
-                            )
-                        }
-                    }
+            // Hàng 3: RPG Progress Bar + Nút Resume dập nổi
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                com.example.luminalearn.presentation.vocabulary.component.PixelRpgProgressBar(
+                    label = "⚡ EXP 65%",
+                    progress = 0.65f,
+                    barColor = PixelColors.PixelYellow,
+                    labelColor = PixelColors.PixelYellow,
+                    emptyColor = Color(0xFF0369A1),
+                    modifier = Modifier.weight(1f)
+                )
 
-                    Spacer(modifier = Modifier.width(16.dp))
+                Spacer(modifier = Modifier.width(12.dp))
 
-                    // Nút tiếp tục nổi bật
-                    Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(
-                                Brush.horizontalGradient(
-                                    listOf(Color(0xFF6366F1), Color(0xFF8B5CF6))
-                                )
-                            )
-                            .padding(horizontal = 14.dp, vertical = 9.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = stringResource(R.string.bento_hero_btn_resume),
-                            color = Color.White,
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    }
-                }
+                // Nút tiếp tục Arcade
+                PixelArcadeButton(
+                    text = "RESUME ▶",
+                    onClick = { onStartLessonClick(lessonId) },
+                    backgroundColor = PixelColors.PixelYellow,
+                    textColor = PixelColors.BorderDark,
+                    fontSize = 11.5f,
+                    contentPadding = 6.dp,
+                    shadowOffset = 2.5.dp
+                )
             }
         }
     }

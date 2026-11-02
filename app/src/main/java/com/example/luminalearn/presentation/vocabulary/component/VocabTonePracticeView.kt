@@ -37,11 +37,13 @@ fun VocabTonePracticeView(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         // ── 1. Header Card ──
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
-            color = Color.White,
-            border = androidx.compose.foundation.BorderStroke(1.dp, VocabColors.BorderLight)
+        PixelCardBox(
+            backgroundColor = Color.White,
+            borderColor = PixelColors.BorderDark,
+            shadowColor = PixelColors.ShadowDark,
+            borderWidth = 1.5.dp,
+            shadowOffset = 3.dp,
+            cornerRadius = 6.dp
         ) {
             Row(
                 modifier = Modifier
@@ -50,32 +52,38 @@ fun VocabTonePracticeView(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(38.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFFFEF3C7)),
-                    contentAlignment = Alignment.Center
+                PixelCardBox(
+                    backgroundColor = Color(0xFFFEF3C7),
+                    borderColor = PixelColors.BorderDark,
+                    shadowColor = PixelColors.ShadowDark,
+                    borderWidth = 1.2.dp,
+                    shadowOffset = 1.5.dp,
+                    cornerRadius = 4.dp
                 ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_speaker),
-                        contentDescription = null,
-                        tint = Color(0xFFD97706),
-                        modifier = Modifier.size(18.dp)
-                    )
+                    Box(
+                        modifier = Modifier.size(34.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_speaker),
+                            contentDescription = null,
+                            tint = Color(0xFFD97706),
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
                 }
 
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = "Luyện thanh điệu từng chữ",
-                        fontSize = 13.5.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = VocabColors.TextDark
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Black,
+                        color = PixelColors.BorderDark
                     )
                     Text(
                         text = "Luyện tai nghe và kiểm soát cao độ theo chuẩn Chao",
-                        fontSize = 11.sp,
-                        color = VocabColors.TextMuted,
+                        fontSize = 10.5.sp,
+                        color = PixelColors.BorderDark.copy(alpha = 0.7f),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -106,11 +114,13 @@ fun VocabTonePracticeView(
 
 @Composable
 private fun ToneSandhiRuleCard(word: VocabWordItem) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        color = Color(0xFFFFFBEB),
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFFDE68A))
+    PixelCardBox(
+        backgroundColor = Color(0xFFFFFBEB),
+        borderColor = PixelColors.BorderDark,
+        shadowColor = PixelColors.ShadowDark,
+        borderWidth = 1.5.dp,
+        shadowOffset = 3.dp,
+        cornerRadius = 6.dp
     ) {
         Column(
             modifier = Modifier
@@ -126,14 +136,14 @@ private fun ToneSandhiRuleCard(word: VocabWordItem) {
                 Text(
                     text = "Quy tắc biến điệu thanh 3 (3 + 3 → 2 + 3)",
                     fontSize = 12.5.sp,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.Black,
                     color = Color(0xFFB45309)
                 )
             }
 
             Text(
                 text = "Khi hai âm tiết thanh 3 đi liền nhau như trong \"${word.hanzi}\", âm tiết đầu tiên sẽ tự động biến thành thanh 2 (đọc vút lên cao) để câu nói mượt mà hơn.",
-                fontSize = 11.5.sp,
+                fontSize = 11.sp,
                 color = Color(0xFF78350F),
                 lineHeight = 16.sp
             )
@@ -143,31 +153,37 @@ private fun ToneSandhiRuleCard(word: VocabWordItem) {
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Box(
-                    modifier = Modifier
-                        .background(Color.White, RoundedCornerShape(6.dp))
-                        .border(1.dp, Color(0xFFFCD34D), RoundedCornerShape(6.dp))
-                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                PixelCardBox(
+                    backgroundColor = Color.White,
+                    borderColor = PixelColors.BorderDark,
+                    shadowColor = PixelColors.ShadowDark,
+                    borderWidth = 1.dp,
+                    shadowOffset = 1.dp,
+                    cornerRadius = 3.dp
                 ) {
                     Text(
                         text = "Viết: ${word.pinyin}",
                         fontSize = 11.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = Color(0xFF92400E)
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF92400E),
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
                     )
                 }
-                Text(text = "→", fontSize = 12.sp, color = Color(0xFFB45309), fontWeight = FontWeight.Bold)
-                Box(
-                    modifier = Modifier
-                        .background(Color(0xFFDCFCE7), RoundedCornerShape(6.dp))
-                        .border(1.dp, Color(0xFF86EFAC), RoundedCornerShape(6.dp))
-                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                Text(text = "→", fontSize = 12.sp, color = PixelColors.BorderDark, fontWeight = FontWeight.Black)
+                PixelCardBox(
+                    backgroundColor = Color(0xFFDCFCE7),
+                    borderColor = PixelColors.BorderDark,
+                    shadowColor = PixelColors.ShadowDark,
+                    borderWidth = 1.dp,
+                    shadowOffset = 1.dp,
+                    cornerRadius = 3.dp
                 ) {
                     Text(
                         text = "Đọc: Thanh 2 + Thanh 3",
                         fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF166534)
+                        fontWeight = FontWeight.Black,
+                        color = Color(0xFF166534),
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
                     )
                 }
             }
@@ -190,11 +206,13 @@ private fun SyllableToneCard(
         else -> Color(0xFF64748B)
     }
 
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        color = Color.White,
-        border = androidx.compose.foundation.BorderStroke(1.dp, VocabColors.BorderLight)
+    PixelCardBox(
+        backgroundColor = Color.White,
+        borderColor = PixelColors.BorderDark,
+        shadowColor = PixelColors.ShadowDark,
+        borderWidth = 1.5.dp,
+        shadowOffset = 3.dp,
+        cornerRadius = 6.dp
     ) {
         Column(
             modifier = Modifier
@@ -211,19 +229,25 @@ private fun SyllableToneCard(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .size(44.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(toneColor.copy(alpha = 0.1f)),
-                        contentAlignment = Alignment.Center
+                    PixelCardBox(
+                        backgroundColor = toneColor.copy(alpha = 0.12f),
+                        borderColor = PixelColors.BorderDark,
+                        shadowColor = PixelColors.ShadowDark,
+                        borderWidth = 1.2.dp,
+                        shadowOffset = 1.5.dp,
+                        cornerRadius = 4.dp
                     ) {
-                        Text(
-                            text = syllable.hanzi,
-                            fontSize = 22.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = toneColor
-                        )
+                        Box(
+                            modifier = Modifier.size(40.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = syllable.hanzi,
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Black,
+                                color = toneColor
+                            )
+                        }
                     }
 
                     Column {
@@ -231,28 +255,32 @@ private fun SyllableToneCard(
                             Text(
                                 text = syllable.pinyin,
                                 fontSize = 15.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = VocabColors.TextDark
+                                fontWeight = FontWeight.Black,
+                                color = PixelColors.BorderDark
                             )
                             Spacer(modifier = Modifier.width(6.dp))
-                            Box(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(6.dp))
-                                    .background(toneColor.copy(alpha = 0.12f))
-                                    .padding(horizontal = 6.dp, vertical = 2.dp)
+                            PixelCardBox(
+                                backgroundColor = toneColor.copy(alpha = 0.15f),
+                                borderColor = PixelColors.BorderDark,
+                                shadowColor = PixelColors.ShadowDark,
+                                borderWidth = 1.dp,
+                                shadowOffset = 1.dp,
+                                cornerRadius = 3.dp
                             ) {
                                 Text(
                                     text = "${syllable.toneName} (${syllable.toneCode})",
                                     fontSize = 9.5.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = toneColor
+                                    fontWeight = FontWeight.Black,
+                                    color = toneColor,
+                                    modifier = Modifier.padding(horizontal = 5.dp, vertical = 2.dp)
                                 )
                             }
                         }
                         Text(
                             text = "Âm tiết $index • Cao độ Chao: ${syllable.toneCode}",
-                            fontSize = 11.sp,
-                            color = VocabColors.TextMuted
+                            fontSize = 10.5.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = PixelColors.BorderDark.copy(alpha = 0.6f)
                         )
                     }
                 }
@@ -263,55 +291,61 @@ private fun SyllableToneCard(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Surface(
-                    modifier = Modifier
-                        .weight(1f)
-                        .clip(RoundedCornerShape(8.dp))
-                        .clickable(onClick = onPlayNormal),
-                    shape = RoundedCornerShape(8.dp),
-                    color = VocabColors.BrandLight,
-                    border = androidx.compose.foundation.BorderStroke(1.dp, VocabColors.BrandPrimary.copy(alpha = 0.25f))
+                PixelCardBox(
+                    backgroundColor = PixelColors.PixelGreen.copy(alpha = 0.15f),
+                    borderColor = PixelColors.BorderDark,
+                    shadowColor = PixelColors.ShadowDark,
+                    borderWidth = 1.2.dp,
+                    shadowOffset = 2.dp,
+                    cornerRadius = 4.dp,
+                    onClick = onPlayNormal,
+                    modifier = Modifier.weight(1f)
                 ) {
                     Row(
-                        modifier = Modifier.padding(vertical = 7.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 7.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_speaker),
                             contentDescription = null,
-                            tint = VocabColors.BrandPrimary,
+                            tint = PixelColors.BorderDark,
                             modifier = Modifier.size(13.dp)
                         )
                         Spacer(modifier = Modifier.width(5.dp))
                         Text(
                             text = "Nghe âm (1.0x)",
                             fontSize = 11.5.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = VocabColors.BrandPrimary
+                            fontWeight = FontWeight.Black,
+                            color = PixelColors.BorderDark
                         )
                     }
                 }
 
-                Surface(
-                    modifier = Modifier
-                        .weight(1f)
-                        .clip(RoundedCornerShape(8.dp))
-                        .clickable(onClick = onPlaySlow),
-                    shape = RoundedCornerShape(8.dp),
-                    color = Color(0xFFF1F5F9),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFE2E8F0))
+                PixelCardBox(
+                    backgroundColor = PixelColors.PixelYellow.copy(alpha = 0.25f),
+                    borderColor = PixelColors.BorderDark,
+                    shadowColor = PixelColors.ShadowDark,
+                    borderWidth = 1.2.dp,
+                    shadowOffset = 2.dp,
+                    cornerRadius = 4.dp,
+                    onClick = onPlaySlow,
+                    modifier = Modifier.weight(1f)
                 ) {
                     Row(
-                        modifier = Modifier.padding(vertical = 7.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 7.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            text = "🐢 Nghe chậm (0.65x)",
+                            text = "🐢 Chậm (0.65x)",
                             fontSize = 11.5.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = Color(0xFF475569)
+                            fontWeight = FontWeight.Bold,
+                            color = PixelColors.BorderDark
                         )
                     }
                 }
@@ -322,11 +356,13 @@ private fun SyllableToneCard(
 
 @Composable
 private fun ChaoScaleReferenceCard() {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        color = Color.White,
-        border = androidx.compose.foundation.BorderStroke(1.dp, VocabColors.BorderLight)
+    PixelCardBox(
+        backgroundColor = Color.White,
+        borderColor = PixelColors.BorderDark,
+        shadowColor = PixelColors.ShadowDark,
+        borderWidth = 1.5.dp,
+        shadowOffset = 3.dp,
+        cornerRadius = 6.dp
     ) {
         Column(
             modifier = Modifier
@@ -337,8 +373,8 @@ private fun ChaoScaleReferenceCard() {
             Text(
                 text = "📊 Thang ngũ độ Chao (Mốc 1 – 5)",
                 fontSize = 13.sp,
-                fontWeight = FontWeight.Bold,
-                color = VocabColors.TextDark
+                fontWeight = FontWeight.Black,
+                color = PixelColors.BorderDark
             )
 
             val tones = listOf(
@@ -354,8 +390,8 @@ private fun ChaoScaleReferenceCard() {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(text = name, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = Color(0xFF334155))
-                    Text(text = desc, fontSize = 11.sp, color = VocabColors.TextMuted)
+                    Text(text = name, fontSize = 11.sp, fontWeight = FontWeight.Bold, color = PixelColors.BorderDark)
+                    Text(text = desc, fontSize = 11.sp, fontWeight = FontWeight.Medium, color = PixelColors.BorderDark.copy(alpha = 0.7f))
                 }
             }
         }

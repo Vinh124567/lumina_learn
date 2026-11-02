@@ -1,9 +1,8 @@
 package com.example.luminalearn.presentation.spark_ai_lab.component
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,33 +10,22 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.luminalearn.R
-import com.example.luminalearn.core.ui.component.DuoButton
-import com.example.luminalearn.core.ui.effect.CosmicStarfield
-import com.example.luminalearn.core.ui.effect.bounceClick
+import com.example.luminalearn.presentation.vocabulary.component.PixelArcadeButton
+import com.example.luminalearn.presentation.vocabulary.component.PixelBadge
+import com.example.luminalearn.presentation.vocabulary.component.PixelCardBox
+import com.example.luminalearn.presentation.vocabulary.component.PixelColors
+import com.example.luminalearn.presentation.vocabulary.component.PixelStepCornerShape
 
 data class RoleplayScenarioData(
     val id: String,
@@ -104,214 +92,188 @@ val DEFAULT_SCENARIOS = listOf(
     )
 )
 
-private val CardBorderColor = Color(0xFFE2E8F0)
-private val PrimaryIndigo = Color(0xFF4F46E5)
-
 @Composable
 fun RoleplayScenarioCard(
     scenario: RoleplayScenarioData,
     onStartClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(
+    val headerColor = when (scenario.levelCategory) {
+        "hsk12" -> PixelColors.PixelGreen
+        "hsk23" -> PixelColors.PixelBlue
+        else -> PixelColors.PixelOrange
+    }
+
+    PixelCardBox(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = BorderStroke(0.5.dp, Color(0xFFDDE3EC)),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        backgroundColor = Color(0xFFFFFBEB), // Kem phiêu lưu RPG ấm áp
+        headerTitle = "${scenario.iconEmoji} ${scenario.title.uppercase()}",
+        headerBadge = scenario.levelLabel,
+        headerColor = headerColor
     ) {
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(
-                    Brush.linearGradient(
-                        colors = listOf(
-                            Color.White,
-                            Color.White,
-                            Color(0xFFFAF9FF)
-                        )
-                    )
-                )
+                .padding(horizontal = 14.dp, vertical = 12.dp)
         ) {
-            Canvas(modifier = Modifier.matchParentSize()) {
-                drawCircle(
-                    brush = Brush.radialGradient(
-                        colors = listOf(Color(0xFF5C50F6).copy(alpha = 0.045f), Color.Transparent),
-                        center = Offset(size.width, 0f),
-                        radius = size.width * 0.55f
-                    )
-                )
-            }
-
-            CosmicStarfield(
-                modifier = Modifier.matchParentSize(),
-                particleCount = 28,
-                focusCenterXRatio = 0.88f,
-                focusCenterYRatio = 0.35f
-            )
-
-            Text(
-                text = scenario.iconEmoji,
-                fontSize = 70.sp,
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .offset(x = 8.dp, y = 10.dp)
-                    .alpha(0.11f)
-            )
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
+            // 1. Tiêu đề Hán tự & Phiên âm Pinyin lớn, sắc nét
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                ScenarioHeader(scenario = scenario)
-                Spacer(modifier = Modifier.height(10.dp))
-                ScenarioContent(scenario = scenario)
-                Spacer(modifier = Modifier.height(14.dp))
-                ScenarioFooter(scenario = scenario, onStartClick = onStartClick)
-            }
-        }
-    }
-}
-
-@Composable
-private fun ScenarioHeader(scenario: RoleplayScenarioData) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(
-                modifier = Modifier
-                    .size(42.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(Color(0xFFF1F5F9)),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(text = scenario.iconEmoji, fontSize = 20.sp)
-            }
-
-            Spacer(modifier = Modifier.width(12.dp))
-
-            Column {
-                Text(
-                    text = scenario.title,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF1E293B)
-                )
                 Text(
                     text = scenario.pinyinTitle,
-                    fontSize = 12.sp,
-                    color = Color(0xFF64748B)
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Black,
+                    color = PixelColors.BorderDark,
+                    letterSpacing = 0.3.sp
+                )
+
+                // Huy hiệu cấp độ HSK mini
+                PixelBadge(
+                    text = when (scenario.levelCategory) {
+                        "hsk12" -> "HSK 1-2"
+                        "hsk23" -> "HSK 2-3"
+                        else -> "HSK 3-4"
+                    },
+                    backgroundColor = headerColor,
+                    textColor = Color.White
                 )
             }
-        }
 
-        Box(
-            modifier = Modifier
-                .clip(CircleShape)
-                .background(scenario.levelColor.copy(alpha = 0.12f))
-                .padding(horizontal = 9.dp, vertical = 4.dp)
-        ) {
-            Text(
-                text = scenario.levelLabel,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Bold,
-                color = scenario.levelColor
-            )
-        }
-    }
-}
+            Spacer(modifier = Modifier.height(6.dp))
 
-@Composable
-private fun ScenarioContent(scenario: RoleplayScenarioData) {
-    Text(
-        text = scenario.description,
-        fontSize = 13.sp,
-        color = Color(0xFF475569),
-        lineHeight = 18.sp
-    )
-
-    Spacer(modifier = Modifier.height(8.dp))
-
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        RoleInfoTag(label = "AI", value = scenario.aiRole)
-        RoleInfoTag(label = "Bạn", value = scenario.userRole)
-    }
-}
-
-@Composable
-private fun RoleInfoTag(label: String, value: String) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Text(
-            text = "$label: ",
-            fontSize = 11.5.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = Color(0xFF94A3B8)
-        )
-        Text(
-            text = value,
-            fontSize = 11.5.sp,
-            fontWeight = FontWeight.Medium,
-            color = Color(0xFF334155)
-        )
-    }
-}
-
-@Composable
-private fun ScenarioFooter(
-    scenario: RoleplayScenarioData,
-    onStartClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_bolt),
-                contentDescription = null,
-                tint = Color(0xFFD97706),
-                modifier = Modifier.size(14.dp)
-            )
-            Spacer(modifier = Modifier.width(4.dp))
-            Text(
-                text = "+${scenario.bonusSparks} Tia Sáng",
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFFD97706)
-            )
-        }
-
-        DuoButton(
-            onClick = onStartClick,
-            backgroundColor = PrimaryIndigo,
-            shadowColor = Color(0xFF312E81),
-            shape = RoundedCornerShape(50.dp),
-            depth = 3.dp
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(horizontal = 14.dp, vertical = 7.dp)
+            // 2. Khung Mô tả Nhiệm vụ Giao tiếp
+            val descShape = PixelStepCornerShape(2.dp)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(descShape)
+                    .background(Color.White)
+                    .border(BorderStroke(1.dp, Color(0xFFFDE68A)), descShape)
+                    .padding(8.dp)
             ) {
-                Text(
-                    text = "Bắt đầu trò chuyện",
-                    fontSize = 12.5.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(
-                    text = "→",
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
+                Row(
+                    verticalAlignment = Alignment.Top,
+                    horizontalArrangement = Arrangement.spacedBy(5.dp)
+                ) {
+                    Text(
+                        text = "🎯 NHIỆM VỤ:",
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Black,
+                        color = Color(0xFFB45309),
+                        letterSpacing = 0.3.sp
+                    )
+                    Text(
+                        text = scenario.description,
+                        fontSize = 11.sp,
+                        color = Color(0xFF78350F),
+                        lineHeight = 15.sp,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            // 3. Phân vai Hội thoại Đối kháng (Roleplay Co-op Duel Grid)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                // Vai AI
+                val roleAiShape = PixelStepCornerShape(1.5.dp)
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clip(roleAiShape)
+                        .background(Color(0xFFEDE9FE))
+                        .border(BorderStroke(1.dp, Color(0xFFDDD6FE)), roleAiShape)
+                        .padding(horizontal = 6.dp, vertical = 4.dp)
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = "🤖 AI: ",
+                            fontSize = 9.sp,
+                            fontWeight = FontWeight.Black,
+                            color = Color(0xFF6D28D9)
+                        )
+                        Text(
+                            text = scenario.aiRole,
+                            fontSize = 9.5.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF4C1D95),
+                            maxLines = 1
+                        )
+                    }
+                }
+
+                // Vai Bạn
+                val roleUserShape = PixelStepCornerShape(1.5.dp)
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clip(roleUserShape)
+                        .background(Color(0xFFFEF3C7))
+                        .border(BorderStroke(1.dp, Color(0xFFFDE68A)), roleUserShape)
+                        .padding(horizontal = 6.dp, vertical = 4.dp)
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = "🧑 BẠN: ",
+                            fontSize = 9.sp,
+                            fontWeight = FontWeight.Black,
+                            color = Color(0xFFB45309)
+                        )
+                        Text(
+                            text = scenario.userRole,
+                            fontSize = 9.5.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF78350F),
+                            maxLines = 1
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // 4. Chân thẻ: Chiến lợi phẩm + Nút Arcade Bắt đầu
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Phần thưởng Sparks
+                val rewardShape = PixelStepCornerShape(1.5.dp)
+                Box(
+                    modifier = Modifier
+                        .clip(rewardShape)
+                        .background(Color(0xFFFEF08A))
+                        .border(BorderStroke(1.dp, Color(0xFFCA8A04)), rewardShape)
+                        .padding(horizontal = 6.dp, vertical = 3.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(3.dp)
+                    ) {
+                        Text(text = "⚡", fontSize = 9.sp)
+                        Text(
+                            text = "+${scenario.bonusSparks} SPARKS",
+                            fontSize = 9.5.sp,
+                            fontWeight = FontWeight.Black,
+                            color = Color(0xFF713F12)
+                        )
+                    }
+                }
+
+                // Nút hành động Arcade nảy 3D
+                PixelArcadeButton(
+                    text = "VÀO VAI ▶",
+                    color = PixelColors.PixelBlue,
+                    onClick = onStartClick
                 )
             }
         }

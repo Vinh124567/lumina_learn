@@ -179,20 +179,32 @@ fun CollapsingVocabHeaderBar(
                         translationY = -progress * 25f
                     }
             ) {
-                Text(
-                    text = "Kho Từ Vựng HSK",
-                    fontFamily = PlusJakartaSans,
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = TextMain,
-                    letterSpacing = (-0.4).sp
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = "Kho Từ Vựng HSK",
+                        fontFamily = PlusJakartaSans,
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Black,
+                        color = PixelColors.BorderDark,
+                        letterSpacing = (-0.4).sp
+                    )
+                    PixelBadge(
+                        text = "★ 8-BIT QUEST ★",
+                        backgroundColor = PixelColors.PixelYellow,
+                        textColor = PixelColors.BorderDark,
+                        borderColor = PixelColors.BorderDark
+                    )
+                }
                 Spacer(modifier = Modifier.height(3.dp))
                 Text(
                     text = "Hệ thống hóa 5,000+ từ chuẩn đề thi HSK 1–6",
                     fontFamily = PlusJakartaSans,
                     fontSize = 11.5.sp,
-                    color = TextMuted
+                    fontWeight = FontWeight.Bold,
+                    color = PixelColors.MutedText
                 )
             }
         }

@@ -19,56 +19,43 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-private const val BADGE_LABEL = "✨ LUMINA SPARK AI LAB • V4.0 •"
+import com.example.luminalearn.presentation.vocabulary.component.PixelBadge
+import com.example.luminalearn.presentation.vocabulary.component.PixelColors
+
+private const val BADGE_LABEL = "✨ LUMINA SPARK AI LAB • V4.0"
 private const val TITLE_LABEL = "Lumina Spark AI Lab"
 private const val DESC_LABEL =
     "Luyện phản xạ giao tiếp và đối thoại tình huống thực tế cùng Lumina AI."
-
-private val PrimaryPurple = Color(0xFF5C50F6)
-private val DarkTitleColor = Color(0xFF0F172A)
-private val SubtitleColor = Color(0xFF64748B)
 
 @Composable
 fun SparkAiHeader(
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
-        Box(
-            modifier = Modifier
-                .clip(RoundedCornerShape(20.dp))
-                .background(Color(0xFFEEF2FF))
-                .border(
-                    BorderStroke(1.dp, Color(0xFFE0E7FF)),
-                    shape = RoundedCornerShape(20.dp)
-                )
-                .padding(horizontal = 9.dp, vertical = 4.dp)
-        ) {
-            Text(
-                text = BADGE_LABEL,
-                color = PrimaryPurple,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.ExtraBold,
-                letterSpacing = 0.5.sp
-            )
-        }
+        PixelBadge(
+            text = BADGE_LABEL,
+            backgroundColor = Color(0xFFE0F2FE),
+            textColor = Color(0xFF0369A1)
+        )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(6.dp))
 
         Text(
             text = TITLE_LABEL,
-            fontSize = 22.sp,
-            fontWeight = FontWeight.ExtraBold,
-            color = DarkTitleColor,
-            letterSpacing = (-0.5).sp
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Black,
+            color = PixelColors.BorderDark,
+            letterSpacing = 0.3.sp
         )
 
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(2.dp))
 
         Text(
             text = DESC_LABEL,
-            fontSize = 13.sp,
-            color = SubtitleColor,
-            lineHeight = 18.sp
+            fontSize = 12.sp,
+            color = Color(0xFF64748B),
+            lineHeight = 16.5.sp,
+            fontWeight = FontWeight.Medium
         )
     }
 }

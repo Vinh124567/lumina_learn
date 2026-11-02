@@ -88,7 +88,7 @@ fun MainContainerScreen(
     ) {
         NavHost(
             navController = bottomNavController,
-            startDestination = AppDestination.Main.route,
+            startDestination = AppDestination.SparkAI.route,
             modifier = Modifier.fillMaxSize(),
             enterTransition = {
                 fadeIn(animationSpec = tween(260)) + scaleIn(

@@ -41,7 +41,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import com.example.luminalearn.core.ui.effect.bounceClick
-import com.example.luminalearn.core.ui.effect.staggeredEntrance
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -105,7 +104,11 @@ fun VocabularyScreen(
     var isFlashcardPracticeOpen by remember { mutableStateOf(false) }
     var isReflexQuizPracticeOpen by remember { mutableStateOf(false) }
     var isSpeedMatchOpen by remember { mutableStateOf(false) }
-    var selectedHskDetailData by remember { mutableStateOf<HskLevelCardData?>(null) }
+    var isHanziShooterOpen by remember { mutableStateOf(false) }
+    var isSentenceOrderOpen by remember { mutableStateOf(false) }
+    var selectedHskDetailData by remember {
+        mutableStateOf<HskLevelCardData?>(null)
+    }
     var selectedHanziDetailData by remember { mutableStateOf<com.example.luminalearn.presentation.vocabulary.component.HanziSpotlightData?>(null) }
 
     BackHandler(enabled = selectedHskDetailData != null || selectedHanziDetailData != null) {
@@ -150,55 +153,31 @@ fun VocabularyScreen(
             targetState = selectedHskDetailData,
             transitionSpec = {
                 if (targetState != null) {
-                    // Mở màn hình con: Trượt vào với độ nảy vật lý Spring nhẹ và zoom từ 94%
+                    // Mở màn hình con: Trượt vào nhẹ nhàng kèm fade thanh thoát
                     (slideInHorizontally(
-                        animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioNoBouncy,
-                            stiffness = Spring.StiffnessMediumLow
-                        )
-                    ) { width -> (width * 0.92f).toInt() } + fadeIn(tween(280)) + scaleIn(
-                        initialScale = 0.94f,
-                        animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioNoBouncy,
-                            stiffness = Spring.StiffnessMediumLow
-                        )
-                    )).togetherWith(
+                        animationSpec = tween(durationMillis = 260, easing = androidx.compose.animation.core.FastOutSlowInEasing)
+                    ) { width -> (width * 0.35f).toInt() } + fadeIn(tween(240))).togetherWith(
                         slideOutHorizontally(
-                            animationSpec = tween(280)
-                        ) { width -> (-width * 0.25f).toInt() } + fadeOut(tween(220)) + scaleOut(
-                            targetScale = 0.96f,
-                            animationSpec = tween(280)
-                        )
+                            animationSpec = tween(durationMillis = 200, easing = androidx.compose.animation.core.FastOutSlowInEasing)
+                        ) { width -> (-width * 0.15f).toInt() } + fadeOut(tween(180))
                     )
                 } else {
-                    // Đóng màn hình con quay lại: Màn hình cha hồi phục mượt mà
+                    // Đóng màn hình con quay lại: Lướt về êm ái
                     (slideInHorizontally(
-                        animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioNoBouncy,
-                            stiffness = Spring.StiffnessMediumLow
-                        )
-                    ) { width -> (-width * 0.25f).toInt() } + fadeIn(tween(280)) + scaleIn(
-                        initialScale = 0.96f,
-                        animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioNoBouncy,
-                            stiffness = Spring.StiffnessMediumLow
-                        )
-                    )).togetherWith(
+                        animationSpec = tween(durationMillis = 260, easing = androidx.compose.animation.core.FastOutSlowInEasing)
+                    ) { width -> (-width * 0.15f).toInt() } + fadeIn(tween(240))).togetherWith(
                         slideOutHorizontally(
-                            animationSpec = tween(280)
-                        ) { width -> (width * 0.92f).toInt() } + fadeOut(tween(220)) + scaleOut(
-                            targetScale = 0.94f,
-                            animationSpec = tween(280)
-                        )
+                            animationSpec = tween(durationMillis = 200, easing = androidx.compose.animation.core.FastOutSlowInEasing)
+                        ) { width -> (width * 0.35f).toInt() } + fadeOut(tween(180))
                     )
                 }
             },
             label = "hsk_vocab_screen_transition",
             modifier = Modifier.fillMaxSize()
-        ) { hskData ->
-            if (hskData != null) {
+        ) { targetHskData ->
+            if (targetHskData != null) {
                 HskVocabGridScreen(
-                    hskData = hskData,
+                    hskData = targetHskData,
                     vocabList = uiState.vocabList,
                     dueTodayCount = uiState.dueTodayCount,
                     isLoading = uiState.isLoadingVocab,
@@ -258,8 +237,7 @@ fun VocabularyScreen(
                                 MainSectionHeader(
                                     title = "Nhịp học hôm nay",
                                     subtitle = "Ôn tập ngắt quãng SRS và thử thách phản xạ nhanh",
-                                    accentColors = listOf(Color(0xFF6366F1), Color(0xFF00F2FE)),
-                                    modifier = Modifier.staggeredEntrance(index = 1)
+                                    accentColors = listOf(Color(0xFF6366F1), Color(0xFF00F2FE))
                                 )
                             }
 
@@ -277,15 +255,15 @@ fun VocabularyScreen(
                                     onStartQuiz = {
                                         viewModel.processIntent(VocabularyUiIntent.StartReflexQuiz)
                                         isReflexQuizPracticeOpen = true
-                                    },
-                                    modifier = Modifier.staggeredEntrance(index = 1)
+                                    }
                                 )
                             }
 
                             item(key = "speed_word_match_card", contentType = "gamification") {
                                 com.example.luminalearn.presentation.vocabulary.component.SpeedWordMatchCard(
                                     onStartMatch = { isSpeedMatchOpen = true },
-                                    modifier = Modifier.staggeredEntrance(index = 2)
+                                    onStartShooter = { isHanziShooterOpen = true },
+                                    onStartSentenceOrder = { isSentenceOrderOpen = true }
                                 )
                             }
 
@@ -298,8 +276,7 @@ fun VocabularyScreen(
                                     onActionClick = {
                                         selectedHskDetailData = com.example.luminalearn.presentation.vocabulary.component.HSK_LEVEL_INFOS.firstOrNull()
                                     },
-                                    accentColors = listOf(Color(0xFF06B6D4), Color(0xFF3B82F6)),
-                                    modifier = Modifier.staggeredEntrance(index = 3)
+                                    accentColors = listOf(Color(0xFF06B6D4), Color(0xFF3B82F6))
                                 )
                             }
 
@@ -308,8 +285,7 @@ fun VocabularyScreen(
                                     hskLevels = com.example.luminalearn.presentation.vocabulary.component.HSK_LEVEL_INFOS,
                                     onOpenHskLevel = { levelData ->
                                         selectedHskDetailData = levelData
-                                    },
-                                    modifier = Modifier.staggeredEntrance(index = 3)
+                                    }
                                 )
                             }
 
@@ -321,8 +297,7 @@ fun VocabularyScreen(
                                     progressPercent = uiState.progressPercent,
                                     onOpenHskLevel = { levelData ->
                                         selectedHskDetailData = levelData
-                                    },
-                                    modifier = Modifier.staggeredEntrance(index = 4)
+                                    }
                                 )
                             }
 
@@ -331,8 +306,7 @@ fun VocabularyScreen(
                                 MainSectionHeader(
                                     title = "Chiết tự tâm điểm",
                                     subtitle = "Thấu hiểu triết lý và kết cấu chữ Hán mỗi ngày",
-                                    accentColors = listOf(Color(0xFF10B981), Color(0xFF059669)),
-                                    modifier = Modifier.staggeredEntrance(index = 5)
+                                    accentColors = listOf(Color(0xFF10B981), Color(0xFF059669))
                                 )
                             }
 
@@ -341,8 +315,7 @@ fun VocabularyScreen(
                                     onSpeakWord = onSpeakWord,
                                     onOpenDetail = { hanziData ->
                                         selectedHanziDetailData = hanziData
-                                    },
-                                    modifier = Modifier.staggeredEntrance(index = 5)
+                                    }
                                 )
                             }
                         }
@@ -453,6 +426,21 @@ fun VocabularyScreen(
             isOpen = isSpeedMatchOpen,
             vocabList = uiState.vocabList,
             onDismiss = { isSpeedMatchOpen = false }
+        )
+
+        // ── Dialog Minigame Pháo Thủ Bắn Hán Tự 16-Bit Arcade ──
+        com.example.luminalearn.presentation.vocabulary.component.HanziShooterDialog(
+            isOpen = isHanziShooterOpen,
+            vocabList = uiState.vocabList,
+            onDismiss = { isHanziShooterOpen = false }
+        )
+
+        // ── Dialog Minigame Xếp Từ Thành Câu Ngữ Pháp 16-Bit Arcade ──
+        com.example.luminalearn.presentation.vocabulary.component.SentenceOrderPuzzleDialog(
+            isOpen = isSentenceOrderOpen,
+            vocabList = uiState.vocabList,
+            onSpeak = onSpeakWord,
+            onDismiss = { isSentenceOrderOpen = false }
         )
 
         // ── Dialog Chi Tiết Chiết Tự Chữ Hán Chuyên Sâu (Ô Mễ Tự Cách & Cội Nguồn) ──

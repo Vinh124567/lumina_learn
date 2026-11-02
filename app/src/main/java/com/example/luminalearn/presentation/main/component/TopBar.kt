@@ -38,6 +38,9 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.material3.Text
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.graphicsLayer
+import com.example.luminalearn.presentation.vocabulary.component.PixelBadge
+import com.example.luminalearn.presentation.vocabulary.component.PixelCardBox
+import com.example.luminalearn.presentation.vocabulary.component.PixelColors
 import com.example.luminalearn.ui.theme.PlusJakartaSans
 
 /**
@@ -267,7 +270,7 @@ fun CollapsingHomeTopBar(
         modifier = modifier
             .fillMaxWidth()
             .height(headerHeight)
-            .background(Color.White.copy(alpha = progress * 0.98f))
+            .background(Color.White)
     ) {
         // ── 1. KHỐI EXPANDED HERO PROFILE (Avatar to 48dp + Large Title + Badge HSK) ──
         if (progress < 0.95f) {
@@ -289,47 +292,42 @@ fun CollapsingHomeTopBar(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(14.dp)
             ) {
-                // Avatar lớn 48dp viền gradient phát sáng
-                Box(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(CircleShape)
-                        .background(
-                            brush = Brush.linearGradient(
-                                colors = listOf(Color(0xFF6366F1), Color(0xFF8B5CF6), Color(0xFFEC4899))
-                            )
-                        )
-                        .padding(2.dp)
-                        .bounceClick(scaleDown = 0.93f) { onAvatarClick?.invoke() },
-                    contentAlignment = Alignment.Center
+                // Avatar pixel 48dp có viền đen 2dp và bóng cứng 3D
+                PixelCardBox(
+                    modifier = Modifier.size(48.dp),
+                    backgroundColor = PixelColors.PixelYellow,
+                    borderColor = PixelColors.BorderDark,
+                    shadowColor = PixelColors.ShadowDark,
+                    borderWidth = 2.dp,
+                    shadowOffset = 3.dp,
+                    cornerRadius = 6.dp,
+                    showRivets = false,
+                    onClick = { onAvatarClick?.invoke() }
                 ) {
                     Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clip(CircleShape)
-                            .background(Color(0xFFF8FAFC)),
+                        modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_avatar_default),
                             contentDescription = stringResource(R.string.cd_avatar),
-                            tint = Color(0xFF6366F1),
+                            tint = PixelColors.BorderDark,
                             modifier = Modifier.size(26.dp)
                         )
                     }
                 }
 
-                // Cụm Large Title & Badge cấp độ
+                // Cụm Large Title & Badge cấp độ RPG
                 Column(
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Text(
                         text = stringResource(R.string.large_greeting_name),
                         fontFamily = PlusJakartaSans,
-                        fontWeight = FontWeight.ExtraBold,
-                        fontSize = 20.sp,
-                        color = Color(0xFF0F172A),
-                        letterSpacing = (-0.4).sp,
+                        fontWeight = FontWeight.Black,
+                        fontSize = 19.sp,
+                        color = PixelColors.BorderDark,
+                        letterSpacing = (-0.2).sp,
                         maxLines = 1
                     )
 
@@ -337,28 +335,18 @@ fun CollapsingHomeTopBar(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(6.dp))
-                                .background(Color(0xFFEEF2FF))
-                                .border(BorderStroke(0.8.dp, Color(0xFFC7D2FE)), RoundedCornerShape(6.dp))
-                                .padding(horizontal = 7.dp, vertical = 2.dp)
-                        ) {
-                            Text(
-                                text = stringResource(R.string.large_greeting_badge),
-                                fontFamily = PlusJakartaSans,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 11.sp,
-                                color = Color(0xFF4F46E5)
-                            )
-                        }
+                        PixelBadge(
+                            text = "⚔️ LV.1 NOVICE",
+                            backgroundColor = PixelColors.PixelYellow,
+                            textColor = PixelColors.BorderDark
+                        )
 
                         Text(
-                            text = "• Mục tiêu 10 phút/ngày",
+                            text = "• Mục tiêu 10 m/ngày",
                             fontFamily = PlusJakartaSans,
-                            fontWeight = FontWeight.Medium,
-                            fontSize = 11.sp,
-                            color = Color(0xFF64748B)
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 10.5.sp,
+                            color = PixelColors.MutedText
                         )
                     }
                 }
@@ -378,6 +366,7 @@ fun CollapsingHomeTopBar(
             // Bên trái khi Collapsed: Avatar nhỏ (34dp) + Brandmark Lumina (Hiện dần khi progress > 0.4)
             val collapsedLeftAlpha = ((progress - 0.35f) / 0.65f).coerceIn(0f, 1f)
 
+            // Bên trái khi collapsed: Avatar Pixel nhỏ + Brandmark
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -387,30 +376,25 @@ fun CollapsingHomeTopBar(
                     }
                     .bounceClick(scaleDown = 0.95f) { onAvatarClick?.invoke() }
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(34.dp)
-                        .clip(CircleShape)
-                        .background(
-                            brush = Brush.linearGradient(
-                                colors = listOf(Color(0xFF6366F1), Color(0xFF8B5CF6), Color(0xFFEC4899))
-                            )
-                        )
-                        .padding(1.5.dp),
-                    contentAlignment = Alignment.Center
+                PixelCardBox(
+                    modifier = Modifier.size(32.dp),
+                    backgroundColor = PixelColors.PixelYellow,
+                    borderColor = PixelColors.BorderDark,
+                    shadowColor = PixelColors.ShadowDark,
+                    borderWidth = 1.5.dp,
+                    shadowOffset = 2.dp,
+                    cornerRadius = 4.dp,
+                    showRivets = false
                 ) {
                     Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clip(CircleShape)
-                            .background(Color(0xFFF8FAFC)),
+                        modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_avatar_default),
                             contentDescription = stringResource(R.string.cd_avatar),
-                            tint = Color(0xFF6366F1),
-                            modifier = Modifier.size(18.dp)
+                            tint = PixelColors.BorderDark,
+                            modifier = Modifier.size(16.dp)
                         )
                     }
                 }
@@ -422,124 +406,111 @@ fun CollapsingHomeTopBar(
                     Text(
                         text = "Lumina",
                         fontFamily = PlusJakartaSans,
-                        fontWeight = FontWeight.ExtraBold,
-                        fontSize = 16.sp,
-                        color = Color(0xFF0F172A),
-                        letterSpacing = (-0.3).sp
+                        fontWeight = FontWeight.Black,
+                        fontSize = 15.sp,
+                        color = PixelColors.BorderDark,
+                        letterSpacing = (-0.2).sp
                     )
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_sparkle),
-                        contentDescription = null,
-                        tint = Color(0xFFF59E0B),
-                        modifier = Modifier
-                            .size(12.dp)
-                            .breathingGlow(minScale = 0.9f, maxScale = 1.25f, durationMillis = 1500)
-                    )
+                    Text(text = "✨", fontSize = 11.sp)
                 }
             }
 
-            // Bên phải: Bộ 3 Capsule chỉ số (Streak, Points, Chuông) — CỐ ĐỊNH VỮNG VÀNG
+            // Bên phải: Bộ 3 RPG Box chỉ số (Streak, Points, Chuông)
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(7.dp)
             ) {
-                // Streak Capsule
-                Row(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(Color(0xFFFFF7ED))
-                        .border(
-                            BorderStroke(1.dp, Color(0xFFFED7AA)),
-                            shape = RoundedCornerShape(16.dp)
-                        )
-                        .bounceClick(scaleDown = 0.92f) { onStreakClick?.invoke() }
-                        .padding(horizontal = 8.5.dp, vertical = 5.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                // Streak Pixel Box
+                PixelCardBox(
+                    backgroundColor = PixelColors.CardOrange,
+                    borderColor = PixelColors.BorderDark,
+                    shadowColor = PixelColors.ShadowDark,
+                    borderWidth = 1.5.dp,
+                    shadowOffset = 2.dp,
+                    cornerRadius = 5.dp,
+                    showRivets = false,
+                    onClick = { onStreakClick?.invoke() }
                 ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_streak),
-                        contentDescription = "Chuỗi ngày",
-                        tint = Color(0xFFEA580C),
-                        modifier = Modifier
-                            .size(14.dp)
-                            .breathingGlow(minScale = 0.94f, maxScale = 1.14f, durationMillis = 1400)
-                    )
-                    AnimatedRollingCounter(
-                        count = streakDays,
-                        textStyle = TextStyle(
-                            fontFamily = PlusJakartaSans,
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = Color(0xFFC2410C)
+                    Row(
+                        modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.5.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(3.dp)
+                    ) {
+                        Text(text = "🔥", fontSize = 11.sp)
+                        AnimatedRollingCounter(
+                            count = streakDays,
+                            textStyle = TextStyle(
+                                fontFamily = PlusJakartaSans,
+                                fontSize = 11.5.sp,
+                                fontWeight = FontWeight.Black,
+                                color = PixelColors.BorderDark
+                            )
                         )
-                    )
+                    }
                 }
 
-                // Points Capsule
-                Row(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(Color(0xFFEEF2FF))
-                        .border(
-                            BorderStroke(1.dp, Color(0xFFC7D2FE)),
-                            shape = RoundedCornerShape(16.dp)
-                        )
-                        .bounceClick(scaleDown = 0.92f) { onPointsClick?.invoke() }
-                        .padding(horizontal = 8.5.dp, vertical = 5.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                // Points / Coin Pixel Box
+                PixelCardBox(
+                    backgroundColor = PixelColors.CardYellow,
+                    borderColor = PixelColors.BorderDark,
+                    shadowColor = PixelColors.ShadowDark,
+                    borderWidth = 1.5.dp,
+                    shadowOffset = 2.dp,
+                    cornerRadius = 5.dp,
+                    showRivets = false,
+                    onClick = { onPointsClick?.invoke() }
                 ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_bolt),
-                        contentDescription = "Điểm tích lũy",
-                        tint = Color(0xFF6366F1),
-                        modifier = Modifier
-                            .size(14.dp)
-                            .breathingGlow(minScale = 0.95f, maxScale = 1.10f, durationMillis = 1800)
-                    )
-                    AnimatedRollingCounter(
-                        count = points,
-                        textStyle = TextStyle(
-                            fontFamily = PlusJakartaSans,
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = Color(0xFF4338CA)
+                    Row(
+                        modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.5.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(3.dp)
+                    ) {
+                        Text(text = "🪙", fontSize = 11.sp)
+                        AnimatedRollingCounter(
+                            count = points,
+                            textStyle = TextStyle(
+                                fontFamily = PlusJakartaSans,
+                                fontSize = 11.5.sp,
+                                fontWeight = FontWeight.Black,
+                                color = PixelColors.BorderDark
+                            )
                         )
-                    )
+                    }
                 }
 
-                // Bento Notification Bell
-                Box(
-                    modifier = Modifier
-                        .size(34.dp)
-                        .clip(CircleShape)
-                        .background(Color.White)
-                        .border(
-                            BorderStroke(1.dp, Color(0xFFE2E8F0)),
-                            shape = CircleShape
-                        )
-                        .bounceClick(scaleDown = 0.90f) { onNotificationClick?.invoke() },
-                    contentAlignment = Alignment.Center
+                // Bento Notification Bell Pixel Box
+                PixelCardBox(
+                    modifier = Modifier.size(31.dp),
+                    backgroundColor = Color.White,
+                    borderColor = PixelColors.BorderDark,
+                    shadowColor = PixelColors.ShadowDark,
+                    borderWidth = 1.5.dp,
+                    shadowOffset = 2.dp,
+                    cornerRadius = 5.dp,
+                    showRivets = false,
+                    onClick = { onNotificationClick?.invoke() }
                 ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_notification),
-                        contentDescription = "Thông báo",
-                        tint = Color(0xFF475569),
-                        modifier = Modifier.size(16.dp)
-                    )
-
-                    if (hasUnreadNotification) {
-                        Box(
-                            modifier = Modifier
-                                .align(Alignment.TopEnd)
-                                .offset(x = (-5).dp, y = 5.dp)
-                                .size(7.dp)
-                                .clip(CircleShape)
-                                .background(Color(0xFFEF4444))
-                                .border(1.dp, Color.White, CircleShape)
-                                .breathingGlow(minScale = 0.85f, maxScale = 1.25f, durationMillis = 1100)
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_notification),
+                            contentDescription = "Thông báo",
+                            tint = PixelColors.BorderDark,
+                            modifier = Modifier.size(15.dp)
                         )
+
+                        if (hasUnreadNotification) {
+                            Box(
+                                modifier = Modifier
+                                    .align(Alignment.TopEnd)
+                                    .offset(x = (-3).dp, y = 3.dp)
+                                    .size(5.dp)
+                                    .background(PixelColors.PixelRed)
+                                    .border(0.8.dp, PixelColors.BorderDark)
+                            )
+                        }
                     }
                 }
             }

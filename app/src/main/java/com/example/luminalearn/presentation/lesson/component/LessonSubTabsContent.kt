@@ -153,15 +153,17 @@ private fun LessonVocabCardItem(
     item: LessonCoreVocabData,
     onSpeak: (String) -> Unit
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .background(Color.White)
-            .border(1.dp, Color(0xFFE2E8F0), RoundedCornerShape(16.dp))
-            .padding(14.dp)
+    com.example.luminalearn.presentation.vocabulary.component.PixelCardBox(
+        modifier = Modifier.fillMaxWidth(),
+        backgroundColor = Color.White,
+        borderColor = com.example.luminalearn.presentation.vocabulary.component.PixelColors.BorderDark,
+        shadowColor = com.example.luminalearn.presentation.vocabulary.component.PixelColors.ShadowDark,
+        cornerRadius = 10.dp
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(14.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
             // Hàng trên: Hán tự + Pinyin/Loa/Hán Việt + Loại từ
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -174,17 +176,25 @@ private fun LessonVocabCardItem(
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(50.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(Color(0xFF5538EE)),
-                        contentAlignment = Alignment.Center
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(com.example.luminalearn.presentation.vocabulary.component.PixelColors.ShadowDark)
+                            .padding(bottom = 2.dp)
                     ) {
-                        Text(
-                            text = item.hanzi,
-                            fontSize = 22.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
+                        Box(
+                            modifier = Modifier
+                                .size(50.dp)
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(com.example.luminalearn.presentation.vocabulary.component.PixelColors.ArcadePurple)
+                                .border(1.5.dp, com.example.luminalearn.presentation.vocabulary.component.PixelColors.BorderDark, RoundedCornerShape(6.dp)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = item.hanzi,
+                                fontSize = 24.sp,
+                                fontWeight = FontWeight.Black,
+                                color = Color.White
+                            )
+                        }
                     }
 
                     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -339,28 +349,14 @@ private fun VocabExampleBox(
 
 @Composable
 private fun NavigateToWritingButton(onClick: () -> Unit) {
-    Surface(
+    com.example.luminalearn.presentation.vocabulary.component.PixelArcadeButton(
+        text = "✍️ LUYỆN VIẾT CHỮ HÁN ▶",
         onClick = onClick,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(46.dp),
-        shape = RoundedCornerShape(50),
-        color = Color(0xFF5C50F6),
-        shadowElevation = 1.dp
-    ) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = "Luyện viết chữ Hán",
-                fontFamily = PlusJakartaSans,
-                fontSize = 13.5.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
-        }
-    }
+        color = com.example.luminalearn.presentation.vocabulary.component.PixelColors.ArcadePurple,
+        textColor = Color.White,
+        height = 48.dp,
+        modifier = Modifier.fillMaxWidth()
+    )
 }
 
 /**

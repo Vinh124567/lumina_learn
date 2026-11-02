@@ -50,18 +50,14 @@ fun SoundWaveComparisonCard(
         label = "animatedProgress"
     )
 
-    Surface(
+    PixelCardBox(
+        backgroundColor = Color.White,
+        borderColor = PixelColors.BorderDark,
+        shadowColor = PixelColors.ShadowDark,
+        borderWidth = 1.5.dp,
+        shadowOffset = 3.dp,
+        cornerRadius = 6.dp,
         modifier = modifier
-            .fillMaxWidth()
-            .shadow(
-                elevation = 2.dp,
-                shape = RoundedCornerShape(18.dp),
-                spotColor = Color(0x0F000000),
-                ambientColor = Color(0x0A000000)
-            ),
-        shape = RoundedCornerShape(18.dp),
-        color = Color.White,
-        border = BorderStroke(0.5.dp, Color(0xFFE2E8F0))
     ) {
         Column(
             modifier = Modifier
@@ -77,28 +73,35 @@ fun SoundWaveComparisonCard(
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .size(24.dp)
-                            .clip(CircleShape)
-                            .background(Color(0xFFEEF2FF)),
-                        contentAlignment = Alignment.Center
+                    PixelCardBox(
+                        backgroundColor = Color(0xFFEEF2FF),
+                        borderColor = PixelColors.BorderDark,
+                        shadowColor = PixelColors.ShadowDark,
+                        borderWidth = 1.2.dp,
+                        shadowOffset = 1.5.dp,
+                        cornerRadius = 4.dp,
+                        showRivets = false
                     ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_waveform),
-                            contentDescription = null,
-                            tint = Color(0xFF6366F1),
-                            modifier = Modifier.size(13.dp)
-                        )
+                        Box(
+                            modifier = Modifier.size(24.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_waveform),
+                                contentDescription = null,
+                                tint = Color(0xFF4F46E5),
+                                modifier = Modifier.size(13.dp)
+                            )
+                        }
                     }
 
                     Text(
                         text = "Phổ Sóng Âm (Waveform Spectrum)",
                         fontSize = 12.5.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF0F172A),
+                        fontWeight = FontWeight.Black,
+                        color = PixelColors.BorderDark,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -107,8 +110,8 @@ fun SoundWaveComparisonCard(
                 Text(
                     text = "Tiết tấu & Biên độ",
                     fontSize = 10.sp,
-                    color = Color(0xFF94A3B8),
-                    fontWeight = FontWeight.Medium
+                    color = PixelColors.BorderDark.copy(alpha = 0.6f),
+                    fontWeight = FontWeight.Bold
                 )
             }
 
@@ -147,7 +150,7 @@ fun SoundWaveComparisonCard(
             }
 
             val userDotColor = when {
-                isListening -> VocabColors.AccentCoral
+                isListening -> Color(0xFFEF4444)
                 speechSuccess == null -> Color(0xFF94A3B8)
                 userScore >= 80 -> Color(0xFF10B981)
                 userScore >= 60 -> Color(0xFFF59E0B)
@@ -207,11 +210,14 @@ private fun WaveformChannelCard(
     showTimeRuler: Boolean,
     modifier: Modifier = Modifier
 ) {
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        color = Color(0xFFF8FAFD),
-        border = BorderStroke(0.5.dp, Color(0xFFE2E8F0))
+    PixelCardBox(
+        backgroundColor = Color(0xFFF8FAFD),
+        borderColor = PixelColors.BorderDark,
+        shadowColor = PixelColors.ShadowDark,
+        borderWidth = 1.2.dp,
+        shadowOffset = 2.dp,
+        cornerRadius = 4.dp,
+        modifier = modifier
     ) {
         Column(
             modifier = Modifier
@@ -227,30 +233,35 @@ private fun WaveformChannelCard(
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(5.dp)
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(6.dp)
-                            .clip(CircleShape)
+                            .size(7.dp)
                             .background(dotColor)
+                            .border(1.dp, PixelColors.BorderDark)
                     )
                     Text(
                         text = title,
                         fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF1E293B)
+                        fontWeight = FontWeight.Black,
+                        color = PixelColors.BorderDark
                     )
                 }
 
-                Surface(
-                    shape = RoundedCornerShape(6.dp),
-                    color = badgeBgColor
+                PixelCardBox(
+                    backgroundColor = badgeBgColor,
+                    borderColor = PixelColors.BorderDark,
+                    shadowColor = PixelColors.ShadowDark,
+                    borderWidth = 1.dp,
+                    shadowOffset = 1.dp,
+                    cornerRadius = 3.dp,
+                    showRivets = false
                 ) {
                     Text(
                         text = badgeText,
                         fontSize = 9.5.sp,
-                        fontWeight = FontWeight.SemiBold,
+                        fontWeight = FontWeight.Bold,
                         color = badgeTextColor,
                         modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
                     )
@@ -262,8 +273,8 @@ private fun WaveformChannelCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(44.dp)
-                    .background(Color.White, RoundedCornerShape(8.dp))
-                    .border(0.5.dp, Color(0xFFF1F5F9), RoundedCornerShape(8.dp))
+                    .background(Color.White, RoundedCornerShape(4.dp))
+                    .border(1.dp, PixelColors.BorderDark, RoundedCornerShape(4.dp))
                     .padding(horizontal = 6.dp, vertical = 4.dp)
             ) {
                 Canvas(modifier = Modifier.fillMaxSize()) {

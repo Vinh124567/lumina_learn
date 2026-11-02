@@ -73,63 +73,35 @@ fun LessonComprehensiveTabContent(
             onSpeak = onSpeak
         )
 
-        // ── 4. Hai nút điều hướng nhanh ở cuối trang ──
+        // ── 4. Hai nút điều hướng nhanh ở cuối trang Pixel Arcade ──
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            // Nút viền tím bo tròn pill: Học từ vựng bài này
-            Surface(
+            com.example.luminalearn.presentation.vocabulary.component.PixelArcadeButton(
+                text = "HỌC TỪ VỰNG ▶",
                 onClick = onNavigateToVocab,
-                modifier = Modifier
-                    .weight(1f)
-                    .height(46.dp),
-                shape = RoundedCornerShape(50),
-                color = Color.White,
-                border = BorderStroke(1.2.dp, Color(0xFF5C50F6))
-            ) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "Học từ vựng bài này",
-                        fontFamily = PlusJakartaSans,
-                        fontSize = 12.5.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF5C50F6)
-                    )
-                }
-            }
+                color = com.example.luminalearn.presentation.vocabulary.component.PixelColors.SurfaceLight,
+                textColor = com.example.luminalearn.presentation.vocabulary.component.PixelColors.TextDark,
+                height = 46.dp,
+                fillMaxWidth = true,
+                modifier = Modifier.weight(1f)
+            )
 
-            // Nút nền tím bo tròn pill: Làm bài tập củng cố
-            Surface(
+            com.example.luminalearn.presentation.vocabulary.component.PixelArcadeButton(
+                text = "LÀM BÀI TẬP ⚡",
                 onClick = onNavigateToQuiz,
-                modifier = Modifier
-                    .weight(1f)
-                    .height(46.dp),
-                shape = RoundedCornerShape(50),
-                color = Color(0xFF5C50F6),
-                shadowElevation = 1.dp
-            ) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "Làm bài tập củng cố",
-                        fontFamily = PlusJakartaSans,
-                        fontSize = 12.5.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                }
-            }
+                color = com.example.luminalearn.presentation.vocabulary.component.PixelColors.ArcadePurple,
+                textColor = Color.White,
+                height = 46.dp,
+                fillMaxWidth = true,
+                modifier = Modifier.weight(1f)
+            )
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(28.dp))
     }
 }
 
@@ -146,15 +118,20 @@ private fun LessonObjectivesCompactCard(
     var isExpanded by remember { mutableStateOf(false) }
     val visibleItems = if (isExpanded) objectives else objectives.take(2)
 
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(14.dp))
-            .background(Color(0xFFF8FAFC))
-            .border(1.dp, Color(0xFFE2E8F0), RoundedCornerShape(14.dp))
-            .padding(12.dp)
+    com.example.luminalearn.presentation.vocabulary.component.PixelCardBox(
+        modifier = Modifier.fillMaxWidth(),
+        backgroundColor = Color(0xFFF8FAFC),
+        borderColor = com.example.luminalearn.presentation.vocabulary.component.PixelColors.BorderDark,
+        shadowColor = com.example.luminalearn.presentation.vocabulary.component.PixelColors.ShadowDark,
+        headerTitle = "🎯 MỤC TIÊU BÀI HỌC",
+        headerColor = com.example.luminalearn.presentation.vocabulary.component.PixelColors.ArcadeAmber,
+        cornerRadius = 10.dp
     ) {
-        Column(modifier = Modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp)
+        ) {
             ObjectivesHeader(
                 isExpanded = isExpanded,
                 totalCount = objectives.size,
@@ -185,24 +162,20 @@ private fun ObjectivesHeader(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(text = "🎯", fontSize = 13.sp)
-            Spacer(modifier = Modifier.width(6.dp))
-            Text(
-                text = "MỤC TIÊU BÀI HỌC (KHUNG CHUẨN CƠ BẢN)",
-                fontSize = 11.5.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF4338CA),
-                letterSpacing = 0.2.sp
-            )
-        }
+        Text(
+            text = "KHUNG CHUẨN CƠ BẢN",
+            fontSize = 11.sp,
+            fontWeight = FontWeight.Black,
+            color = com.example.luminalearn.presentation.vocabulary.component.PixelColors.TextDark,
+            letterSpacing = 0.2.sp
+        )
 
         val toggleText = if (isExpanded) "Thu gọn ▲" else "Xem đủ ($totalCount) ▼"
         Text(
             text = toggleText,
             fontSize = 10.5.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = Color(0xFF6366F1)
+            fontWeight = FontWeight.Bold,
+            color = com.example.luminalearn.presentation.vocabulary.component.PixelColors.ArcadePurple
         )
     }
 }
@@ -217,17 +190,18 @@ private fun ObjectiveRowItem(
         verticalAlignment = Alignment.Top
     ) {
         Text(
-            text = "✓",
-            color = Color(0xFF16A34A),
-            fontSize = 11.sp,
-            fontWeight = FontWeight.Bold,
+            text = "✔",
+            color = com.example.luminalearn.presentation.vocabulary.component.PixelColors.ArcadeGreen,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.Black,
             modifier = Modifier.padding(top = 1.dp)
         )
         Spacer(modifier = Modifier.width(6.dp))
         Text(
             text = text,
             fontSize = 11.5.sp,
-            color = Color(0xFF334155),
+            fontWeight = FontWeight.Bold,
+            color = com.example.luminalearn.presentation.vocabulary.component.PixelColors.TextDark,
             lineHeight = 16.sp,
             maxLines = if (isExpanded) Int.MAX_VALUE else 1,
             overflow = TextOverflow.Ellipsis
@@ -243,48 +217,35 @@ private fun LessonTopicOverviewBanner(
     title: String,
     description: String
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .background(
-                Brush.linearGradient(
-                    listOf(Color(0xFF5538EE), Color(0xFF4338CA))
-                )
-            )
-            .padding(16.dp)
+    com.example.luminalearn.presentation.vocabulary.component.PixelCardBox(
+        modifier = Modifier.fillMaxWidth(),
+        backgroundColor = Color.White,
+        borderColor = com.example.luminalearn.presentation.vocabulary.component.PixelColors.BorderDark,
+        shadowColor = com.example.luminalearn.presentation.vocabulary.component.PixelColors.ShadowDark,
+        headerTitle = "TỔNG QUAN CHUYÊN ĐỀ",
+        headerColor = com.example.luminalearn.presentation.vocabulary.component.PixelColors.ArcadePurple,
+        cornerRadius = 10.dp
     ) {
-        Column {
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(6.dp))
-                    .background(Color.White.copy(alpha = 0.2f))
-                    .padding(horizontal = 8.dp, vertical = 3.dp)
-            ) {
-                Text(
-                    text = "TỔNG QUAN CHUYÊN ĐỀ",
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White,
-                    letterSpacing = 0.4.sp
-                )
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(14.dp)
+        ) {
             Text(
                 text = title,
-                fontSize = 16.5.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
+                fontFamily = PlusJakartaSans,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Black,
+                color = com.example.luminalearn.presentation.vocabulary.component.PixelColors.TextDark
             )
 
             Spacer(modifier = Modifier.height(4.dp))
 
             Text(
                 text = description.ifBlank { "Nắm chắc 4 thanh điệu tiếng Trung và quy tắc biến điệu hai thanh 3 kinh điển giúp nói tự nhiên như người bản xứ." },
+                fontFamily = PlusJakartaSans,
                 fontSize = 12.sp,
-                color = Color.White.copy(alpha = 0.9f),
+                color = com.example.luminalearn.presentation.vocabulary.component.PixelColors.TextMuted,
                 lineHeight = 17.sp
             )
         }
@@ -344,37 +305,37 @@ private fun GrammarStructureCard(
     structure: GrammarStructureData,
     onSpeak: (String) -> Unit
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .background(Color.White)
-            .border(1.dp, Color(0xFFE2E8F0), RoundedCornerShape(16.dp))
-            .padding(14.dp)
+    com.example.luminalearn.presentation.vocabulary.component.PixelCardBox(
+        modifier = Modifier.fillMaxWidth(),
+        backgroundColor = Color.White,
+        borderColor = com.example.luminalearn.presentation.vocabulary.component.PixelColors.BorderDark,
+        shadowColor = com.example.luminalearn.presentation.vocabulary.component.PixelColors.ShadowDark,
+        cornerRadius = 10.dp
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(14.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
             // Tag CẤU TRÚC #X
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(6.dp))
-                    .background(Color(0xFFEEF2FF))
-                    .border(1.dp, Color(0xFFC7D2FE), RoundedCornerShape(6.dp))
-                    .padding(horizontal = 7.dp, vertical = 2.5.dp)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
+                com.example.luminalearn.presentation.vocabulary.component.PixelBadge(
                     text = "CẤU TRÚC #${structure.structureOrder}",
-                    fontSize = 9.5.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF4F46E5)
+                    color = com.example.luminalearn.presentation.vocabulary.component.PixelColors.ArcadePurple,
+                    textColor = Color.White
                 )
             }
 
             // Tên cấu trúc
             Text(
                 text = structure.title,
-                fontSize = 14.5.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF0F172A)
+                fontFamily = PlusJakartaSans,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Black,
+                color = com.example.luminalearn.presentation.vocabulary.component.PixelColors.TextDark
             )
 
             // Box Công thức

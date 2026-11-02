@@ -29,24 +29,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.luminalearn.presentation.vocabulary.component.PixelCardBox
+import com.example.luminalearn.presentation.vocabulary.component.PixelColors
+import com.example.luminalearn.presentation.vocabulary.component.PixelStepCornerShape
 
 import com.example.luminalearn.core.ui.effect.CosmicStarfield
 import com.example.luminalearn.core.ui.effect.VoiceWaveformVisualizer
 import com.example.luminalearn.core.ui.effect.animatedMidnightGradient
 
-private val BannerGradient = Brush.linearGradient(
-    colors = listOf(
-        Color(0xFF14123E),
-        Color(0xFF1E1C59),
-        Color(0xFF2E2C80),
-        Color(0xFF3F3DBA)
-    )
-)
-private val GoldBadgeText = Color(0xFFFEF08A)
-private val GreenDotColor = Color(0xFF22C55E)
-private val MintTextColor = Color(0xFF6EE7B7)
-
-private const val BADGE_STUDIO = "✨ AI DIALOGUE 4.0"
 private const val BADGE_VOICE = "Giọng Bắc Kinh"
 private const val BANNER_TITLE = "Phòng Luyện Hội Thoại AI"
 private const val BANNER_DESC =
@@ -56,165 +46,134 @@ private const val BANNER_DESC =
 fun RoleplayStudioBanner(
     modifier: Modifier = Modifier
 ) {
-    Card(
+    PixelCardBox(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-        border = BorderStroke(1.dp, Color(0xFF5C50F6).copy(alpha = 0.35f)),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        backgroundColor = PixelColors.CardBlue, // Sky Blue Arcade tươi sáng, không tím than
+        headerTitle = "✨ AI DIALOGUE STUDIO",
+        headerBadge = "VOICE 1:1",
+        headerColor = PixelColors.PixelBlue
     ) {
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .animatedMidnightGradient()
+                .padding(horizontal = 14.dp, vertical = 12.dp)
         ) {
-            CosmicStarfield(
-                modifier = Modifier.matchParentSize(),
-                particleCount = 45,
-                focusCenterXRatio = 0.85f,
-                focusCenterYRatio = 0.35f
+            // 1. Dải trạng thái Mic và Giọng Bắc Kinh
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Waveform live
+                val micShape = PixelStepCornerShape(1.5.dp)
+                Box(
+                    modifier = Modifier
+                        .clip(micShape)
+                        .background(Color.White)
+                        .border(BorderStroke(1.dp, PixelColors.BorderDark), micShape)
+                        .padding(horizontal = 7.dp, vertical = 3.dp)
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        VoiceWaveformVisualizer(
+                            isSpeaking = true,
+                            barCount = 4,
+                            maxHeight = 11.dp,
+                            minHeight = 3.dp,
+                            barWidth = 2.dp,
+                            barSpacing = 2.dp,
+                            gradient = Brush.verticalGradient(
+                                listOf(Color(0xFF16A34A), Color(0xFF22C55E))
+                            )
+                        )
+                        Spacer(modifier = Modifier.width(5.dp))
+                        Text(
+                            text = BADGE_VOICE,
+                            color = Color(0xFF15803D),
+                            fontSize = 9.5.sp,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1
+                        )
+                    }
+                }
+
+                // Nhãn thời gian thực
+                Box(
+                    modifier = Modifier
+                        .clip(PixelStepCornerShape(1.5.dp))
+                        .background(Color(0xFFFEF3C7))
+                        .border(BorderStroke(1.dp, PixelColors.BorderDark), PixelStepCornerShape(1.5.dp))
+                        .padding(horizontal = 6.dp, vertical = 2.dp)
+                ) {
+                    Text(
+                        text = "REALTIME 🎙️",
+                        color = Color(0xFF92400E),
+                        fontSize = 8.5.sp,
+                        fontWeight = FontWeight.Black
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // 2. Tiêu đề & Giới thiệu
+            Text(
+                text = BANNER_TITLE,
+                color = PixelColors.BorderDark,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Black,
+                letterSpacing = 0.3.sp
             )
 
-            Column(
+            Spacer(modifier = Modifier.height(3.dp))
+
+            Text(
+                text = BANNER_DESC,
+                color = Color(0xFF334155),
+                fontSize = 11.5.sp,
+                lineHeight = 16.sp,
+                fontWeight = FontWeight.Medium
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            // 3. Mini Chips tính năng dạng cartridge
+            val scrollState = rememberScrollState()
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 18.dp, vertical = 15.dp)
+                    .horizontalScroll(scrollState),
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                BannerHeaderBadges()
-                Spacer(modifier = Modifier.height(10.dp))
-                BannerTitleAndDescription()
-                Spacer(modifier = Modifier.height(12.dp))
-                BannerMiniChips()
+                PixelBannerMiniChip(icon = "🎙️", label = "1 Chạm nói ngay")
+                PixelBannerMiniChip(icon = "🎯", label = "Sửa phát âm chuẩn")
+                PixelBannerMiniChip(icon = "⚡", label = "+30 Sparks / Lượt")
             }
         }
     }
 }
 
 @Composable
-private fun BannerHeaderBadges() {
-    val scrollState = rememberScrollState()
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .horizontalScroll(scrollState),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .clip(RoundedCornerShape(8.dp))
-                .background(Color.White.copy(alpha = 0.12f))
-                .border(
-                    BorderStroke(1.dp, GoldBadgeText.copy(alpha = 0.35f)),
-                    shape = RoundedCornerShape(8.dp)
-                )
-                .padding(horizontal = 8.dp, vertical = 3.dp)
-        ) {
-            Text(
-                text = BADGE_STUDIO,
-                color = GoldBadgeText,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = 0.4.sp,
-                maxLines = 1
-            )
-        }
-
-        Box(
-            modifier = Modifier
-                .clip(RoundedCornerShape(8.dp))
-                .background(Color.White.copy(alpha = 0.12f))
-                .border(
-                    BorderStroke(1.dp, GreenDotColor.copy(alpha = 0.35f)),
-                    shape = RoundedCornerShape(8.dp)
-                )
-                .padding(horizontal = 8.dp, vertical = 3.dp)
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                VoiceWaveformVisualizer(
-                    isSpeaking = true,
-                    barCount = 4,
-                    maxHeight = 12.dp,
-                    minHeight = 4.dp,
-                    barWidth = 2.5.dp,
-                    barSpacing = 2.dp,
-                    gradient = Brush.verticalGradient(
-                        listOf(Color(0xFF22C55E), Color(0xFF6EE7B7))
-                    )
-                )
-                Spacer(modifier = Modifier.width(6.dp))
-                Text(
-                    text = BADGE_VOICE,
-                    color = MintTextColor,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    maxLines = 1
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun BannerTitleAndDescription() {
-    Text(
-        text = BANNER_TITLE,
-        color = Color.White,
-        fontSize = 18.sp,
-        fontWeight = FontWeight.Bold
-    )
-
-    Spacer(modifier = Modifier.height(4.dp))
-
-    Text(
-        text = BANNER_DESC,
-        color = Color.White.copy(alpha = 0.85f),
-        fontSize = 12.5.sp,
-        lineHeight = 17.sp
-    )
-}
-
-@Composable
-private fun BannerMiniChips() {
-    val scrollState = rememberScrollState()
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .horizontalScroll(scrollState),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        MiniChip(icon = "🎙️", label = "1 Chạm nói ngay")
-        MiniChip(icon = "💡", label = "Sửa lỗi câu chuẩn")
-        MiniChip(icon = "⚡", label = "Thưởng +30 Tia Sáng")
-    }
-}
-
-@Composable
-private fun MiniChip(
+private fun PixelBannerMiniChip(
     icon: String,
     label: String
 ) {
+    val chipShape = PixelStepCornerShape(1.5.dp)
     Box(
         modifier = Modifier
-            .clip(RoundedCornerShape(8.dp))
-            .background(Color.White.copy(alpha = 0.10f))
-            .border(
-                BorderStroke(1.dp, Color.White.copy(alpha = 0.15f)),
-                shape = RoundedCornerShape(8.dp)
-            )
-            .padding(horizontal = 9.dp, vertical = 5.dp)
+            .clip(chipShape)
+            .background(Color.White)
+            .border(BorderStroke(1.dp, PixelColors.BorderDark), chipShape)
+            .padding(horizontal = 7.dp, vertical = 4.dp)
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(text = icon, fontSize = 11.5.sp)
-            Spacer(modifier = Modifier.width(5.dp))
+            Text(text = icon, fontSize = 10.sp)
+            Spacer(modifier = Modifier.width(4.dp))
             Text(
                 text = label,
-                color = Color(0xFFE2E8F0),
-                fontSize = 11.5.sp,
-                fontWeight = FontWeight.Medium,
+                color = PixelColors.BorderDark,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold,
                 maxLines = 1
             )
         }

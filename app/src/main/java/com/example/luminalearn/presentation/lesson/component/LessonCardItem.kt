@@ -2,6 +2,7 @@ package com.example.luminalearn.presentation.lesson.component
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -35,6 +36,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.luminalearn.R
+import com.example.luminalearn.presentation.vocabulary.component.PixelColors
+import com.example.luminalearn.presentation.vocabulary.component.PixelCardBox
+import com.example.luminalearn.presentation.vocabulary.component.PixelBadge
+import com.example.luminalearn.presentation.vocabulary.component.PixelArcadeButton
 
 data class GrammarExampleData(
     val hanzi: String = "",
@@ -105,16 +110,26 @@ fun LessonCardItem(
     modifier: Modifier = Modifier,
     onSpeakClick: ((String) -> Unit)? = null
 ) {
-    androidx.compose.material3.Card(
+    val hanziPart = lesson.pinyinHanziTitle.substringBefore("(").trim()
+    val pinyinPart = if (lesson.pinyinHanziTitle.contains("(")) {
+        "(" + lesson.pinyinHanziTitle.substringAfter("(").trim()
+    } else ""
+
+    PixelCardBox(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
-        colors = androidx.compose.material3.CardDefaults.cardColors(containerColor = Color.White),
-        elevation = androidx.compose.material3.CardDefaults.cardElevation(defaultElevation = 2.dp)
+        backgroundColor = Color.White,
+        borderWidth = 1.8.dp,
+        shadowOffset = 3.dp,
+        headerTitle = "BÀI HỌC • ${lesson.level.uppercase()}",
+        headerBadge = if (lesson.isCompleted) "✓ HOÀN THÀNH" else "${lesson.durationMins} PHÚT",
+        headerColor = if (lesson.isCompleted) PixelColors.CardGreen else PixelColors.CardYellow,
+        showGrille = true,
+        showRivets = false
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(18.dp)
+                .padding(14.dp)
         ) {
             // 1. Hàng trên cùng: Badges và Trạng thái hoàn thành / Thời lượng
             CardTopHeader(
@@ -129,11 +144,6 @@ fun LessonCardItem(
             Spacer(modifier = Modifier.height(10.dp))
 
             // 2. Dòng chữ Hán kèm phiên âm Pinyin và loa phát âm
-            val hanziPart = lesson.pinyinHanziTitle.substringBefore("(").trim()
-            val pinyinPart = if (lesson.pinyinHanziTitle.contains("(")) {
-                "(" + lesson.pinyinHanziTitle.substringAfter("(").trim()
-            } else ""
-
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -142,39 +152,39 @@ fun LessonCardItem(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = hanziPart,
-                        color = Color(0xFF581C87),
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold
+                        color = PixelColors.PixelPurpleDark,
+                        fontSize = 14.5.sp,
+                        fontWeight = FontWeight.Black
                     )
                     if (pinyinPart.isNotBlank()) {
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
                             text = pinyinPart,
-                            color = Color(0xFF64748B),
-                            fontSize = 11.5.sp,
-                            fontWeight = FontWeight.Medium
+                            color = PixelColors.MutedText,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.SemiBold
                         )
                     }
                 }
 
                 if (onSpeakClick != null) {
-                    Surface(
-                        shape = CircleShape,
-                        color = Color(0xFFEEF2FF),
+                    Box(
                         modifier = Modifier
                             .size(28.dp)
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(PixelColors.CardPurple)
+                            .border(BorderStroke(1.2.dp, PixelColors.BorderDark), RoundedCornerShape(4.dp))
                             .clickable {
                                 onSpeakClick(hanziPart.ifBlank { lesson.title })
-                            }
+                            },
+                        contentAlignment = Alignment.Center
                     ) {
-                        Box(contentAlignment = Alignment.Center) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_speaker),
-                                contentDescription = "Phát âm",
-                                tint = Color(0xFF6366F1),
-                                modifier = Modifier.size(13.dp)
-                            )
-                        }
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_speaker),
+                            contentDescription = "Phát âm",
+                            tint = PixelColors.BorderDark,
+                            modifier = Modifier.size(13.dp)
+                        )
                     }
                 }
             }
@@ -184,25 +194,25 @@ fun LessonCardItem(
             // 3. Tiêu đề chính của bài học
             Text(
                 text = lesson.title,
-                color = Color(0xFF0F172A),
+                color = PixelColors.BorderDark,
                 fontSize = 15.sp,
-                fontWeight = FontWeight.ExtraBold,
+                fontWeight = FontWeight.Black,
                 lineHeight = 21.sp
             )
 
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
             // 4. Mô tả tóm tắt
             Text(
                 text = lesson.description,
-                color = Color(0xFF64748B),
-                fontSize = 12.5.sp,
-                lineHeight = 18.sp
+                color = PixelColors.MutedText,
+                fontSize = 12.sp,
+                lineHeight = 17.sp
             )
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
-            // 5. Hàng đáy: Điểm Sparks + Nút Bắt đầu / Ôn lại
+            // 5. Hàng đáy: Điểm Sparks + Nút Arcade Bắt đầu / Ôn lại
             CardBottomAction(
                 sparks = lesson.sparks,
                 isCompleted = lesson.isCompleted,
@@ -335,20 +345,12 @@ private fun BadgeTag(
     bgColor: Color,
     textColor: Color
 ) {
-    Surface(
-        shape = RoundedCornerShape(6.dp),
-        color = bgColor
-    ) {
-        Text(
-            text = text,
-            color = textColor,
-            fontSize = 10.5.sp,
-            fontWeight = FontWeight.Bold,
-            maxLines = 1,
-            softWrap = false,
-            modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.5.dp)
-        )
-    }
+    PixelBadge(
+        text = text,
+        backgroundColor = bgColor,
+        textColor = textColor,
+        borderColor = PixelColors.BorderDark
+    )
 }
 
 @Composable
@@ -362,48 +364,31 @@ private fun CardBottomAction(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        // Điểm thưởng Tia Sáng
+        // Điểm thưởng Tia Sáng phong cách Pixel RPG
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_bolt),
-                contentDescription = null,
-                tint = Color(0xFFF59E0B),
-                modifier = Modifier.size(14.dp)
-            )
-            Spacer(modifier = Modifier.width(4.dp))
+            Text(text = "⚡", fontSize = 14.sp)
+            Spacer(modifier = Modifier.width(3.dp))
             Text(
-                text = "+$sparks Tia Sáng",
-                color = Color(0xFFF59E0B),
-                fontSize = 12.5.sp,
-                fontWeight = FontWeight.ExtraBold
+                text = "+$sparks SPARKS",
+                color = PixelColors.PixelYellowDark,
+                fontSize = 11.5.sp,
+                fontWeight = FontWeight.Black,
+                letterSpacing = 0.5.sp
             )
         }
 
-        // Nút bấm "Ôn lại" hoặc "Bắt đầu học"
-        val buttonText = if (isCompleted) "Ôn lại" else "Bắt đầu học"
-
-        Box(
-            modifier = Modifier
-                .height(34.dp)
-                .clip(RoundedCornerShape(17.dp))
-                .background(Color(0xFF5C50F6))
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = ripple(color = Color.White),
-                    onClick = onActionClick
-                )
-                .padding(horizontal = 16.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = buttonText,
-                color = Color.White,
-                fontSize = 12.5.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
+        // Nút bấm Arcade "ÔN LẠI" hoặc "BẮT ĐẦU"
+        val buttonText = if (isCompleted) "ÔN LẠI" else "BẮT ĐẦU"
+        PixelArcadeButton(
+            text = buttonText,
+            onClick = onActionClick,
+            color = if (isCompleted) PixelColors.PixelGreen else PixelColors.PixelYellow,
+            fontSize = 11f,
+            contentPadding = 6.dp,
+            shadowOffset = 2.dp
+        )
     }
 }
 

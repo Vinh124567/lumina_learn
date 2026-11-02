@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -30,22 +31,16 @@ import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.unit.sp
 import com.example.luminalearn.R
 import com.example.luminalearn.core.ui.effect.bounceClick
+import com.example.luminalearn.presentation.vocabulary.component.PixelColors
 import com.example.luminalearn.ui.theme.PlusJakartaSans
 
-private val PrimaryIndigo = Color(0xFF5C50F6)
-private val BrandIndigoLight = Color(0xFF6366F1)
-private val TextMain = Color(0xFF0F172A)
-private val TextMuted = Color(0xFF64748B)
-private val BorderSubtle = Color(0xFFE2E8F0)
 private val BackgroundColor = Color(0xFFF6F8FB)
 
 /**
- * Collapsing Header chuẩn hóa theo phong cách của Tab Trang Chủ & Tab Từ Vựng:
- * - Đồng bộ 100% màu nền cùng màu với Body (#F6F8FB), liền mạch tuyệt đối.
- * - Khi ở đỉnh (progress = 0): Chiều cao 106dp, Tiêu đề to 22sp "Lộ Trình Bài Học", Subtitle mô tả.
- * - Khi cuộn (progress -> 1): Co mượt về 56dp, tiêu đề to scale trượt lên TopBar.
- * - Khi cuộn sâu: Dừng đóng và ghim cố định ở độ cao 56dp (Sticky Pinned), che chắn nội dung cuộn bên dưới.
- * - Góc phải: Nút chuyển chế độ xem (Bản đồ 🗺️ / Danh sách 📄) bo góc 12dp với hiệu ứng click nảy cao cấp.
+ * Collapsing Header phong cách Retro 16-Bit Pixel Arcade đồng nhất toàn ứng dụng:
+ * - Đồng bộ với Cartridge Quest & Pixel Card Box của Tab Trang Chủ và Từ Vựng.
+ * - Co giãn mượt mà từ 106dp về 56dp khi cuộn, ghim cố định che chắn nội dung cuộn bên dưới.
+ * - Các nút hành động Tim HP, Kho Ngữ Pháp và Chuyển Đổi View chuẩn phím Arcade dập nổi 3D.
  */
 @Composable
 fun CollapsingLessonHeaderBar(
@@ -69,7 +64,7 @@ fun CollapsingLessonHeaderBar(
             .height(headerHeight)
             .background(BackgroundColor)
     ) {
-        // ── 1. KHỐI EXPANDED TITLE (Tiêu đề to 22sp + Subtitle) ──
+        // ── 1. KHỐI EXPANDED TITLE (Tiêu đề 16-Bit Arcade + Subtitle) ──
         if (progress < 0.95f) {
             val titleAlpha = (1f - progress * 1.5f).coerceIn(0f, 1f)
             val titleScale = 1f - progress * 0.15f
@@ -89,41 +84,63 @@ fun CollapsingLessonHeaderBar(
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = "Lộ Trình Bài Học",
+                        text = "LỘ TRÌNH BÀI HỌC",
                         fontFamily = PlusJakartaSans,
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = TextMain,
-                        letterSpacing = (-0.4).sp
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Black,
+                        color = PixelColors.BorderDark,
+                        letterSpacing = 0.5.sp
                     )
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    // Badge Quest HSK kiểu Pixel
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(PixelColors.PixelYellow)
+                            .border(BorderStroke(1.2.dp, PixelColors.BorderDark), RoundedCornerShape(4.dp))
+                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                    ) {
+                        Text(
+                            text = "★ QUEST",
+                            fontSize = 9.sp,
+                            fontWeight = FontWeight.Black,
+                            color = PixelColors.BorderDark
+                        )
+                    }
+
                     if (isOfflineMode) {
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
                         Box(
                             modifier = Modifier
-                                .clip(RoundedCornerShape(8.dp))
+                                .clip(RoundedCornerShape(4.dp))
                                 .background(Color(0xFFE0F2FE))
-                                .border(BorderStroke(0.5.dp, Color(0xFF38BDF8)), RoundedCornerShape(8.dp))
-                                .padding(horizontal = 7.dp, vertical = 2.dp)
+                                .border(BorderStroke(1.2.dp, PixelColors.BorderDark), RoundedCornerShape(4.dp))
+                                .padding(horizontal = 6.dp, vertical = 2.dp)
                         ) {
                             Text(
-                                text = androidx.compose.ui.res.stringResource(R.string.offline_badge),
-                                fontSize = 10.5.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFF0369A1)
+                                text = "OFFLINE",
+                                fontSize = 9.sp,
+                                fontWeight = FontWeight.Black,
+                                color = PixelColors.BorderDark
                             )
                         }
                     }
                 }
+
                 Spacer(modifier = Modifier.height(3.dp))
+
                 Text(
                     text = if (isOfflineMode) {
-                        androidx.compose.ui.res.stringResource(R.string.offline_subtitle)
+                        "Đang học ở chế độ ngoại tuyến từ bộ nhớ đệm"
                     } else {
-                        "Chinh phục 6 cấp độ HSK theo lộ trình tương tác chuẩn quốc tế"
+                        "Chinh phục các chương bài học tương tác theo chuẩn quốc tế"
                     },
                     fontFamily = PlusJakartaSans,
                     fontSize = 11.5.sp,
-                    color = TextMuted
+                    fontWeight = FontWeight.Medium,
+                    color = Color(0xFF64748B)
                 )
             }
         }
@@ -138,9 +155,9 @@ fun CollapsingLessonHeaderBar(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            // Tiêu đề mini (17sp) mờ hiện dần khi progress > 0.35
             val collapsedTitleAlpha = ((progress - 0.35f) / 0.65f).coerceIn(0f, 1f)
 
+            // Tiêu đề mini khi cuộn sâu
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.graphicsLayer {
@@ -148,159 +165,99 @@ fun CollapsingLessonHeaderBar(
                 }
             ) {
                 Text(
-                    text = "Lộ Trình Bài Học",
+                    text = "LỘ TRÌNH BÀI HỌC",
                     fontFamily = PlusJakartaSans,
-                    fontSize = 17.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = TextMain,
-                    letterSpacing = (-0.3).sp
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Black,
+                    color = PixelColors.BorderDark,
+                    letterSpacing = 0.3.sp
                 )
-                if (isOfflineMode) {
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(6.dp))
-                            .background(Color(0xFFE0F2FE))
-                            .padding(horizontal = 5.dp, vertical = 2.dp)
-                    ) {
-                        Text(
-                            text = androidx.compose.ui.res.stringResource(R.string.offline_badge_mini),
-                            fontSize = 9.5.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFF0369A1)
-                        )
-                    }
-                }
             }
 
-            // Góc phải: Cụm chuyển đổi chế độ xem + Tim + Phân tích
+            // Góc phải: Cụm Tim HP + Nút Chuyển Mode Arcade
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                // Nút Radar Phân tích
+                // 1. Badge Tim HP phong cách Pixel Retro dập nổi
                 Box(
                     modifier = Modifier
-                        .height(36.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(Color(0xFFEEF2FF))
-                        .border(BorderStroke(0.5.dp, BrandIndigoLight), RoundedCornerShape(12.dp))
-                        .bounceClick(scaleDown = 0.92f) { onOpenAnalytics() }
-                        .padding(horizontal = 8.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(text = "📊", fontSize = 13.sp)
-                }
-
-                // Nút Cẩm nang Ngữ pháp HSK
-                Box(
-                    modifier = Modifier
-                        .height(36.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(Color(0xFFF3E8FF))
-                        .border(BorderStroke(0.5.dp, Color(0xFFA855F7)), RoundedCornerShape(12.dp))
-                        .bounceClick(scaleDown = 0.92f) { onOpenGrammarVault() }
-                        .padding(horizontal = 8.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(text = "📖", fontSize = 13.sp)
-                }
-
-                // Badge Trái Tim
-                Box(
-                    modifier = Modifier
-                        .height(36.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(Color(0xFFFEE2E2))
-                        .border(BorderStroke(0.5.dp, Color(0xFFEF4444)), RoundedCornerShape(12.dp))
+                        .padding(bottom = 2.dp, end = 2.dp)
                         .bounceClick(scaleDown = 0.92f) { onOpenHearts() }
-                        .padding(horizontal = 8.dp),
-                    contentAlignment = Alignment.Center
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(text = "❤️", fontSize = 12.sp)
-                        Spacer(modifier = Modifier.width(3.dp))
-                        Text(
-                            text = "$currentHearts",
-                            fontFamily = PlusJakartaSans,
-                            fontSize = 11.5.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFFEF4444)
-                        )
+                    // Bóng cứng 3D
+                    Box(
+                        modifier = Modifier
+                            .matchParentSize()
+                            .offset(x = 2.dp, y = 2.dp)
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(PixelColors.ShadowDark)
+                    )
+                    // Mặt thẻ
+                    Box(
+                        modifier = Modifier
+                            .height(32.dp)
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(Color(0xFFFEE2E2))
+                            .border(BorderStroke(1.5.dp, PixelColors.BorderDark), RoundedCornerShape(6.dp))
+                            .padding(horizontal = 8.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Text(text = "❤️", fontSize = 12.sp)
+                            Text(
+                                text = "$currentHearts",
+                                fontFamily = PlusJakartaSans,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Black,
+                                color = PixelColors.BorderDark
+                            )
+                        }
                     }
                 }
 
-                // Nút Bản đồ
+                // 2. Nút Chuyển Đổi View phong cách Phím Bấm Console 16-Bit
                 Box(
                     modifier = Modifier
-                        .height(36.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(if (isJourneyView) Color.White else Color(0xFFEEF2F6))
-                        .border(
-                            BorderStroke(
-                                0.5.dp,
-                                if (isJourneyView) BrandIndigoLight.copy(alpha = 0.5f) else BorderSubtle
-                            ),
-                            RoundedCornerShape(12.dp)
-                        )
-                        .bounceClick(scaleDown = 0.92f) { onToggleJourneyView(true) }
-                        .padding(horizontal = 10.dp),
-                    contentAlignment = Alignment.Center
+                        .padding(bottom = 2.dp, end = 2.dp)
+                        .bounceClick(scaleDown = 0.90f) { onToggleJourneyView(!isJourneyView) }
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    // Bóng cứng 3D
+                    Box(
+                        modifier = Modifier
+                            .matchParentSize()
+                            .offset(x = 2.dp, y = 2.dp)
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(PixelColors.ShadowDark)
+                    )
+                    // Mặt phím
+                    Box(
+                        modifier = Modifier
+                            .height(32.dp)
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(if (isJourneyView) PixelColors.PixelGreen else PixelColors.PixelBlue)
+                            .border(BorderStroke(1.5.dp, PixelColors.BorderDark), RoundedCornerShape(6.dp))
+                            .padding(horizontal = 9.dp),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_nav_roadmap),
-                            contentDescription = "Bản đồ",
-                            tint = if (isJourneyView) BrandIndigoLight else TextMuted,
-                            modifier = Modifier.size(14.dp)
-                        )
-                        Text(
-                            text = "Bản đồ",
-                            fontFamily = PlusJakartaSans,
-                            fontSize = 11.5.sp,
-                            fontWeight = if (isJourneyView) FontWeight.Bold else FontWeight.Medium,
-                            color = if (isJourneyView) BrandIndigoLight else TextMuted
-                        )
-                    }
-                }
-
-                // Nút Danh sách
-                Box(
-                    modifier = Modifier
-                        .height(36.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(if (!isJourneyView) Color.White else Color(0xFFEEF2F6))
-                        .border(
-                            BorderStroke(
-                                0.5.dp,
-                                if (!isJourneyView) BrandIndigoLight.copy(alpha = 0.5f) else BorderSubtle
-                            ),
-                            RoundedCornerShape(12.dp)
-                        )
-                        .bounceClick(scaleDown = 0.92f) { onToggleJourneyView(false) }
-                        .padding(horizontal = 10.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_layers),
-                            contentDescription = "Danh sách",
-                            tint = if (!isJourneyView) BrandIndigoLight else TextMuted,
-                            modifier = Modifier.size(14.dp)
-                        )
-                        Text(
-                            text = "Danh sách",
-                            fontFamily = PlusJakartaSans,
-                            fontSize = 11.5.sp,
-                            fontWeight = if (!isJourneyView) FontWeight.Bold else FontWeight.Medium,
-                            color = if (!isJourneyView) BrandIndigoLight else TextMuted
-                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Text(
+                                text = if (isJourneyView) "🗺️" else "📄",
+                                fontSize = 11.5.sp
+                            )
+                            Text(
+                                text = if (isJourneyView) "BẢN ĐỒ" else "DANH SÁCH",
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Black,
+                                color = PixelColors.BorderDark
+                            )
+                        }
                     }
                 }
             }

@@ -44,11 +44,13 @@ fun VocabDiagnosticView(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         // ── 1. Header Card Chẩn đoán âm vị ──
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
-            color = Color.White,
-            border = androidx.compose.foundation.BorderStroke(1.dp, VocabColors.BorderLight)
+        PixelCardBox(
+            backgroundColor = Color.White,
+            borderColor = PixelColors.BorderDark,
+            shadowColor = PixelColors.ShadowDark,
+            borderWidth = 1.5.dp,
+            shadowOffset = 3.dp,
+            cornerRadius = 6.dp
         ) {
             Row(
                 modifier = Modifier
@@ -62,33 +64,39 @@ fun VocabDiagnosticView(
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
                     modifier = Modifier.weight(1f)
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .size(38.dp)
-                            .clip(CircleShape)
-                            .background(Color(0xFFEFF6FF)),
-                        contentAlignment = Alignment.Center
+                    PixelCardBox(
+                        backgroundColor = Color(0xFFEFF6FF),
+                        borderColor = PixelColors.BorderDark,
+                        shadowColor = PixelColors.ShadowDark,
+                        borderWidth = 1.2.dp,
+                        shadowOffset = 1.5.dp,
+                        cornerRadius = 4.dp
                     ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_waveform),
-                            contentDescription = null,
-                            tint = Color(0xFF2563EB),
-                            modifier = Modifier.size(18.dp)
-                        )
+                        Box(
+                            modifier = Modifier.size(34.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_waveform),
+                                contentDescription = null,
+                                tint = Color(0xFF2563EB),
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
                     }
 
                     Column {
                         Text(
                             text = "Chẩn đoán âm vị & Độ chuẩn xác",
-                            fontSize = 13.5.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = VocabColors.TextDark
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Black,
+                            color = PixelColors.BorderDark
                         )
                         Spacer(modifier = Modifier.height(2.dp))
                         Text(
                             text = "Phân tích khẩu hình, trường độ & cao độ thanh điệu",
-                            fontSize = 11.sp,
-                            color = VocabColors.TextMuted,
+                            fontSize = 10.5.sp,
+                            color = PixelColors.BorderDark.copy(alpha = 0.7f),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -140,16 +148,23 @@ private fun DiagnosticPromptCard(
     onMicClick: () -> Unit
 ) {
     val buttonColor = when {
-        isListening -> VocabColors.AccentCoral
-        isProcessing -> Color(0xFFF59E0B)
-        else -> VocabColors.BrandPrimary
+        isListening -> Color(0xFFEF4444)
+        isProcessing -> PixelColors.PixelYellow
+        else -> PixelColors.PixelPurple
+    }
+    val buttonTextColor = when {
+        isListening -> Color.White
+        isProcessing -> PixelColors.BorderDark
+        else -> Color.White
     }
 
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        color = Color(0xFFF8FAFC),
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFE2E8F0))
+    PixelCardBox(
+        backgroundColor = Color(0xFFF8FAFC),
+        borderColor = PixelColors.BorderDark,
+        shadowColor = PixelColors.ShadowDark,
+        borderWidth = 1.5.dp,
+        shadowOffset = 3.dp,
+        cornerRadius = 6.dp
     ) {
         Column(
             modifier = Modifier
@@ -164,14 +179,14 @@ private fun DiagnosticPromptCard(
                 Box(
                     modifier = Modifier
                         .size(8.dp)
-                        .clip(CircleShape)
                         .background(
                             when {
-                                isListening -> VocabColors.AccentCoral
-                                isProcessing -> Color(0xFFF59E0B)
-                                else -> Color(0xFF94A3B8)
+                                isListening -> Color(0xFFEF4444)
+                                isProcessing -> Color(0xFFD97706)
+                                else -> PixelColors.BorderDark.copy(alpha = 0.5f)
                             }
                         )
+                        .border(1.dp, PixelColors.BorderDark)
                 )
                 Text(
                     text = when {
@@ -180,48 +195,50 @@ private fun DiagnosticPromptCard(
                         else -> "Chưa có bản ghi âm chẩn đoán"
                     },
                     fontSize = 12.5.sp,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.Black,
                     color = when {
-                        isListening -> VocabColors.AccentCoral
+                        isListening -> Color(0xFFEF4444)
                         isProcessing -> Color(0xFFD97706)
-                        else -> Color(0xFF475569)
+                        else -> PixelColors.BorderDark
                     }
                 )
             }
 
             Text(
                 text = "Hệ thống sẽ đối chiếu khẩu hình, phụ âm đầu, vần và đường cao độ 5 mức của bạn so với phát âm chuẩn Bắc Kinh.",
-                fontSize = 11.5.sp,
-                color = Color(0xFF64748B),
+                fontSize = 11.sp,
+                color = PixelColors.BorderDark.copy(alpha = 0.75f),
                 lineHeight = 16.sp
             )
 
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(42.dp),
-                shape = RoundedCornerShape(10.dp),
-                color = buttonColor,
-                onClick = onMicClick,
-                enabled = !isProcessing
+            PixelCardBox(
+                backgroundColor = buttonColor,
+                borderColor = PixelColors.BorderDark,
+                shadowColor = PixelColors.ShadowDark,
+                borderWidth = 1.8.dp,
+                shadowOffset = 3.dp,
+                cornerRadius = 6.dp,
+                onClick = if (!isProcessing) onMicClick else null
             ) {
                 Row(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(42.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
                 ) {
                     if (isProcessing) {
                         CircularProgressIndicator(
                             modifier = Modifier.size(16.dp),
-                            color = Color.White,
+                            color = PixelColors.BorderDark,
                             strokeWidth = 2.dp
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = "Đang chẩn đoán âm điệu...",
                             fontSize = 12.5.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
+                            fontWeight = FontWeight.Black,
+                            color = PixelColors.BorderDark
                         )
                     } else if (isListening) {
                         Icon(
@@ -234,7 +251,7 @@ private fun DiagnosticPromptCard(
                         Text(
                             text = "Đang thu âm... Bấm để dừng",
                             fontSize = 12.5.sp,
-                            fontWeight = FontWeight.Bold,
+                            fontWeight = FontWeight.Black,
                             color = Color.White
                         )
                     } else {
@@ -248,7 +265,7 @@ private fun DiagnosticPromptCard(
                         Text(
                             text = "Bật mic để chẩn đoán giọng đọc ngay",
                             fontSize = 12.5.sp,
-                            fontWeight = FontWeight.Bold,
+                            fontWeight = FontWeight.Black,
                             color = Color.White
                         )
                     }
@@ -267,9 +284,9 @@ private fun DiagnosticResultCard(
     onRetry: () -> Unit
 ) {
     val scoreColor = when {
-        score >= 80 -> VocabColors.SuccessGreen
-        score >= 60 -> Color(0xFFF59E0B)
-        else -> VocabColors.ErrorRed
+        score >= 80 -> Color(0xFF16A34A)
+        score >= 60 -> Color(0xFFD97706)
+        else -> Color(0xFFDC2626)
     }
     val badgeBg = when {
         score >= 80 -> Color(0xFFDCFCE7)
@@ -277,11 +294,13 @@ private fun DiagnosticResultCard(
         else -> Color(0xFFFEE2E2)
     }
 
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        color = Color.White,
-        border = androidx.compose.foundation.BorderStroke(1.dp, VocabColors.BorderLight)
+    PixelCardBox(
+        backgroundColor = Color.White,
+        borderColor = PixelColors.BorderDark,
+        shadowColor = PixelColors.ShadowDark,
+        borderWidth = 1.5.dp,
+        shadowOffset = 3.dp,
+        cornerRadius = 6.dp
     ) {
         Column(
             modifier = Modifier
@@ -298,68 +317,79 @@ private fun DiagnosticResultCard(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .size(42.dp)
-                            .clip(CircleShape)
-                            .background(scoreColor),
-                        contentAlignment = Alignment.Center
+                    PixelCardBox(
+                        backgroundColor = scoreColor,
+                        borderColor = PixelColors.BorderDark,
+                        shadowColor = PixelColors.ShadowDark,
+                        borderWidth = 1.5.dp,
+                        shadowOffset = 2.dp,
+                        cornerRadius = 4.dp
                     ) {
-                        Text(
-                            text = "$score",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = Color.White
-                        )
+                        Box(
+                            modifier = Modifier.size(38.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "$score",
+                                fontSize = 17.sp,
+                                fontWeight = FontWeight.Black,
+                                color = Color.White
+                            )
+                        }
                     }
                     Column {
                         Text(
                             text = "Kết quả chẩn đoán âm",
                             fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = VocabColors.TextDark
+                            fontWeight = FontWeight.Black,
+                            color = PixelColors.BorderDark
                         )
                         Text(
                             text = "Bạn đọc: \"$spokenText\" • Chuẩn: \"$targetText\"",
                             fontSize = 11.sp,
-                            color = VocabColors.TextMuted,
+                            color = PixelColors.BorderDark.copy(alpha = 0.7f),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
                     }
                 }
 
-                Surface(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(8.dp))
-                        .clickable(onClick = onRetry),
-                    shape = RoundedCornerShape(8.dp),
-                    color = Color.White,
-                    border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFCBD5E1))
+                PixelCardBox(
+                    backgroundColor = Color.White,
+                    borderColor = PixelColors.BorderDark,
+                    shadowColor = PixelColors.ShadowDark,
+                    borderWidth = 1.2.dp,
+                    shadowOffset = 2.dp,
+                    cornerRadius = 4.dp,
+                    onClick = onRetry
                 ) {
                     Text(
                         text = "Thử lại ↺",
                         fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = VocabColors.TextDark,
+                        fontWeight = FontWeight.Black,
+                        color = PixelColors.BorderDark,
                         modifier = Modifier.padding(horizontal = 9.dp, vertical = 6.dp)
                     )
                 }
             }
 
             // Nhận xét chi tiết
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(badgeBg, RoundedCornerShape(10.dp))
-                    .padding(horizontal = 12.dp, vertical = 8.dp)
+            PixelCardBox(
+                backgroundColor = badgeBg,
+                borderColor = PixelColors.BorderDark,
+                shadowColor = PixelColors.ShadowDark,
+                borderWidth = 1.2.dp,
+                shadowOffset = 2.dp,
+                cornerRadius = 4.dp,
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
                     text = feedback,
                     fontSize = 11.5.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Color(0xFF1E293B),
-                    lineHeight = 16.sp
+                    fontWeight = FontWeight.Bold,
+                    color = PixelColors.BorderDark,
+                    lineHeight = 16.sp,
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
                 )
             }
         }
@@ -371,11 +401,13 @@ private fun DiagnosticSyllableBreakdownCard(
     syllables: List<SyllableToneInfo>,
     speechSuccess: SpeechRecognitionState.Success?
 ) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        color = Color.White,
-        border = androidx.compose.foundation.BorderStroke(1.dp, VocabColors.BorderLight)
+    PixelCardBox(
+        backgroundColor = Color.White,
+        borderColor = PixelColors.BorderDark,
+        shadowColor = PixelColors.ShadowDark,
+        borderWidth = 1.5.dp,
+        shadowOffset = 3.dp,
+        cornerRadius = 6.dp
     ) {
         Column(
             modifier = Modifier
@@ -386,8 +418,8 @@ private fun DiagnosticSyllableBreakdownCard(
             Text(
                 text = "Phân tích âm vị từng chữ",
                 fontSize = 13.sp,
-                fontWeight = FontWeight.Bold,
-                color = VocabColors.TextDark
+                fontWeight = FontWeight.Black,
+                color = PixelColors.BorderDark
             )
 
             syllables.forEachIndexed { idx, s ->
@@ -404,54 +436,70 @@ private fun DiagnosticSyllableBreakdownCard(
                     else -> Color(0xFFDC2626)
                 }
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color(0xFFF8FAFC), RoundedCornerShape(10.dp))
-                        .padding(10.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+                PixelCardBox(
+                    backgroundColor = Color(0xFFF8FAFC),
+                    borderColor = PixelColors.BorderDark,
+                    shadowColor = PixelColors.ShadowDark,
+                    borderWidth = 1.2.dp,
+                    shadowOffset = 2.dp,
+                    cornerRadius = 4.dp,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(10.dp),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .size(34.dp)
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(VocabColors.BrandLight),
-                            contentAlignment = Alignment.Center
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
-                            Text(
-                                text = s.hanzi,
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = VocabColors.BrandPrimary
-                            )
+                            PixelCardBox(
+                                backgroundColor = Color(0xFFEEF2FF),
+                                borderColor = PixelColors.BorderDark,
+                                shadowColor = PixelColors.ShadowDark,
+                                borderWidth = 1.dp,
+                                shadowOffset = 1.dp,
+                                cornerRadius = 3.dp
+                            ) {
+                                Box(
+                                    modifier = Modifier.size(32.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = s.hanzi,
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.Black,
+                                        color = Color(0xFF4F46E5)
+                                    )
+                                }
+                            }
+
+                            Column {
+                                Text(
+                                    text = "${s.pinyin} • ${s.toneName} (${s.toneCode})",
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Black,
+                                    color = PixelColors.BorderDark
+                                )
+                                Text(
+                                    text = "Âm tiết #${idx + 1}",
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = PixelColors.BorderDark.copy(alpha = 0.6f)
+                                )
+                            }
                         }
 
-                        Column {
-                            Text(
-                                text = "${s.pinyin} • ${s.toneName} (${s.toneCode})",
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = VocabColors.TextDark
-                            )
-                            Text(
-                                text = "Âm tiết #${idx + 1}",
-                                fontSize = 10.sp,
-                                color = VocabColors.TextMuted
-                            )
-                        }
+                        Text(
+                            text = sylStatus,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Black,
+                            color = sylColor
+                        )
                     }
-
-                    Text(
-                        text = sylStatus,
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = sylColor
-                    )
                 }
             }
         }
@@ -460,11 +508,13 @@ private fun DiagnosticSyllableBreakdownCard(
 
 @Composable
 private fun PhoneticGuidanceCard(syllables: List<SyllableToneInfo>) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        color = Color.White,
-        border = androidx.compose.foundation.BorderStroke(1.dp, VocabColors.BorderLight)
+    PixelCardBox(
+        backgroundColor = Color.White,
+        borderColor = PixelColors.BorderDark,
+        shadowColor = PixelColors.ShadowDark,
+        borderWidth = 1.5.dp,
+        shadowOffset = 3.dp,
+        cornerRadius = 6.dp
     ) {
         Column(
             modifier = Modifier
@@ -475,8 +525,8 @@ private fun PhoneticGuidanceCard(syllables: List<SyllableToneInfo>) {
             Text(
                 text = "💡 Lưu ý ngữ âm & Mẹo phát âm",
                 fontSize = 13.sp,
-                fontWeight = FontWeight.Bold,
-                color = VocabColors.TextDark
+                fontWeight = FontWeight.Black,
+                color = PixelColors.BorderDark
             )
 
             syllables.forEach { s ->
@@ -490,7 +540,8 @@ private fun PhoneticGuidanceCard(syllables: List<SyllableToneInfo>) {
                 Text(
                     text = "• ${s.hanzi} (${s.pinyin}): $tip",
                     fontSize = 11.sp,
-                    color = Color(0xFF475569),
+                    fontWeight = FontWeight.Medium,
+                    color = PixelColors.BorderDark.copy(alpha = 0.8f),
                     lineHeight = 15.sp
                 )
             }

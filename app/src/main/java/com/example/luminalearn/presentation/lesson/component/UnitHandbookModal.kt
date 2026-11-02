@@ -46,6 +46,11 @@ import com.example.luminalearn.R
 import com.example.luminalearn.core.ui.effect.bounceClick
 import com.example.luminalearn.ui.theme.PlusJakartaSans
 
+import com.example.luminalearn.presentation.vocabulary.component.PixelColors
+import com.example.luminalearn.presentation.vocabulary.component.PixelCardBox
+import com.example.luminalearn.presentation.vocabulary.component.PixelBadge
+import com.example.luminalearn.presentation.vocabulary.component.PixelArcadeButton
+
 private val BrandIndigo = Color(0xFF5C50F6)
 private val BrandIndigoLight = Color(0xFF6366F1)
 private val TextMain = Color(0xFF0F172A)
@@ -54,14 +59,14 @@ private val BorderSubtle = Color(0xFFE2E8F0)
 private val CardBg = Color(0xFFF8FAFC)
 
 private enum class HandbookTab(val title: String) {
-    GRAMMAR("Ngữ pháp"),
-    VOCABULARY("Từ vựng"),
-    DIALOGUE("Hội thoại")
+    GRAMMAR("NGỮ PHÁP"),
+    VOCABULARY("TỪ VỰNG"),
+    DIALOGUE("HỘI THOẠI")
 }
 
 /**
  * Sổ tay kiến thức bỏ túi theo từng Unit (Unit Grammar Handbook).
- * Hiển thị tóm tắt lý thuyết ngữ pháp, từ mới và đàm thoại cốt lõi.
+ * Hiển thị tóm tắt lý thuyết ngữ pháp, từ mới và đàm thoại cốt lõi phong cách Pixel 16-Bit.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -89,15 +94,15 @@ fun UnitHandbookModal(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
         containerColor = Color.White,
-        shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
+        shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(0.85f)
-                .padding(horizontal = 20.dp)
+                .fillMaxHeight(0.88f)
+                .padding(horizontal = 18.dp)
         ) {
-            // ── 1. HEADER MODAL ──
+            // ── 1. HEADER MODAL PIXEL ──
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
@@ -110,76 +115,70 @@ fun UnitHandbookModal(
                     Box(
                         modifier = Modifier
                             .size(38.dp)
-                            .clip(CircleShape)
-                            .background(Color(0xFFEEF2FF)),
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(PixelColors.RetroCream)
+                            .border(BorderStroke(1.8.dp, PixelColors.BorderDark), RoundedCornerShape(6.dp)),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(text = "📖", fontSize = 18.sp)
                     }
                     Column {
                         Text(
-                            text = "Sổ Tay Phần $unitNumber",
+                            text = "SỔ TAY PHẦN $unitNumber",
                             fontFamily = PlusJakartaSans,
-                            fontSize = 17.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = TextMain
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Black,
+                            color = PixelColors.BorderDark
                         )
                         Text(
                             text = unitTitle,
                             fontFamily = PlusJakartaSans,
-                            fontSize = 12.sp,
+                            fontSize = 11.5.sp,
                             fontWeight = FontWeight.Medium,
-                            color = TextMuted
+                            color = PixelColors.MutedText
                         )
                     }
                 }
 
-                // Nút Đóng
+                // Nút Đóng Pixel
                 Box(
                     modifier = Modifier
-                        .size(32.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFFF1F5F9))
+                        .size(30.dp)
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(PixelColors.RetroCream)
+                        .border(BorderStroke(1.5.dp, PixelColors.BorderDark), RoundedCornerShape(4.dp))
                         .clickable { onDismiss() },
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(text = "✕", fontSize = 13.sp, color = TextMuted, fontWeight = FontWeight.Bold)
+                    Text(text = "✕", fontSize = 12.sp, color = PixelColors.BorderDark, fontWeight = FontWeight.Black)
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
-            // ── 2. TAB SELECTOR ──
+            // ── 2. TAB SELECTOR PIXEL ARCADE ──
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color(0xFFF1F5F9), RoundedCornerShape(14.dp))
-                    .padding(4.dp),
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 HandbookTab.entries.forEach { tab ->
                     val isSelected = selectedTab == tab
-                    Box(
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(36.dp)
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(if (isSelected) Color.White else Color.Transparent)
-                            .clickable { selectedTab = tab },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
+                    Box(modifier = Modifier.weight(1f)) {
+                        PixelArcadeButton(
                             text = tab.title,
-                            fontFamily = PlusJakartaSans,
-                            fontSize = 12.5.sp,
-                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                            color = if (isSelected) BrandIndigo else TextMuted
+                            onClick = { selectedTab = tab },
+                            color = if (isSelected) PixelColors.PixelYellow else Color.White,
+                            textColor = if (isSelected) PixelColors.BorderDark else PixelColors.MutedText,
+                            fontSize = 10.5f,
+                            contentPadding = 6.dp,
+                            shadowOffset = if (isSelected) 2.5.dp else 1.dp,
+                            fillMaxWidth = true
                         )
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
             // ── 3. NỘI DUNG THEO TAB ──
             when (selectedTab) {
@@ -238,36 +237,31 @@ private fun GrammarCardItem(
     grammar: GrammarStructureData,
     onSpeak: (String) -> Unit
 ) {
-    Surface(
+    PixelCardBox(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        color = CardBg,
-        border = BorderStroke(0.6.dp, BorderSubtle)
+        backgroundColor = Color.White,
+        borderWidth = 1.8.dp,
+        shadowOffset = 2.5.dp,
+        showGrille = false,
+        showRivets = false
     ) {
         Column(modifier = Modifier.padding(14.dp)) {
             Text(
                 text = grammar.title,
                 fontFamily = PlusJakartaSans,
                 fontSize = 14.sp,
-                fontWeight = FontWeight.Bold,
-                color = TextMain
+                fontWeight = FontWeight.Black,
+                color = PixelColors.BorderDark
             )
             Spacer(modifier = Modifier.height(6.dp))
 
-            // Công thức
-            Surface(
-                shape = RoundedCornerShape(8.dp),
-                color = Color(0xFFEEF2FF)
-            ) {
-                Text(
-                    text = grammar.formula,
-                    fontFamily = PlusJakartaSans,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = BrandIndigo,
-                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
-                )
-            }
+            // Công thức Pixel Badge
+            PixelBadge(
+                text = "⚡ CÔNG THỨC: ${grammar.formula}",
+                backgroundColor = PixelColors.CardPurple,
+                textColor = PixelColors.PixelPurpleDark,
+                borderColor = PixelColors.BorderDark
+            )
 
             if (grammar.explanation.isNotBlank()) {
                 Spacer(modifier = Modifier.height(6.dp))
@@ -275,26 +269,19 @@ private fun GrammarCardItem(
                     text = grammar.explanation,
                     fontFamily = PlusJakartaSans,
                     fontSize = 12.sp,
-                    color = TextMuted,
+                    color = PixelColors.MutedText,
                     lineHeight = 17.sp
                 )
             }
 
             if (!grammar.examTip.isNullOrBlank()) {
                 Spacer(modifier = Modifier.height(8.dp))
-                Surface(
-                    shape = RoundedCornerShape(8.dp),
-                    color = Color(0xFFFFFBEB),
-                    border = BorderStroke(0.5.dp, Color(0xFFFDE68A))
-                ) {
-                    Text(
-                        text = "💡 Mẹo thi HSK: ${grammar.examTip}",
-                        fontFamily = PlusJakartaSans,
-                        fontSize = 11.5.sp,
-                        color = Color(0xFFB45309),
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
-                    )
-                }
+                PixelBadge(
+                    text = "💡 MẸO THI HSK: ${grammar.examTip}",
+                    backgroundColor = PixelColors.CardYellow,
+                    textColor = PixelColors.PixelYellowDark,
+                    borderColor = PixelColors.BorderDark
+                )
             }
 
             // Các câu ví dụ
@@ -304,7 +291,7 @@ private fun GrammarCardItem(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 3.dp),
+                            .padding(vertical = 4.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
@@ -313,14 +300,14 @@ private fun GrammarCardItem(
                                 text = example.hanzi,
                                 fontFamily = PlusJakartaSans,
                                 fontSize = 13.5.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = TextMain
+                                fontWeight = FontWeight.Black,
+                                color = PixelColors.BorderDark
                             )
                             Text(
                                 text = "${example.pinyinActual.ifBlank { example.pinyinOriginal }} — ${example.meaning}",
                                 fontFamily = PlusJakartaSans,
                                 fontSize = 11.sp,
-                                color = TextMuted
+                                color = PixelColors.MutedText
                             )
                             if (!example.warning.isNullOrBlank()) {
                                 Spacer(modifier = Modifier.height(2.dp))
@@ -328,16 +315,16 @@ private fun GrammarCardItem(
                                     text = "⚠️ ${example.warning}",
                                     fontFamily = PlusJakartaSans,
                                     fontSize = 10.5.sp,
-                                    color = Color(0xFFDC2626)
+                                    color = PixelColors.PixelRedDark
                                 )
                             }
                         }
                         Box(
                             modifier = Modifier
-                                .size(30.dp)
-                                .clip(CircleShape)
-                                .background(Color.White)
-                                .border(BorderStroke(0.6.dp, BorderSubtle), CircleShape)
+                                .size(28.dp)
+                                .clip(RoundedCornerShape(4.dp))
+                                .background(PixelColors.CardPurple)
+                                .border(BorderStroke(1.2.dp, PixelColors.BorderDark), RoundedCornerShape(4.dp))
                                 .clickable { onSpeak(example.audioText ?: example.hanzi) },
                             contentAlignment = Alignment.Center
                         ) {
@@ -355,11 +342,13 @@ private fun VocabCardItem(
     vocab: LessonCoreVocabData,
     onSpeak: (String) -> Unit
 ) {
-    Surface(
+    PixelCardBox(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(14.dp),
-        color = CardBg,
-        border = BorderStroke(0.6.dp, BorderSubtle)
+        backgroundColor = Color.White,
+        borderWidth = 1.8.dp,
+        shadowOffset = 2.5.dp,
+        showGrille = false,
+        showRivets = false
     ) {
         Row(
             modifier = Modifier
@@ -376,31 +365,31 @@ private fun VocabCardItem(
                     Text(
                         text = vocab.hanzi,
                         fontFamily = PlusJakartaSans,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = TextMain
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Black,
+                        color = PixelColors.BorderDark
                     )
                     Text(
                         text = "[${vocab.pinyin}]",
                         fontFamily = PlusJakartaSans,
                         fontSize = 12.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = BrandIndigo
+                        fontWeight = FontWeight.Bold,
+                        color = PixelColors.PixelPurpleDark
                     )
                 }
                 Text(
                     text = "${vocab.hanViet} · ${vocab.meaning}",
                     fontFamily = PlusJakartaSans,
                     fontSize = 11.5.sp,
-                    color = TextMuted
+                    color = PixelColors.MutedText
                 )
             }
             Box(
                 modifier = Modifier
-                    .size(32.dp)
-                    .clip(CircleShape)
-                    .background(Color.White)
-                    .border(BorderStroke(0.6.dp, BorderSubtle), CircleShape)
+                    .size(28.dp)
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(PixelColors.CardPurple)
+                    .border(BorderStroke(1.2.dp, PixelColors.BorderDark), RoundedCornerShape(4.dp))
                     .clickable { onSpeak(vocab.hanzi) },
                 contentAlignment = Alignment.Center
             ) {
@@ -415,11 +404,13 @@ private fun DialogueCardItem(
     dialogue: LessonDialogueData,
     onSpeak: (String) -> Unit
 ) {
-    Surface(
+    PixelCardBox(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(14.dp),
-        color = CardBg,
-        border = BorderStroke(0.6.dp, BorderSubtle)
+        backgroundColor = Color.White,
+        borderWidth = 1.8.dp,
+        shadowOffset = 2.5.dp,
+        showGrille = false,
+        showRivets = false
     ) {
         Row(
             modifier = Modifier
@@ -433,22 +424,22 @@ private fun DialogueCardItem(
                     text = "${dialogue.speakerName}: ${dialogue.chinese}",
                     fontFamily = PlusJakartaSans,
                     fontSize = 13.5.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = TextMain
+                    fontWeight = FontWeight.Black,
+                    color = PixelColors.BorderDark
                 )
                 Text(
                     text = "${dialogue.pinyin} — ${dialogue.vietnamese}",
                     fontFamily = PlusJakartaSans,
-                    fontSize = 11.5.sp,
-                    color = TextMuted
+                    fontSize = 11.sp,
+                    color = PixelColors.MutedText
                 )
             }
             Box(
                 modifier = Modifier
-                    .size(30.dp)
-                    .clip(CircleShape)
-                    .background(Color.White)
-                    .border(BorderStroke(0.6.dp, BorderSubtle), CircleShape)
+                    .size(28.dp)
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(PixelColors.CardPurple)
+                    .border(BorderStroke(1.2.dp, PixelColors.BorderDark), RoundedCornerShape(4.dp))
                     .clickable { onSpeak(dialogue.chinese) },
                 contentAlignment = Alignment.Center
             ) {

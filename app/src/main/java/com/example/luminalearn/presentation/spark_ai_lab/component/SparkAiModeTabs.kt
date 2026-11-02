@@ -2,12 +2,14 @@ package com.example.luminalearn.presentation.spark_ai_lab.component
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -29,17 +31,14 @@ import androidx.compose.ui.unit.sp
 import com.example.luminalearn.R
 import com.example.luminalearn.core.ui.effect.bounceClick
 
+import com.example.luminalearn.presentation.vocabulary.component.PixelColors
+import com.example.luminalearn.presentation.vocabulary.component.PixelStepCornerShape
+
 enum class SparkAiMode(val title: String, val shortTitle: String) {
     ROLEPLAY("Hội Thoại", "Hội Thoại"),
     MICRO_PROMPT("Trợ Lý AI", "Trợ Lý AI"),
     REFLEX_QUIZ("Trắc Nghiệm", "Trắc Nghiệm")
 }
-
-private val ActiveGradient = Brush.horizontalGradient(
-    listOf(Color(0xFF4F46E5), Color(0xFF5C50F6))
-)
-private val TextDark = Color(0xFF334155)
-private val TextMuted = Color(0xFF64748B)
 
 @Composable
 fun SparkAiModeTabs(
@@ -47,34 +46,49 @@ fun SparkAiModeTabs(
     onSelectMode: (SparkAiMode) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(50.dp),
-        color = Color.White,
-        border = BorderStroke(1.dp, Color(0xFFF1F5F9)),
-        shadowElevation = 1.dp
-    ) {
-        Row(
+    val barShape = PixelStepCornerShape(3.dp)
+
+    Box(modifier = modifier.fillMaxWidth()) {
+        // Gờ bóng máy kim loại 3D phía sau
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .offset(x = 2.dp, y = 2.dp)
+                .clip(barShape)
+                .background(PixelColors.ShadowDark)
+                .border(BorderStroke(1.2.dp, PixelColors.BorderDark), barShape)
+        )
+
+        // Bề mặt Dock chính
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(4.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .clip(barShape)
+                .background(Color(0xFFF1F5F9))
+                .border(BorderStroke(1.5.dp, PixelColors.BorderDark), barShape)
+                .padding(3.dp)
         ) {
-            SparkAiMode.entries.forEach { mode ->
-                val isSelected = mode == selectedMode
-                SegmentedPillItem(
-                    mode = mode,
-                    isSelected = isSelected,
-                    onClick = { onSelectMode(mode) },
-                    modifier = Modifier.weight(1f)
-                )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                SparkAiMode.entries.forEach { mode ->
+                    val isSelected = mode == selectedMode
+                    PixelModeTabItem(
+                        mode = mode,
+                        isSelected = isSelected,
+                        onClick = { onSelectMode(mode) },
+                        modifier = Modifier.weight(1f)
+                    )
+                }
             }
         }
     }
 }
 
 @Composable
-private fun SegmentedPillItem(
+private fun PixelModeTabItem(
     mode: SparkAiMode,
     isSelected: Boolean,
     onClick: () -> Unit,
@@ -86,17 +100,35 @@ private fun SegmentedPillItem(
         SparkAiMode.REFLEX_QUIZ -> R.drawable.ic_reflect
     }
 
+    val tabShape = PixelStepCornerShape(2.dp)
+
     Box(
         modifier = modifier
-            .clip(RoundedCornerShape(50.dp))
+            .clip(tabShape)
             .then(
-                if (isSelected) Modifier.background(ActiveGradient)
-                else Modifier.background(Color.Transparent)
+                if (isSelected) {
+                    Modifier
+                        .background(PixelColors.PixelBlue)
+                        .border(BorderStroke(1.2.dp, PixelColors.BorderDark), tabShape)
+                } else {
+                    Modifier
+                        .background(Color.Transparent)
+                }
             )
-            .bounceClick(scaleDown = 0.94f, onClick = onClick)
-            .padding(vertical = 10.dp),
+            .bounceClick(scaleDown = 0.95f, onClick = onClick)
+            .padding(vertical = 7.dp),
         contentAlignment = Alignment.Center
     ) {
+        // Highlight bevel trên nóc nút khi đang chọn
+        if (isSelected) {
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .padding(top = 1.dp, start = 1.dp, end = 1.dp)
+                    .border(BorderStroke(0.8.dp, Color.White.copy(alpha = 0.5f)), tabShape)
+            )
+        }
+
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
@@ -104,26 +136,18 @@ private fun SegmentedPillItem(
             Icon(
                 painter = painterResource(id = iconRes),
                 contentDescription = null,
-                tint = if (isSelected) Color.White else TextMuted,
-                modifier = Modifier.size(14.dp)
+                tint = if (isSelected) Color.White else Color(0xFF64748B),
+                modifier = Modifier.size(13.dp)
             )
-            Spacer(modifier = Modifier.width(5.dp))
+            Spacer(modifier = Modifier.width(4.dp))
             Text(
                 text = mode.shortTitle,
-                fontSize = 12.sp,
-                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                color = if (isSelected) Color.White else TextDark,
+                fontSize = 11.sp,
+                fontWeight = if (isSelected) FontWeight.Black else FontWeight.Bold,
+                color = if (isSelected) Color.White else Color(0xFF334155),
+                letterSpacing = 0.3.sp,
                 maxLines = 1
             )
-            if (mode == SparkAiMode.ROLEPLAY && !isSelected) {
-                Spacer(modifier = Modifier.width(4.dp))
-                Box(
-                    modifier = Modifier
-                        .size(5.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFFEA580C))
-                )
-            }
         }
     }
 }

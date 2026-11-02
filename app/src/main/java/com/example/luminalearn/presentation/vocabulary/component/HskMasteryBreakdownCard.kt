@@ -68,17 +68,19 @@ fun HskMasteryBreakdownCard(
         }
     }
 
-    Card(
+    PixelCardBox(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = BorderStroke(0.5.dp, BorderSubtle),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        backgroundColor = Color.White,
+        borderColor = PixelColors.BorderDark,
+        shadowColor = PixelColors.ShadowDark,
+        borderWidth = 2.dp,
+        shadowOffset = 4.dp,
+        cornerRadius = 8.dp
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(14.dp)
         ) {
             // ── Header: Tiêu đề & Tổng tiến độ ──
             Row(
@@ -88,49 +90,42 @@ fun HskMasteryBreakdownCard(
             ) {
                 Column {
                     Text(
-                        text = "Năng Lực Từ Vựng HSK",
+                        text = "NĂNG LỰC TỪ VỰNG",
                         fontFamily = PlusJakartaSans,
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = TextMain
+                        fontSize = 14.5.sp,
+                        fontWeight = FontWeight.Black,
+                        color = PixelColors.BorderDark,
+                        letterSpacing = 0.3.sp
                     )
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
                         text = "Đã làm chủ $masteredCount/$totalCount từ ($formattedTotalProgress)",
                         fontFamily = PlusJakartaSans,
                         fontSize = 10.5.sp,
-                        color = TextMuted
+                        fontWeight = FontWeight.Bold,
+                        color = PixelColors.MutedText
                     )
                 }
 
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(6.dp))
-                        .background(Color(0xFFEEF2FF))
-                        .border(BorderStroke(0.5.dp, Color(0xFFC7D2FE)), RoundedCornerShape(6.dp))
-                        .padding(horizontal = 7.dp, vertical = 2.dp)
-                ) {
-                    Text(
-                        text = "🎯 HSK 1–6",
-                        fontFamily = PlusJakartaSans,
-                        fontSize = 9.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = BrandIndigo
-                    )
-                }
+                PixelBadge(
+                    text = "📊 STATS EXP",
+                    backgroundColor = PixelColors.PixelBlue,
+                    textColor = PixelColors.BorderDark,
+                    borderColor = PixelColors.BorderDark
+                )
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             // ── Body: Lưới 2 Cột x 3 Hàng tiến độ HSK ──
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(14.dp)
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 // Cột trái: HSK 1, 2, 3
                 Column(
                     modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                    verticalArrangement = Arrangement.spacedBy(9.dp)
                 ) {
                     hskStats.take(3).forEach { (levelInfo, counts, pctString) ->
                         HskLevelProgressRow(
@@ -146,7 +141,7 @@ fun HskMasteryBreakdownCard(
                 // Cột phải: HSK 4, 5, 6
                 Column(
                     modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                    verticalArrangement = Arrangement.spacedBy(9.dp)
                 ) {
                     hskStats.drop(3).forEach { (levelInfo, counts, pctString) ->
                         HskLevelProgressRow(
@@ -174,9 +169,9 @@ private fun HskLevelProgressRow(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(8.dp))
+            .clip(RoundedCornerShape(4.dp))
             .bounceClick(scaleDown = 0.96f, onClick = onClick)
-            .padding(vertical = 2.dp)
+            .padding(vertical = 1.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -186,16 +181,17 @@ private fun HskLevelProgressRow(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(4.dp))
-                        .background(levelInfo.accentColor.copy(alpha = 0.15f))
+                        .clip(RoundedCornerShape(3.dp))
+                        .background(levelInfo.accentColor)
+                        .border(BorderStroke(1.dp, PixelColors.BorderDark), RoundedCornerShape(3.dp))
                         .padding(horizontal = 4.dp, vertical = 1.dp)
                 ) {
                     Text(
                         text = "HSK ${levelInfo.levelNumber}",
                         fontFamily = PlusJakartaSans,
-                        fontSize = 9.5.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = levelInfo.accentColor
+                        fontSize = 9.sp,
+                        fontWeight = FontWeight.Black,
+                        color = Color.White
                     )
                 }
                 Spacer(modifier = Modifier.width(4.dp))
@@ -203,36 +199,37 @@ private fun HskLevelProgressRow(
                     text = "$mastered/$total",
                     fontFamily = PlusJakartaSans,
                     fontSize = 9.sp,
-                    color = TextMuted
+                    fontWeight = FontWeight.Bold,
+                    color = PixelColors.MutedText
                 )
             }
 
             Text(
                 text = percentStr,
                 fontFamily = PlusJakartaSans,
-                fontSize = 10.sp,
-                fontWeight = FontWeight.Bold,
-                color = levelInfo.accentColor
+                fontSize = 9.5.sp,
+                fontWeight = FontWeight.Black,
+                color = PixelColors.BorderDark
             )
         }
 
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(3.dp))
 
-        // Thanh progress bar mini
+        // Thanh HP/EXP bar pixel viền đen
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(4.dp)
+                .height(6.dp)
                 .clip(RoundedCornerShape(2.dp))
-                .background(Color(0xFFF1F5F9))
+                .background(Color(0xFFE4E4E7))
+                .border(BorderStroke(1.dp, PixelColors.BorderDark), RoundedCornerShape(2.dp))
         ) {
             val rawFraction = if (total > 0) (mastered.toFloat() / total).coerceIn(0f, 1f) else 0f
-            val fraction = if (mastered > 0) maxOf(rawFraction, 0.035f) else 0f
+            val fraction = if (mastered > 0) maxOf(rawFraction, 0.05f) else 0f
             Box(
                 modifier = Modifier
                     .fillMaxWidth(fraction)
                     .fillMaxHeight()
-                    .clip(RoundedCornerShape(2.dp))
                     .background(levelInfo.accentColor)
             )
         }

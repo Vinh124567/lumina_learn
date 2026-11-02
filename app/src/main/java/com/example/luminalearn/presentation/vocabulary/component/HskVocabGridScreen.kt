@@ -27,6 +27,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
@@ -60,6 +61,10 @@ import androidx.compose.ui.unit.sp
 import com.example.luminalearn.R
 import com.example.luminalearn.core.ui.effect.bounceClick
 import com.example.luminalearn.presentation.vocabulary.model.VocabWordItem
+import com.example.luminalearn.presentation.vocabulary.component.PixelBadge
+import com.example.luminalearn.presentation.vocabulary.component.PixelCardBox
+import com.example.luminalearn.presentation.vocabulary.component.PixelColors
+import com.example.luminalearn.presentation.vocabulary.component.PixelHeartIcon
 import com.example.luminalearn.ui.theme.PlusJakartaSans
 
 /**
@@ -233,113 +238,131 @@ fun HskVocabGridScreen(
             .fillMaxSize()
             .background(Color(0xFFF6F8FB))
     ) {
-        // ── 1. APP BAR THANH LỊCH & NÚT THÊM TỪ ──
+        // ── 1. APP BAR PHONG CÁCH PIXEL RETRO CART & NÚT TÁC VỤ ──
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .statusBarsPadding()
-                .padding(start = 8.dp, end = 16.dp, top = 6.dp, bottom = 4.dp),
+                .padding(start = 14.dp, end = 16.dp, top = 8.dp, bottom = 6.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Nút quay lại dạng < (chevron) phẳng
-            Box(
-                modifier = Modifier
-                    .size(38.dp)
-                    .bounceClick(scaleDown = 0.86f, onClick = onBack),
-                contentAlignment = Alignment.Center
+            // Nút quay lại Pixel Box 36dp
+            PixelCardBox(
+                modifier = Modifier.size(36.dp),
+                backgroundColor = Color.White,
+                borderColor = PixelColors.BorderDark,
+                shadowColor = PixelColors.ShadowDark,
+                borderWidth = 1.5.dp,
+                shadowOffset = 2.dp,
+                cornerRadius = 4.dp,
+                showRivets = false,
+                onClick = onBack
             ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_chevron_left),
-                    contentDescription = "Quay lại",
-                    tint = Color(0xFF0F172A),
-                    modifier = Modifier.size(24.dp)
-                )
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_chevron_left),
+                        contentDescription = "Quay lại",
+                        tint = PixelColors.BorderDark,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
             }
 
-            Spacer(modifier = Modifier.width(4.dp))
+            Spacer(modifier = Modifier.width(10.dp))
 
-            // Tiêu đề màn hình
+            // Tiêu đề & Cấp độ HSK Cartridge
             Text(
-                text = if (selectedHskLevelNumber == 0) "Tất cả từ vựng" else currentHskData.stageName,
+                text = if (selectedHskLevelNumber == 0) "KHO TỪ VỰNG" else currentHskData.stageName.uppercase(),
                 fontFamily = PlusJakartaSans,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = Color(0xFF0F172A),
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Black,
+                color = PixelColors.BorderDark,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
+                letterSpacing = (-0.2).sp,
                 modifier = Modifier.weight(1f)
             )
 
-            // Nút chuyển đổi chế độ xem (Lưới 2 cột <-> Danh sách 1 cột)
-            Box(
-                modifier = Modifier
-                    .size(34.dp)
-                    .clip(CircleShape)
-                    .background(Color.White)
-                    .border(BorderStroke(0.5.dp, Color(0xFFE2E8F0)), CircleShape)
-                    .bounceClick(scaleDown = 0.88f) {
-                        isGridView = !isGridView
-                    },
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    painter = painterResource(
-                        if (isGridView) R.drawable.ic_view_list else R.drawable.ic_view_grid
-                    ),
-                    contentDescription = stringResource(
-                        if (isGridView) R.string.content_desc_switch_to_list else R.string.content_desc_switch_to_grid
-                    ),
-                    tint = Color(0xFF475569),
-                    modifier = Modifier.size(16.dp)
-                )
-            }
-
             Spacer(modifier = Modifier.width(8.dp))
 
-            // Nút + Thêm từ nhanh
-            Box(
-                modifier = Modifier
-                    .size(34.dp)
-                    .clip(CircleShape)
-                    .background(Color(0xFFEEF2FF))
-                    .border(BorderStroke(0.5.dp, Color(0xFFC7D2FE)), CircleShape)
-                    .bounceClick(scaleDown = 0.88f, onClick = onAddVocabClick),
-                contentAlignment = Alignment.Center
+            // Nút chuyển đổi chế độ xem Grid / List Pixel Box 34dp
+            PixelCardBox(
+                modifier = Modifier.size(34.dp),
+                backgroundColor = Color.White,
+                borderColor = PixelColors.BorderDark,
+                shadowColor = PixelColors.ShadowDark,
+                borderWidth = 1.5.dp,
+                shadowOffset = 2.dp,
+                cornerRadius = 4.dp,
+                showRivets = false,
+                onClick = { isGridView = !isGridView }
             ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Thêm từ",
-                    tint = Color(0xFF6366F1),
-                    modifier = Modifier.size(16.dp)
-                )
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Icon(
+                        painter = painterResource(
+                            if (isGridView) R.drawable.ic_view_list else R.drawable.ic_view_grid
+                        ),
+                        contentDescription = stringResource(
+                            if (isGridView) R.string.content_desc_switch_to_list else R.string.content_desc_switch_to_grid
+                        ),
+                        tint = PixelColors.BorderDark,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.width(7.dp))
+
+            // Nút + Thêm từ nhanh Pixel Box 34dp màu vàng
+            PixelCardBox(
+                modifier = Modifier.size(34.dp),
+                backgroundColor = PixelColors.PixelYellow,
+                borderColor = PixelColors.BorderDark,
+                shadowColor = PixelColors.ShadowDark,
+                borderWidth = 1.5.dp,
+                shadowOffset = 2.dp,
+                cornerRadius = 4.dp,
+                showRivets = false,
+                onClick = onAddVocabClick
+            ) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Thêm từ",
+                        tint = PixelColors.BorderDark,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
             }
         }
 
-        // ── 2. KHUNG TÌM KIẾM MỎNG GỌN ──
+        // ── 2. KHUNG TÌM KIẾM PIXEL RETRO CONSOLE INPUT ──
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 3.dp)
+                .padding(horizontal = 14.dp, vertical = 4.dp)
         ) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(38.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
-                border = BorderStroke(0.5.dp, Color(0xFFE2E8F0)),
-                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+            PixelCardBox(
+                modifier = Modifier.fillMaxWidth(),
+                backgroundColor = Color.White,
+                borderColor = PixelColors.BorderDark,
+                shadowColor = PixelColors.ShadowDark,
+                borderWidth = 1.8.dp,
+                shadowOffset = 2.5.dp,
+                cornerRadius = 5.dp,
+                showRivets = false
             ) {
                 Row(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 11.dp),
+                        .fillMaxWidth()
+                        .height(38.dp)
+                        .padding(horizontal = 10.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_search),
                         contentDescription = "Search",
-                        tint = Color(0xFF6366F1),
+                        tint = PixelColors.BorderDark,
                         modifier = Modifier.size(15.dp)
                     )
 
@@ -350,8 +373,9 @@ fun HskVocabGridScreen(
                             Text(
                                 text = "Tìm chữ Hán, Pinyin, nghĩa...",
                                 fontFamily = PlusJakartaSans,
-                                fontSize = 12.sp,
-                                color = Color(0xFF94A3B8),
+                                fontSize = 11.5.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = PixelColors.MutedText,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
@@ -362,11 +386,11 @@ fun HskVocabGridScreen(
                             textStyle = TextStyle(
                                 fontFamily = PlusJakartaSans,
                                 fontSize = 12.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = Color(0xFF0F172A)
+                                fontWeight = FontWeight.Bold,
+                                color = PixelColors.BorderDark
                             ),
                             singleLine = true,
-                            cursorBrush = SolidColor(Color(0xFF6366F1)),
+                            cursorBrush = SolidColor(PixelColors.BorderDark),
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
@@ -375,99 +399,89 @@ fun HskVocabGridScreen(
                         Icon(
                             painter = painterResource(id = R.drawable.ic_close),
                             contentDescription = "Clear",
-                            tint = Color(0xFF94A3B8),
+                            tint = PixelColors.BorderDark,
                             modifier = Modifier
                                 .size(15.dp)
-                                .clickable { searchQuery = "" }
+                                .bounceClick { searchQuery = "" }
                         )
                     }
                 }
             }
         }
 
-        // ── 3. DẢI CHỌN CẤP ĐỘ HSK (CHUYỂN NHANH HSK 1–6 HOẶC XEM TẤT CẢ) ──
+        // ── 3. DẢI CHỌN CẤP ĐỘ HSK (LEVEL CARTRIDGE CHIPS) ──
         LazyRow(
-            contentPadding = PaddingValues(horizontal = 16.dp),
+            contentPadding = PaddingValues(horizontal = 14.dp),
             horizontalArrangement = Arrangement.spacedBy(7.dp),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 3.dp)
+                .padding(vertical = 4.dp)
         ) {
             items(hskLevelPills) { (levelNum, label) ->
                 val isSelected = selectedHskLevelNumber == levelNum
-                val pillGradient = getHskGradientColors(levelNum)
+                val pillColor = when (levelNum) {
+                    0 -> PixelColors.PixelYellow
+                    1 -> PixelColors.CardGreen
+                    2 -> PixelColors.CardBlue
+                    3 -> Color(0xFF60A5FA)
+                    4 -> PixelColors.CardPurple
+                    5 -> PixelColors.CardOrange
+                    6 -> Color(0xFFF87171)
+                    else -> PixelColors.PixelYellow
+                }
+                val shape = CutCornerShape(topStart = 4.dp, bottomEnd = 4.dp)
                 Box(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(
-                            if (isSelected) {
-                                Brush.horizontalGradient(pillGradient)
-                            } else {
-                                SolidColor(Color.White)
-                            }
-                        )
-                        .border(
-                            BorderStroke(
-                                0.5.dp,
-                                if (isSelected) Color.Transparent
-                                else Color(0xFFE2E8F0)
-                            ),
-                            RoundedCornerShape(10.dp)
-                        )
-                        .bounceClick(scaleDown = 0.94f) {
+                        .clip(shape)
+                        .background(if (isSelected) pillColor else Color.White)
+                        .border(BorderStroke(1.5.dp, PixelColors.BorderDark), shape)
+                        .bounceClick(scaleDown = 0.92f) {
                             selectedHskLevelNumber = levelNum
                             selectedFilterIndex = 0
                         }
-                        .padding(horizontal = 12.dp, vertical = 5.dp)
+                        .padding(horizontal = 11.dp, vertical = 5.dp)
                 ) {
                     Text(
-                        text = label,
+                        text = label.uppercase(),
                         fontFamily = PlusJakartaSans,
-                        fontSize = 11.5.sp,
-                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold,
-                        color = if (isSelected) Color.White else Color(0xFF475569)
+                        fontSize = 10.5.sp,
+                        fontWeight = if (isSelected) FontWeight.Black else FontWeight.Bold,
+                        color = PixelColors.BorderDark
                     )
                 }
             }
         }
 
-        // ── 4. BỘ LỌC PHÂN LOẠI & TRẠNG THÁI (STATUS / POS) ──
+        // ── 4. BỘ LỌC PHÂN LOẠI & TRẠNG THÁI (PIXEL FILTER CHIPS) ──
         LazyRow(
-            contentPadding = PaddingValues(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(7.dp),
+            contentPadding = PaddingValues(horizontal = 14.dp),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 3.dp)
+                .padding(vertical = 4.dp)
         ) {
             itemsIndexed(filterOptions) { index, title ->
                 val isSelected = selectedFilterIndex == index
-                val activeAccent = if (selectedHskLevelNumber == 0) Color(0xFF6366F1) else currentHskData.accentColor
+                val shape = CutCornerShape(topStart = 3.dp, bottomEnd = 3.dp)
                 Box(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(
-                            if (isSelected) activeAccent.copy(alpha = 0.12f)
-                            else Color.White
-                        )
+                        .clip(shape)
+                        .background(if (isSelected) PixelColors.PixelYellow else Color.White)
                         .border(
-                            BorderStroke(
-                                0.5.dp,
-                                if (isSelected) activeAccent.copy(alpha = 0.45f)
-                                else Color(0xFFE2E8F0)
-                            ),
-                            RoundedCornerShape(10.dp)
+                            BorderStroke(1.2.dp, if (isSelected) PixelColors.BorderDark else Color(0xFFCBD5E1)),
+                            shape
                         )
-                        .bounceClick(scaleDown = 0.94f) {
+                        .bounceClick(scaleDown = 0.92f) {
                             selectedFilterIndex = index
                         }
-                        .padding(horizontal = 10.dp, vertical = 4.5.dp)
+                        .padding(horizontal = 9.5.dp, vertical = 4.5.dp)
                 ) {
                     Text(
                         text = title,
                         fontFamily = PlusJakartaSans,
-                        fontSize = 11.sp,
-                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                        color = if (isSelected) activeAccent else Color(0xFF64748B)
+                        fontSize = 10.sp,
+                        fontWeight = if (isSelected) FontWeight.Black else FontWeight.Bold,
+                        color = if (isSelected) PixelColors.BorderDark else Color(0xFF64748B)
                     )
                 }
             }
@@ -628,11 +642,10 @@ fun HskVocabGridScreen(
 }
 
 /**
- * Thẻ từ vựng hiển thị dạng Grid 2 cột phong cách Luxury Flashcard:
- * - Nền trắng sứ tinh tế, bo góc 20dp, viền siêu mỏng hairline 0.5dp.
- * - Header: Nhãn loại từ bên trái & Duy nhất nút Loa phát âm bên phải (thoáng đãng, không chật chội).
- * - Center: Chữ Hán to rõ 35sp mực than sâu, Pinyin & Hán Việt hài hòa.
- * - Footer: Nghĩa tiếng Việt cùng cụm nút hành động SRS và Đánh dấu thuộc cân xứng ở đáy.
+ * Thẻ từ vựng hiển thị dạng Grid 2 cột phong cách Pixel Retro RPG Item Cartridge:
+ * - Header: Nhãn loại từ và nhãn HSK dập trên dải Cartridge Banner có rãnh khía console.
+ * - Centerpiece: Chữ Hán to rõ 33sp mực đậm, Pinyin sắc nét và Hán Việt tinh tế.
+ * - Footer: Nghĩa tiếng Việt, cụm phím cơ Loa, SRS (tia sét vàng) và Trái tim RPG (Đã thuộc).
  */
 @Composable
 private fun VocabGridCard(
@@ -644,74 +657,59 @@ private fun VocabGridCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(
+    val posLabel = item.partOfSpeech.ifBlank { "TỪ VỰNG" }
+    val hskBadge = item.hskLevel.ifBlank { null }
+
+    PixelCardBox(
         modifier = modifier
             .fillMaxWidth()
-            .height(176.dp)
-            .bounceClick(scaleDown = 0.96f, onClick = onClick),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = if (item.isMastered) Color(0xFFF9FDFB) else Color.White
-        ),
-        border = BorderStroke(
-            0.5.dp,
-            if (item.isMastered) Color(0xFF10B981).copy(alpha = 0.35f)
-            else Color(0xFFE2E8F0).copy(alpha = 0.6f)
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+            .height(188.dp),
+        backgroundColor = if (item.isMastered) Color(0xFFF9FDFB) else Color.White,
+        borderColor = if (item.isMastered) Color(0xFF059669) else PixelColors.BorderDark,
+        shadowColor = PixelColors.ShadowDark,
+        borderWidth = 1.8.dp,
+        shadowOffset = 3.dp,
+        headerTitle = posLabel.uppercase(),
+        headerBadge = hskBadge,
+        headerColor = accentColor.copy(alpha = 0.25f),
+        showGrille = true,
+        onClick = onClick
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 12.dp, vertical = 11.dp),
+                .padding(horizontal = 10.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            // ── 1. Header: Loại từ badge bên trái + Duy nhất nút Loa phát âm bên phải ──
+            // ── 1. Top row: Nút Loa góc phải ──
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                val posLabel = item.partOfSpeech.ifBlank { "Từ vựng" }
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(6.dp))
-                        .background(accentColor.copy(alpha = 0.08f))
-                        .padding(horizontal = 7.dp, vertical = 2.5.dp)
+                PixelCardBox(
+                    modifier = Modifier.size(26.dp),
+                    backgroundColor = Color(0xFFF8FAFC),
+                    borderColor = PixelColors.BorderDark,
+                    shadowColor = PixelColors.ShadowDark,
+                    borderWidth = 1.2.dp,
+                    shadowOffset = 1.5.dp,
+                    cornerRadius = 3.dp,
+                    showRivets = false,
+                    onClick = { onSpeak(item.hanzi) }
                 ) {
-                    Text(
-                        text = posLabel,
-                        fontFamily = PlusJakartaSans,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = accentColor,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
-
-                // Nút loa phát âm tròn thoáng đãng
-                Box(
-                    modifier = Modifier
-                        .size(28.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFFF8FAFC))
-                        .border(BorderStroke(0.5.dp, Color(0xFFE2E8F0)), CircleShape)
-                        .bounceClick(scaleDown = 0.85f) {
-                            onSpeak(item.hanzi)
-                        },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_speaker),
-                        contentDescription = "Phát âm",
-                        tint = Color(0xFF475569),
-                        modifier = Modifier.size(13.dp)
-                    )
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_speaker),
+                            contentDescription = "Phát âm",
+                            tint = PixelColors.BorderDark,
+                            modifier = Modifier.size(12.dp)
+                        )
+                    }
                 }
             }
 
-            // ── 2. Centerpiece: Chữ Hán to rõ 35sp mực than sâu + Pinyin & Hán Việt ──
+            // ── 2. Centerpiece: Chữ Hán to rõ 33sp + Pinyin & Hán Việt ──
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -719,9 +717,9 @@ private fun VocabGridCard(
                 Text(
                     text = item.hanzi,
                     fontFamily = PlusJakartaSans,
-                    fontSize = 35.sp,
+                    fontSize = 32.sp,
                     fontWeight = FontWeight.ExtraBold,
-                    color = Color(0xFF0F172A),
+                    color = PixelColors.BorderDark,
                     textAlign = TextAlign.Center,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -736,8 +734,8 @@ private fun VocabGridCard(
                     Text(
                         text = item.pinyin,
                         fontFamily = PlusJakartaSans,
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Bold,
+                        fontSize = 12.5.sp,
+                        fontWeight = FontWeight.Black,
                         color = accentColor,
                         maxLines = 1
                     )
@@ -746,15 +744,15 @@ private fun VocabGridCard(
                         Text(
                             text = " • ",
                             fontFamily = PlusJakartaSans,
-                            fontSize = 10.sp,
-                            color = Color(0xFFCBD5E1)
+                            fontSize = 9.sp,
+                            color = Color(0xFF94A3B8)
                         )
                         Text(
                             text = item.hanViet,
                             fontFamily = PlusJakartaSans,
-                            fontSize = 11.5.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = Color(0xFF64748B),
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = PixelColors.MutedText,
                             maxLines = 1
                         )
                     }
@@ -771,9 +769,9 @@ private fun VocabGridCard(
                     text = item.meaning,
                     fontFamily = PlusJakartaSans,
                     fontSize = 11.sp,
-                    lineHeight = 14.5.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Color(0xFF334155),
+                    lineHeight = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = PixelColors.BorderDark,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f)
@@ -785,52 +783,43 @@ private fun VocabGridCard(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    // Nút thêm/bớt khỏi lộ trình ôn SRS
+                    // Nút SRS Pixel Box
                     val isInSrs = item.isInSrs
-                    Box(
-                        modifier = Modifier
-                            .size(28.dp)
-                            .clip(CircleShape)
-                            .background(
-                                if (isInSrs) Color(0xFFFEF3C7)
-                                else Color(0xFFF1F5F9)
-                            )
-                            .bounceClick(scaleDown = 0.85f, onClick = onToggleEnrollSrs),
-                        contentAlignment = Alignment.Center
+                    PixelCardBox(
+                        modifier = Modifier.size(26.dp),
+                        backgroundColor = if (isInSrs) PixelColors.CardOrange else Color(0xFFF1F5F9),
+                        borderColor = PixelColors.BorderDark,
+                        shadowColor = PixelColors.ShadowDark,
+                        borderWidth = 1.2.dp,
+                        shadowOffset = 1.5.dp,
+                        cornerRadius = 3.dp,
+                        showRivets = false,
+                        onClick = onToggleEnrollSrs
                     ) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_bolt),
-                            contentDescription = if (isInSrs) "Đang ôn SRS" else "Thêm SRS",
-                            tint = if (isInSrs) Color(0xFFD97706) else Color(0xFF94A3B8),
-                            modifier = Modifier.size(13.dp)
-                        )
-                    }
-
-                    // Nút đánh dấu Đã thuộc / Chưa thuộc
-                    Box(
-                        modifier = Modifier
-                            .size(28.dp)
-                            .clip(CircleShape)
-                            .background(
-                                if (item.isMastered) Color(0xFFDCFCE7)
-                                else Color(0xFFF1F5F9)
-                            )
-                            .bounceClick(scaleDown = 0.85f, onClick = onToggleMastered),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        if (item.isMastered) {
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                             Icon(
-                                painter = painterResource(R.drawable.ic_check),
-                                contentDescription = "Đã thuộc",
-                                tint = Color(0xFF059669),
+                                painter = painterResource(R.drawable.ic_bolt),
+                                contentDescription = if (isInSrs) "Đang ôn SRS" else "Thêm SRS",
+                                tint = if (isInSrs) PixelColors.BorderDark else Color(0xFF94A3B8),
                                 modifier = Modifier.size(13.dp)
                             )
-                        } else {
-                            Box(
-                                modifier = Modifier
-                                    .size(9.dp)
-                                    .border(1.dp, Color(0xFF94A3B8), CircleShape)
-                            )
+                        }
+                    }
+
+                    // Nút Đã thuộc (Mastered) với Tim RPG
+                    PixelCardBox(
+                        modifier = Modifier.size(26.dp),
+                        backgroundColor = if (item.isMastered) Color(0xFFDCFCE7) else Color(0xFFF1F5F9),
+                        borderColor = PixelColors.BorderDark,
+                        shadowColor = PixelColors.ShadowDark,
+                        borderWidth = 1.2.dp,
+                        shadowOffset = 1.5.dp,
+                        cornerRadius = 3.dp,
+                        showRivets = false,
+                        onClick = onToggleMastered
+                    ) {
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            PixelHeartIcon(isFilled = item.isMastered, size = 13.dp)
                         }
                     }
                 }
@@ -840,10 +829,10 @@ private fun VocabGridCard(
 }
 
 /**
- * Thẻ từ vựng hiển thị dạng List 1 cột nằm ngang:
- * - Bên trái: Khối chữ Hán to rõ trên nền nhẹ.
+ * Thẻ từ vựng hiển thị dạng List 1 cột nằm ngang phong cách Pixel Retro RPG Item Cartridge:
+ * - Bên trái: Khối chữ Hán to rõ trong khung Pixel nổi bật.
  * - Ở giữa: Pinyin, loại từ, nghĩa tiếng Việt.
- * - Bên phải: Nút Loa phát âm, nút SRS và nút Đánh dấu thuộc.
+ * - Bên phải: Phím cơ Loa phát âm, phím SRS và Tim RPG Đã thuộc.
  */
 @Composable
 private fun VocabListCard(
@@ -855,47 +844,50 @@ private fun VocabListCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .bounceClick(scaleDown = 0.98f, onClick = onClick),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = if (item.isMastered) Color(0xFFF9FDFB) else Color.White
-        ),
-        border = BorderStroke(
-            0.5.dp,
-            if (item.isMastered) Color(0xFF10B981).copy(alpha = 0.35f)
-            else Color(0xFFE2E8F0).copy(alpha = 0.6f)
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    val posLabel = item.partOfSpeech.ifBlank { "TỪ" }
+
+    PixelCardBox(
+        modifier = modifier.fillMaxWidth(),
+        backgroundColor = if (item.isMastered) Color(0xFFF9FDFB) else Color.White,
+        borderColor = if (item.isMastered) Color(0xFF059669) else PixelColors.BorderDark,
+        shadowColor = PixelColors.ShadowDark,
+        borderWidth = 1.8.dp,
+        shadowOffset = 2.5.dp,
+        cornerRadius = 6.dp,
+        showRivets = false,
+        onClick = onClick
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 10.dp),
+                .padding(horizontal = 10.dp, vertical = 9.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // ── 1. Khối Hán tự bên trái ──
-            Box(
-                modifier = Modifier
-                    .size(52.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(accentColor.copy(alpha = 0.08f)),
-                contentAlignment = Alignment.Center
+            // ── 1. Khối Hán tự bên trái: Hộp pixel dập nổi ──
+            PixelCardBox(
+                modifier = Modifier.size(52.dp),
+                backgroundColor = accentColor.copy(alpha = 0.20f),
+                borderColor = PixelColors.BorderDark,
+                shadowColor = PixelColors.ShadowDark,
+                borderWidth = 1.5.dp,
+                shadowOffset = 2.dp,
+                cornerRadius = 4.dp,
+                showRivets = false
             ) {
-                Text(
-                    text = item.hanzi,
-                    fontFamily = PlusJakartaSans,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = Color(0xFF0F172A),
-                    textAlign = TextAlign.Center,
-                    maxLines = 1
-                )
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text(
+                        text = item.hanzi,
+                        fontFamily = PlusJakartaSans,
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Black,
+                        color = PixelColors.BorderDark,
+                        textAlign = TextAlign.Center,
+                        maxLines = 1
+                    )
+                }
             }
 
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(10.dp))
 
             // ── 2. Nội dung ở giữa: Pinyin, Hán Việt & Nghĩa ──
             Column(
@@ -910,35 +902,24 @@ private fun VocabListCard(
                         text = item.pinyin,
                         fontFamily = PlusJakartaSans,
                         fontSize = 13.sp,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.Black,
                         color = accentColor,
                         maxLines = 1
                     )
 
-                    if (item.partOfSpeech.isNotBlank()) {
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(4.dp))
-                                .background(Color(0xFFF1F5F9))
-                                .padding(horizontal = 5.dp, vertical = 1.5.dp)
-                        ) {
-                            Text(
-                                text = item.partOfSpeech,
-                                fontFamily = PlusJakartaSans,
-                                fontSize = 9.5.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                color = Color(0xFF64748B)
-                            )
-                        }
-                    }
+                    PixelBadge(
+                        text = posLabel.uppercase(),
+                        backgroundColor = Color(0xFFF1F5F9),
+                        textColor = PixelColors.BorderDark
+                    )
 
                     if (item.hanViet.isNotBlank()) {
                         Text(
                             text = item.hanViet,
                             fontFamily = PlusJakartaSans,
-                            fontSize = 11.5.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = Color(0xFF94A3B8),
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = PixelColors.MutedText,
                             maxLines = 1
                         )
                     }
@@ -950,9 +931,9 @@ private fun VocabListCard(
                     text = item.meaning,
                     fontFamily = PlusJakartaSans,
                     fontSize = 12.sp,
-                    lineHeight = 16.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Color(0xFF334155),
+                    lineHeight = 15.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = PixelColors.BorderDark,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -963,74 +944,67 @@ private fun VocabListCard(
             // ── 3. Cụm nút tác vụ bên phải: Loa, SRS, Đã thuộc ──
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(5.dp)
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 // Nút loa phát âm
-                Box(
-                    modifier = Modifier
-                        .size(28.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFFF8FAFC))
-                        .border(BorderStroke(0.5.dp, Color(0xFFE2E8F0)), CircleShape)
-                        .bounceClick(scaleDown = 0.85f) {
-                            onSpeak(item.hanzi)
-                        },
-                    contentAlignment = Alignment.Center
+                PixelCardBox(
+                    modifier = Modifier.size(28.dp),
+                    backgroundColor = Color(0xFFF8FAFC),
+                    borderColor = PixelColors.BorderDark,
+                    shadowColor = PixelColors.ShadowDark,
+                    borderWidth = 1.2.dp,
+                    shadowOffset = 1.5.dp,
+                    cornerRadius = 3.dp,
+                    showRivets = false,
+                    onClick = { onSpeak(item.hanzi) }
                 ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_speaker),
-                        contentDescription = "Phát âm",
-                        tint = Color(0xFF475569),
-                        modifier = Modifier.size(13.dp)
-                    )
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_speaker),
+                            contentDescription = "Phát âm",
+                            tint = PixelColors.BorderDark,
+                            modifier = Modifier.size(13.dp)
+                        )
+                    }
                 }
 
                 // Nút SRS
                 val isInSrs = item.isInSrs
-                Box(
-                    modifier = Modifier
-                        .size(28.dp)
-                        .clip(CircleShape)
-                        .background(
-                            if (isInSrs) Color(0xFFFEF3C7)
-                            else Color(0xFFF1F5F9)
-                        )
-                        .bounceClick(scaleDown = 0.85f, onClick = onToggleEnrollSrs),
-                    contentAlignment = Alignment.Center
+                PixelCardBox(
+                    modifier = Modifier.size(28.dp),
+                    backgroundColor = if (isInSrs) PixelColors.CardOrange else Color(0xFFF1F5F9),
+                    borderColor = PixelColors.BorderDark,
+                    shadowColor = PixelColors.ShadowDark,
+                    borderWidth = 1.2.dp,
+                    shadowOffset = 1.5.dp,
+                    cornerRadius = 3.dp,
+                    showRivets = false,
+                    onClick = onToggleEnrollSrs
                 ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_bolt),
-                        contentDescription = if (isInSrs) "Đang ôn SRS" else "Thêm SRS",
-                        tint = if (isInSrs) Color(0xFFD97706) else Color(0xFF94A3B8),
-                        modifier = Modifier.size(13.dp)
-                    )
-                }
-
-                // Nút Đã thuộc
-                Box(
-                    modifier = Modifier
-                        .size(28.dp)
-                        .clip(CircleShape)
-                        .background(
-                            if (item.isMastered) Color(0xFFDCFCE7)
-                            else Color(0xFFF1F5F9)
-                        )
-                        .bounceClick(scaleDown = 0.85f, onClick = onToggleMastered),
-                    contentAlignment = Alignment.Center
-                ) {
-                    if (item.isMastered) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Icon(
-                            painter = painterResource(R.drawable.ic_check),
-                            contentDescription = "Đã thuộc",
-                            tint = Color(0xFF059669),
+                            painter = painterResource(R.drawable.ic_bolt),
+                            contentDescription = if (isInSrs) "Đang ôn SRS" else "Thêm SRS",
+                            tint = if (isInSrs) PixelColors.BorderDark else Color(0xFF94A3B8),
                             modifier = Modifier.size(13.dp)
                         )
-                    } else {
-                        Box(
-                            modifier = Modifier
-                                .size(9.dp)
-                                .border(1.dp, Color(0xFF94A3B8), CircleShape)
-                        )
+                    }
+                }
+
+                // Nút Đã thuộc (Heart)
+                PixelCardBox(
+                    modifier = Modifier.size(28.dp),
+                    backgroundColor = if (item.isMastered) Color(0xFFDCFCE7) else Color(0xFFF1F5F9),
+                    borderColor = PixelColors.BorderDark,
+                    shadowColor = PixelColors.ShadowDark,
+                    borderWidth = 1.2.dp,
+                    shadowOffset = 1.5.dp,
+                    cornerRadius = 3.dp,
+                    showRivets = false,
+                    onClick = onToggleMastered
+                ) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        PixelHeartIcon(isFilled = item.isMastered, size = 13.dp)
                     }
                 }
             }

@@ -8,6 +8,7 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
@@ -93,37 +94,45 @@ fun VocabWritingPracticeTabContent(
 
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 // Nút bật/tắt nét mờ
-                Surface(
-                    modifier = Modifier.clickable { showHint = !showHint },
-                    shape = RoundedCornerShape(20.dp),
-                    color = Color.White,
-                    border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF6366F1))
+                PixelCardBox(
+                    backgroundColor = if (showHint) PixelColors.PixelYellow else Color.White,
+                    borderColor = PixelColors.BorderDark,
+                    shadowColor = PixelColors.ShadowDark,
+                    borderWidth = 1.2.dp,
+                    shadowOffset = 1.5.dp,
+                    cornerRadius = 3.dp,
+                    showRivets = false,
+                    onClick = { showHint = !showHint }
                 ) {
                     Text(
                         text = if (showHint) "👁 Nét mờ: BẬT" else "👁 Nét mờ: TẮT",
                         fontSize = 10.5.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF6366F1),
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp)
+                        fontWeight = FontWeight.Black,
+                        color = PixelColors.BorderDark,
+                        modifier = Modifier.padding(horizontal = 7.dp, vertical = 5.dp)
                     )
                 }
 
                 // Nút Xóa viết lại
-                Surface(
-                    modifier = Modifier.clickable {
+                PixelCardBox(
+                    backgroundColor = Color.White,
+                    borderColor = PixelColors.BorderDark,
+                    shadowColor = PixelColors.ShadowDark,
+                    borderWidth = 1.2.dp,
+                    shadowOffset = 1.5.dp,
+                    cornerRadius = 3.dp,
+                    showRivets = false,
+                    onClick = {
                         strokes = emptyList()
                         currentPoints = emptyList()
-                    },
-                    shape = RoundedCornerShape(20.dp),
-                    color = Color.White,
-                    border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF6366F1))
+                    }
                 ) {
                     Text(
                         text = "🔄 Xóa viết lại",
                         fontSize = 10.5.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF6366F1),
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp)
+                        color = PixelColors.BorderDark,
+                        modifier = Modifier.padding(horizontal = 7.dp, vertical = 5.dp)
                     )
                 }
             }
@@ -139,24 +148,29 @@ fun VocabWritingPracticeTabContent(
             ) {
                 word.hanzi.forEachIndexed { index, ch ->
                     val isSelected = index == safeCharIndex
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier
-                            .size(38.dp)
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(if (isSelected) Color(0xFF6366F1) else Color(0xFFF1F5F9))
-                            .clickable {
-                                selectedCharIndex = index
-                                strokes = emptyList()
-                                currentPoints = emptyList()
-                            }
+                    PixelCardBox(
+                        modifier = Modifier.size(38.dp),
+                        backgroundColor = if (isSelected) PixelColors.PixelYellow else Color.White,
+                        borderColor = PixelColors.BorderDark,
+                        shadowColor = PixelColors.ShadowDark,
+                        borderWidth = 1.5.dp,
+                        shadowOffset = if (isSelected) 2.5.dp else 1.5.dp,
+                        cornerRadius = 4.dp,
+                        showRivets = false,
+                        onClick = {
+                            selectedCharIndex = index
+                            strokes = emptyList()
+                            currentPoints = emptyList()
+                        }
                     ) {
-                        Text(
-                            text = ch.toString(),
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = if (isSelected) Color.White else Color(0xFF334155)
-                        )
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            Text(
+                                text = ch.toString(),
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Black,
+                                color = PixelColors.BorderDark
+                            )
+                        }
                     }
                 }
             }
@@ -167,12 +181,12 @@ fun VocabWritingPracticeTabContent(
         Box(
             modifier = Modifier
                 .size(260.dp)
-                .clip(RoundedCornerShape(16.dp))
+                .clip(CutCornerShape(6.dp))
                 .background(Color.White)
-                .border(2.dp, Color(0xFFEF4444), RoundedCornerShape(16.dp))
+                .border(2.dp, PixelColors.BorderDark, CutCornerShape(6.dp))
                 .padding(4.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .border(0.8.dp, Color(0xFFEF4444).copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+                .clip(CutCornerShape(4.dp))
+                .border(1.dp, Color(0xFFEF4444).copy(alpha = 0.5f), CutCornerShape(4.dp))
                 .clipToBounds(),
             contentAlignment = Alignment.Center
         ) {
@@ -346,37 +360,26 @@ fun VocabWritingPracticeTabContent(
         Spacer(modifier = Modifier.height(16.dp))
 
         // ── 4. Card Quy tắc nét bút chuẩn phía dưới ──
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(16.dp))
-                .background(Color(0xFFF8FAFC))
-                .border(1.dp, Color(0xFFEEF2FF), RoundedCornerShape(16.dp))
-                .padding(14.dp)
+        PixelCardBox(
+            modifier = Modifier.fillMaxWidth(),
+            backgroundColor = PixelColors.RetroCream,
+            borderColor = PixelColors.BorderDark,
+            shadowColor = PixelColors.ShadowDark,
+            borderWidth = 1.8.dp,
+            shadowOffset = 2.5.dp,
+            cornerRadius = 4.dp,
+            headerTitle = "QUY TẮC NÉT BÚT",
+            headerBadge = word.strokes,
+            headerColor = PixelColors.PixelYellow,
+            showGrille = true,
+            showRivets = false
         ) {
-            Column {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_sparkle),
-                        contentDescription = null,
-                        tint = Color(0xFFF59E0B),
-                        modifier = Modifier.size(14.dp)
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        text = "Quy tắc nét bút chuẩn của chữ \"${word.hanzi}\":",
-                        fontSize = 12.5.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF4338CA)
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(6.dp))
-
+            Column(modifier = Modifier.padding(12.dp)) {
                 Text(
                     text = "Quy tắc vàng: Viết từ trên xuống dưới, từ trái qua phải, ngang trước sổ sau, giữa trước hai bên sau.",
                     fontSize = 11.5.sp,
-                    color = Color(0xFF475569),
+                    color = PixelColors.BorderDark,
+                    fontWeight = FontWeight.Bold,
                     lineHeight = 16.sp
                 )
 
@@ -386,7 +389,7 @@ fun VocabWritingPracticeTabContent(
                     text = "Tổng số nét: ${word.strokes} • ${word.radical}",
                     fontSize = 11.5.sp,
                     fontWeight = FontWeight.Medium,
-                    color = Color(0xFF64748B)
+                    color = PixelColors.MutedText
                 )
             }
         }

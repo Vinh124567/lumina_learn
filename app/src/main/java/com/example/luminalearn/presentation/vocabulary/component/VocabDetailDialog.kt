@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
@@ -82,13 +83,18 @@ fun VocabDetailDialog(
             dismissOnClickOutside = true
         )
     ) {
-        Surface(
+        PixelCardBox(
             modifier = modifier
-                .fillMaxWidth(0.93f)
-                .fillMaxHeight(0.88f)
-                .shadow(elevation = 20.dp, shape = RoundedCornerShape(26.dp)),
-            shape = RoundedCornerShape(26.dp),
-            color = Color(0xFFF6F8FB)
+                .fillMaxWidth(0.94f)
+                .fillMaxHeight(0.90f),
+            backgroundColor = Color(0xFFF8FAFC),
+            borderColor = PixelColors.BorderDark,
+            shadowColor = PixelColors.ShadowDark,
+            borderWidth = 2.dp,
+            shadowOffset = 4.dp,
+            cornerRadius = 8.dp,
+            showRivets = false,
+            showGrille = false
         ) {
             Column(
                 modifier = Modifier.fillMaxSize()
@@ -158,69 +164,81 @@ private fun DialogTopHeader(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 18.dp, end = 14.dp, top = 16.dp, bottom = 8.dp),
+            .background(Color.White)
+            .border(BorderStroke(1.5.dp, PixelColors.BorderDark), CutCornerShape(topStart = 6.dp, topEnd = 6.dp))
+            .padding(horizontal = 14.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = "Chi tiết từ vựng",
-                fontFamily = PlusJakartaSans,
-                fontSize = 17.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = Color(0xFF0F172A),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-
-            Spacer(modifier = Modifier.height(2.dp))
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(5.dp)
+        Row(
+            modifier = Modifier.weight(1f),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            // Cartridge Badge HSK
+            Box(
+                modifier = Modifier
+                    .clip(CutCornerShape(4.dp))
+                    .background(PixelColors.PixelYellow)
+                    .border(BorderStroke(1.5.dp, PixelColors.BorderDark), CutCornerShape(4.dp))
+                    .padding(horizontal = 7.dp, vertical = 3.dp)
             ) {
                 Text(
                     text = word.hskLevel,
                     fontFamily = PlusJakartaSans,
-                    fontSize = 11.5.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = VocabColors.BrandPrimary
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Black,
+                    color = PixelColors.BorderDark
                 )
+            }
+
+            Column {
                 Text(
-                    text = "•",
-                    fontSize = 10.sp,
-                    color = Color(0xFF94A3B8)
-                )
-                Text(
-                    text = word.topic,
+                    text = "CHI TIẾT TỪ VỰNG",
                     fontFamily = PlusJakartaSans,
-                    fontSize = 11.5.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Color(0xFF64748B),
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Black,
+                    color = PixelColors.BorderDark,
+                    letterSpacing = (-0.2).sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
+                if (word.topic.isNotBlank()) {
+                    Text(
+                        text = "CHỦ ĐỀ: ${word.topic.uppercase()}",
+                        fontFamily = PlusJakartaSans,
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = PixelColors.MutedText,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
             }
         }
 
         Spacer(modifier = Modifier.width(10.dp))
 
-        // Nút Đóng (X) tròn thanh lịch
-        Box(
-            modifier = Modifier
-                .size(32.dp)
-                .clip(CircleShape)
-                .background(Color.White)
-                .border(BorderStroke(0.5.dp, Color(0xFFE2E8F0)), CircleShape)
-                .bounceClick(scaleDown = 0.88f, onClick = onDismiss),
-            contentAlignment = Alignment.Center
+        // Nút Đóng [ X ] Arcade Pixel Box
+        PixelCardBox(
+            modifier = Modifier.size(32.dp),
+            backgroundColor = Color.White,
+            borderColor = PixelColors.BorderDark,
+            shadowColor = PixelColors.ShadowDark,
+            borderWidth = 1.5.dp,
+            shadowOffset = 2.dp,
+            cornerRadius = 4.dp,
+            showRivets = false,
+            onClick = onDismiss
         ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_close),
-                contentDescription = "Đóng",
-                tint = Color(0xFF64748B),
-                modifier = Modifier.size(15.dp)
-            )
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_close),
+                    contentDescription = "Đóng",
+                    tint = PixelColors.BorderDark,
+                    modifier = Modifier.size(15.dp)
+                )
+            }
         }
     }
 }
@@ -245,56 +263,41 @@ private fun DialogTabRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 6.dp)
+            .padding(horizontal = 14.dp, vertical = 8.dp)
             .horizontalScroll(rememberScrollState()),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         DIALOG_TAB_ITEMS.forEach { item ->
             val isSelected = selectedTab == item.index
 
-            val bgAnimation by animateColorAsState(
-                targetValue = if (isSelected) VocabColors.BrandPrimary else Color.White,
-                animationSpec = tween(durationMillis = 200),
-                label = "tab_bg"
-            )
-            val contentColorAnimation by animateColorAsState(
-                targetValue = if (isSelected) Color.White else Color(0xFF475569),
-                animationSpec = tween(durationMillis = 200),
-                label = "tab_color"
-            )
-
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(bgAnimation)
-                    .border(
-                        BorderStroke(
-                            0.5.dp,
-                            if (isSelected) Color.Transparent else Color(0xFFE2E8F0)
-                        ),
-                        RoundedCornerShape(12.dp)
-                    )
-                    .bounceClick(scaleDown = 0.94f) { onSelectTab(item.index) }
-                    .padding(horizontal = 13.dp, vertical = 7.dp),
-                contentAlignment = Alignment.Center
+            PixelCardBox(
+                backgroundColor = if (isSelected) PixelColors.PixelYellow else Color.White,
+                borderColor = PixelColors.BorderDark,
+                shadowColor = PixelColors.ShadowDark,
+                borderWidth = 1.5.dp,
+                shadowOffset = if (isSelected) 2.5.dp else 1.5.dp,
+                cornerRadius = 4.dp,
+                showRivets = false,
+                onClick = { onSelectTab(item.index) }
             ) {
                 Row(
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Icon(
                         painter = painterResource(id = item.iconRes),
                         contentDescription = null,
-                        tint = contentColorAnimation,
+                        tint = PixelColors.BorderDark,
                         modifier = Modifier.size(14.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = item.title,
                         fontFamily = PlusJakartaSans,
-                        fontSize = 12.5.sp,
-                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold,
-                        color = contentColorAnimation,
+                        fontSize = 12.sp,
+                        fontWeight = if (isSelected) FontWeight.Black else FontWeight.Bold,
+                        color = PixelColors.BorderDark,
                         maxLines = 1
                     )
                 }
@@ -312,80 +315,81 @@ private fun DialogBottomBar(
     val isInSrs = word.isInSrs
     val isMastered = word.isMastered
 
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        color = Color.White,
-        shape = RoundedCornerShape(bottomStart = 26.dp, bottomEnd = 26.dp),
-        shadowElevation = 6.dp
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.White)
+            .border(BorderStroke(1.5.dp, PixelColors.BorderDark), CutCornerShape(bottomStart = 6.dp, bottomEnd = 6.dp))
+            .padding(horizontal = 14.dp, vertical = 10.dp)
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .border(
-                    BorderStroke(0.5.dp, Color(0xFFE2E8F0).copy(alpha = 0.6f)),
-                    RoundedCornerShape(bottomStart = 26.dp, bottomEnd = 26.dp)
-                )
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+            modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             // Nút Bật/Tắt Ôn SRS
-            Box(
+            PixelCardBox(
                 modifier = Modifier
                     .weight(1f)
-                    .height(44.dp)
-                    .clip(RoundedCornerShape(14.dp))
-                    .background(
-                        if (isInSrs) Color(0xFFFEF3C7) else Color(0xFFF1F5F9)
-                    )
-                    .bounceClick(scaleDown = 0.94f, onClick = onToggleEnrollSrs),
-                contentAlignment = Alignment.Center
+                    .height(42.dp),
+                backgroundColor = if (isInSrs) PixelColors.CardOrange else Color.White,
+                borderColor = PixelColors.BorderDark,
+                shadowColor = PixelColors.ShadowDark,
+                borderWidth = 1.5.dp,
+                shadowOffset = 2.dp,
+                cornerRadius = 4.dp,
+                showRivets = false,
+                onClick = onToggleEnrollSrs
             ) {
                 Row(
+                    modifier = Modifier.fillMaxSize(),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_bolt),
-                        contentDescription = null,
-                        tint = if (isInSrs) Color(0xFFD97706) else Color(0xFF64748B),
-                        modifier = Modifier.size(15.dp)
+                    Text(
+                        text = if (isInSrs) "⚡" else "⚡",
+                        fontSize = 13.sp
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = if (isInSrs) "Đang ôn SRS" else "+ Ôn SRS",
                         fontFamily = PlusJakartaSans,
-                        fontSize = 12.5.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = if (isInSrs) Color(0xFFD97706) else Color(0xFF475569),
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Black,
+                        color = PixelColors.BorderDark,
                         maxLines = 1
                     )
                 }
             }
 
             // Nút Đánh dấu Đã thuộc
-            val btnBgColor = if (isMastered) Color(0xFF059669) else VocabColors.BrandPrimary
-            val btnText = if (isMastered) "✓ Đã thuộc từ này" else "✓ Thuộc từ này (+5)"
+            val btnBgColor = if (isMastered) PixelColors.CardGreen else PixelColors.PixelYellow
+            val btnText = if (isMastered) "✓ ĐÃ THUỘC" else "✓ THUỘC TỪ NÀY (+5)"
 
-            Box(
+            PixelCardBox(
                 modifier = Modifier
                     .weight(1.3f)
-                    .height(44.dp)
-                    .clip(RoundedCornerShape(14.dp))
-                    .background(btnBgColor)
-                    .bounceClick(scaleDown = 0.94f, onClick = onToggleMastered),
-                contentAlignment = Alignment.Center
+                    .height(42.dp),
+                backgroundColor = btnBgColor,
+                borderColor = PixelColors.BorderDark,
+                shadowColor = PixelColors.ShadowDark,
+                borderWidth = 1.8.dp,
+                shadowOffset = 2.5.dp,
+                cornerRadius = 4.dp,
+                showRivets = false,
+                onClick = onToggleMastered
             ) {
                 Row(
+                    modifier = Modifier.fillMaxSize(),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Text(
                         text = btnText,
                         fontFamily = PlusJakartaSans,
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White,
+                        fontSize = 12.5.sp,
+                        fontWeight = FontWeight.Black,
+                        color = PixelColors.BorderDark,
                         maxLines = 1,
                         softWrap = false
                     )

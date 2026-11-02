@@ -306,34 +306,25 @@ private fun SubNavPillItem(
     isSelected: Boolean,
     onSelect: () -> Unit
 ) {
-    val bgColor = if (isSelected) VocabColors.BrandPrimary else Color.White
-    val contentColor = if (isSelected) Color.White else VocabColors.TextMuted
-    val border = if (isSelected) null else androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFE2E8F0))
-    val elevation = if (isSelected) 2.dp else 0.dp
-    val fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold
-
-    Surface(
-        modifier = Modifier
-            .clip(RoundedCornerShape(20.dp))
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null,
-                onClick = onSelect
-            ),
-        shape = RoundedCornerShape(20.dp),
-        color = bgColor,
-        border = border,
-        shadowElevation = elevation
+    PixelCardBox(
+        backgroundColor = if (isSelected) PixelColors.PixelYellow else Color.White,
+        borderColor = PixelColors.BorderDark,
+        shadowColor = PixelColors.ShadowDark,
+        borderWidth = 1.2.dp,
+        shadowOffset = if (isSelected) 2.dp else 1.2.dp,
+        cornerRadius = 4.dp,
+        showRivets = false,
+        onClick = onSelect
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp),
+            modifier = Modifier.padding(horizontal = 11.dp, vertical = 6.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (item.iconRes != null) {
                 Icon(
                     painter = painterResource(id = item.iconRes),
                     contentDescription = null,
-                    tint = contentColor,
+                    tint = PixelColors.BorderDark,
                     modifier = Modifier.size(13.dp)
                 )
                 Spacer(modifier = Modifier.width(5.dp))
@@ -341,8 +332,8 @@ private fun SubNavPillItem(
             Text(
                 text = item.title,
                 fontSize = 11.5.sp,
-                fontWeight = fontWeight,
-                color = contentColor,
+                fontWeight = if (isSelected) FontWeight.Black else FontWeight.Bold,
+                color = PixelColors.BorderDark,
                 maxLines = 1
             )
         }
@@ -354,11 +345,13 @@ private fun TopContourHeaderCard(
     viewMode: ContourViewMode,
     onSelectViewMode: (ContourViewMode) -> Unit
 ) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        color = Color.White,
-        border = androidx.compose.foundation.BorderStroke(1.dp, VocabColors.BorderLight)
+    PixelCardBox(
+        backgroundColor = Color.White,
+        borderColor = PixelColors.BorderDark,
+        shadowColor = PixelColors.ShadowDark,
+        borderWidth = 1.5.dp,
+        shadowOffset = 3.dp,
+        cornerRadius = 6.dp
     ) {
         Column(
             modifier = Modifier
@@ -371,57 +364,66 @@ private fun TopContourHeaderCard(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(38.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFFEEF2FF)),
-                    contentAlignment = Alignment.Center
+                PixelCardBox(
+                    backgroundColor = Color(0xFFEEF2FF),
+                    borderColor = PixelColors.BorderDark,
+                    shadowColor = PixelColors.ShadowDark,
+                    borderWidth = 1.2.dp,
+                    shadowOffset = 1.5.dp,
+                    cornerRadius = 4.dp
                 ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_waveform),
-                        contentDescription = null,
-                        tint = Color(0xFF4F46E5),
-                        modifier = Modifier.size(19.dp)
-                    )
+                    Box(
+                        modifier = Modifier.size(34.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_waveform),
+                            contentDescription = null,
+                            tint = Color(0xFF4F46E5),
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
                 }
 
                 Column(modifier = Modifier.weight(1f)) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "Biểu đồ Sóng âm & Cao độ Thanh điệu",
-                            fontSize = 12.5.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = VocabColors.TextDark,
+                            text = "Sóng âm & Cao độ",
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Black,
+                            color = PixelColors.BorderDark,
                             maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.weight(1f, fill = false)
+                            overflow = TextOverflow.Ellipsis
                         )
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(6.dp))
-                                .background(Color(0xFFEEF2FF))
-                                .padding(horizontal = 6.dp, vertical = 2.dp)
+                        PixelCardBox(
+                            backgroundColor = Color(0xFFEEF2FF),
+                            borderColor = PixelColors.BorderDark,
+                            shadowColor = PixelColors.ShadowDark,
+                            borderWidth = 1.dp,
+                            shadowOffset = 1.dp,
+                            cornerRadius = 3.dp,
+                            showRivets = false
                         ) {
                             Text(
-                                text = "Voice Pitch Contour",
-                                fontSize = 8.sp,
-                                fontWeight = FontWeight.Bold,
+                                text = "CHAO 1-5",
+                                fontSize = 8.5.sp,
+                                fontWeight = FontWeight.Black,
                                 color = Color(0xFF4F46E5),
                                 maxLines = 1,
-                                softWrap = false
+                                softWrap = false,
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
                             )
                         }
                     }
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
-                        text = "Đối chiếu đường uốn lượn thanh điệu (ngũ độ) liệu nguyên bản xứ và giọng của bạn",
+                        text = "Đối chiếu đường uốn lượn thanh điệu bản xứ và giọng của bạn",
                         fontSize = 10.5.sp,
-                        color = VocabColors.TextMuted,
+                        color = PixelColors.BorderDark.copy(alpha = 0.7f),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -458,23 +460,21 @@ private fun ViewFilterChip(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
-    Surface(
-        modifier = Modifier
-            .clip(RoundedCornerShape(8.dp))
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null,
-                onClick = onClick
-            ),
-        shape = RoundedCornerShape(8.dp),
-        color = if (isSelected) VocabColors.BrandPrimary else Color(0xFFF1F5F9),
-        border = if (isSelected) null else androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFE2E8F0))
+    PixelCardBox(
+        backgroundColor = if (isSelected) PixelColors.PixelPurple else Color(0xFFF1F5F9),
+        borderColor = PixelColors.BorderDark,
+        shadowColor = PixelColors.ShadowDark,
+        borderWidth = 1.2.dp,
+        shadowOffset = if (isSelected) 2.dp else 1.dp,
+        cornerRadius = 4.dp,
+        showRivets = false,
+        onClick = onClick
     ) {
         Text(
             text = label,
             fontSize = 11.sp,
-            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-            color = if (isSelected) Color.White else Color(0xFF475569),
+            fontWeight = if (isSelected) FontWeight.Black else FontWeight.Bold,
+            color = if (isSelected) Color.White else PixelColors.BorderDark,
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
             maxLines = 1
         )
@@ -486,11 +486,13 @@ private fun SyllableToneSummaryCard(
     word: VocabWordItem,
     syllables: List<SyllableToneInfo>
 ) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        color = Color.White,
-        border = androidx.compose.foundation.BorderStroke(1.dp, VocabColors.BorderLight)
+    PixelCardBox(
+        backgroundColor = Color.White,
+        borderColor = PixelColors.BorderDark,
+        shadowColor = PixelColors.ShadowDark,
+        borderWidth = 1.5.dp,
+        shadowOffset = 3.dp,
+        cornerRadius = 6.dp
     ) {
         Row(
             modifier = Modifier
@@ -503,19 +505,19 @@ private fun SyllableToneSummaryCard(
                 Text(
                     text = word.hanzi,
                     fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = VocabColors.TextDark
+                    fontWeight = FontWeight.Black,
+                    color = PixelColors.BorderDark
                 )
                 Text(
                     text = word.pinyin,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
-                    color = VocabColors.BrandPrimary
+                    color = Color(0xFF4F46E5)
                 )
                 Text(
                     text = word.meaning,
                     fontSize = 11.5.sp,
-                    color = VocabColors.TextMuted,
+                    color = PixelColors.BorderDark.copy(alpha = 0.7f),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -538,25 +540,31 @@ private fun SyllableToneSummaryCard(
                         else -> Color(0xFF64748B)
                     }
 
-                    Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(badgeBg)
-                            .padding(horizontal = 7.dp, vertical = 4.dp)
+                    PixelCardBox(
+                        backgroundColor = badgeBg,
+                        borderColor = PixelColors.BorderDark,
+                        shadowColor = PixelColors.ShadowDark,
+                        borderWidth = 1.2.dp,
+                        shadowOffset = 1.5.dp,
+                        cornerRadius = 4.dp,
+                        showRivets = false
                     ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.padding(horizontal = 7.dp, vertical = 4.dp)
+                        ) {
                             Text(
                                 text = "${syl.hanzi} ${syl.pinyin}",
                                 fontSize = 11.sp,
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.Black,
                                 color = badgeText,
                                 maxLines = 1
                             )
                             Text(
                                 text = "${syl.toneName} (${syl.toneCode})",
                                 fontSize = 8.5.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                color = badgeText.copy(alpha = 0.85f),
+                                fontWeight = FontWeight.Bold,
+                                color = badgeText.copy(alpha = 0.9f),
                                 maxLines = 1
                             )
                         }
@@ -577,11 +585,13 @@ private fun PitchContourActionCard(
     onToggleSpeed: () -> Unit,
     onMicClick: () -> Unit
 ) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        color = Color.White,
-        border = androidx.compose.foundation.BorderStroke(1.dp, VocabColors.BorderLight)
+    PixelCardBox(
+        backgroundColor = Color.White,
+        borderColor = PixelColors.BorderDark,
+        shadowColor = PixelColors.ShadowDark,
+        borderWidth = 1.5.dp,
+        shadowOffset = 3.dp,
+        cornerRadius = 6.dp
     ) {
         Column(
             modifier = Modifier
@@ -595,49 +605,53 @@ private fun PitchContourActionCard(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Surface(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(20.dp))
-                        .clickable(onClick = onPlaySample),
-                    shape = RoundedCornerShape(20.dp),
-                    color = VocabColors.BrandLight,
-                    border = androidx.compose.foundation.BorderStroke(1.dp, VocabColors.BrandPrimary.copy(alpha = 0.25f))
+                PixelCardBox(
+                    backgroundColor = PixelColors.CardGreen,
+                    borderColor = PixelColors.BorderDark,
+                    shadowColor = PixelColors.ShadowDark,
+                    borderWidth = 1.2.dp,
+                    shadowOffset = 2.dp,
+                    cornerRadius = 4.dp,
+                    showRivets = false,
+                    onClick = onPlaySample
                 ) {
                     Row(
-                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 7.dp),
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_speaker),
                             contentDescription = null,
-                            tint = VocabColors.BrandPrimary,
+                            tint = PixelColors.BorderDark,
                             modifier = Modifier.size(15.dp)
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
                             text = "Nghe mẫu chuẩn (${word.pinyin})",
                             fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = VocabColors.BrandPrimary,
+                            fontWeight = FontWeight.Black,
+                            color = PixelColors.BorderDark,
                             maxLines = 1
                         )
                     }
                 }
 
-                Surface(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(10.dp))
-                        .clickable(onClick = onToggleSpeed),
-                    shape = RoundedCornerShape(10.dp),
-                    color = Color(0xFFF1F5F9),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFE2E8F0))
+                PixelCardBox(
+                    backgroundColor = PixelColors.CardYellow,
+                    borderColor = PixelColors.BorderDark,
+                    shadowColor = PixelColors.ShadowDark,
+                    borderWidth = 1.2.dp,
+                    shadowOffset = 2.dp,
+                    cornerRadius = 4.dp,
+                    showRivets = false,
+                    onClick = onToggleSpeed
                 ) {
                     Text(
                         text = "Tốc độ: ${if (selectedSpeed == 1.0f) "1.0x" else "0.65x"}",
                         fontSize = 11.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = Color(0xFF475569),
-                        modifier = Modifier.padding(horizontal = 9.dp, vertical = 6.dp),
+                        fontWeight = FontWeight.Black,
+                        color = PixelColors.BorderDark,
+                        modifier = Modifier.padding(horizontal = 9.dp, vertical = 7.dp),
                         maxLines = 1
                     )
                 }
@@ -645,9 +659,14 @@ private fun PitchContourActionCard(
 
             // Hàng 2: Nút bật mic & thu âm đối chiếu
             val buttonColor = when {
-                isListening -> VocabColors.AccentCoral
-                isProcessing -> Color(0xFFF59E0B)
-                else -> VocabColors.BrandPrimary
+                isListening -> Color(0xFFEF4444)
+                isProcessing -> PixelColors.PixelYellow
+                else -> PixelColors.PixelPurple
+            }
+            val buttonTextColor = when {
+                isListening -> Color.White
+                isProcessing -> PixelColors.BorderDark
+                else -> Color.White
             }
             val buttonText = when {
                 isListening -> "Đang lắng nghe... (Bấm dừng)"
@@ -655,31 +674,34 @@ private fun PitchContourActionCard(
                 else -> "Bật mic & thu âm đối chiếu ngay"
             }
 
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(42.dp)
-                    .clickable(enabled = !isProcessing, onClick = onMicClick),
-                shape = RoundedCornerShape(10.dp),
-                color = buttonColor
+            PixelCardBox(
+                backgroundColor = buttonColor,
+                borderColor = PixelColors.BorderDark,
+                shadowColor = PixelColors.ShadowDark,
+                borderWidth = 1.8.dp,
+                shadowOffset = 3.dp,
+                cornerRadius = 6.dp,
+                onClick = if (!isProcessing) onMicClick else null
             ) {
                 Row(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(42.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_mic),
                         contentDescription = null,
-                        tint = Color.White,
+                        tint = buttonTextColor,
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = buttonText,
                         fontSize = 12.5.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White,
+                        fontWeight = FontWeight.Black,
+                        color = buttonTextColor,
                         maxLines = 1
                     )
                 }

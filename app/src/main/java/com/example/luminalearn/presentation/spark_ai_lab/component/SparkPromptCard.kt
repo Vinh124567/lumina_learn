@@ -8,7 +8,12 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import com.example.luminalearn.presentation.vocabulary.component.PixelArcadeButton
+import com.example.luminalearn.presentation.vocabulary.component.PixelCardBox
+import com.example.luminalearn.presentation.vocabulary.component.PixelColors
+import com.example.luminalearn.presentation.vocabulary.component.PixelStepCornerShape
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -70,11 +75,9 @@ private val ButtonGradient = Brush.horizontalGradient(
     listOf(Color(0xFF4F46E5), Color(0xFF5C50F6))
 )
 
-private const val BADGE_TEXT = "SINH BÀI HỌC VI MÔ CÁ NHÂN HÓA BẰNG AI"
+private const val BADGE_TEXT = "AI MICRO LESSON GENERATOR"
 private const val TITLE_TEXT = "Nhập chủ đề bạn muốn học hôm nay:"
 private const val PLACEHOLDER_TEXT = "Ví dụ: Gọi món trong quán lẩu Tứ Xuyên..."
-private const val BUTTON_TEXT = "Tạo 3 Tia Sáng"
-private const val BUTTON_LOADING_TEXT = "Lumina đang tạo..."
 
 @Composable
 fun SparkPromptCard(
@@ -84,38 +87,86 @@ fun SparkPromptCard(
     isLoading: Boolean = false,
     modifier: Modifier = Modifier
 ) {
-    Card(
+    PixelCardBox(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = BorderStroke(1.dp, BorderColor),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        backgroundColor = Color(0xFFFFFBEB), // Kem phiêu lưu RPG
+        headerTitle = "⚡ SPARK PROMPT STUDIO",
+        headerBadge = "AI V4.0",
+        headerColor = PixelColors.PixelYellow
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(horizontal = 14.dp, vertical = 12.dp)
         ) {
-            HeaderSection()
-
-            Spacer(modifier = Modifier.height(14.dp))
-
-            InputAndButtonSection(
-                prompt = prompt,
-                onPromptChange = onPromptChange,
-                onGenerateClick = onGenerateClick,
-                isLoading = isLoading
+            // Tiêu đề hướng dẫn
+            Text(
+                text = TITLE_TEXT,
+                fontSize = 12.5.sp,
+                fontWeight = FontWeight.Black,
+                color = PixelColors.BorderDark,
+                letterSpacing = 0.3.sp
             )
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-            HorizontalDivider(
-                color = DividerColor,
-                thickness = 1.dp
+            // Ô nhập liệu Pixel
+            val inputShape = PixelStepCornerShape(2.dp)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(inputShape)
+                    .background(Color.White)
+                    .border(BorderStroke(1.2.dp, PixelColors.BorderDark), inputShape)
+                    .padding(horizontal = 10.dp, vertical = 9.dp),
+                contentAlignment = Alignment.CenterStart
+            ) {
+                if (prompt.isEmpty()) {
+                    Text(
+                        text = PLACEHOLDER_TEXT,
+                        color = Color(0xFF94A3B8),
+                        fontSize = 12.sp,
+                        maxLines = 1
+                    )
+                }
+
+                BasicTextField(
+                    value = prompt,
+                    onValueChange = onPromptChange,
+                    textStyle = TextStyle(
+                        fontSize = 12.5.sp,
+                        color = PixelColors.BorderDark,
+                        fontWeight = FontWeight.Bold
+                    ),
+                    cursorBrush = SolidColor(PixelColors.PixelBlue),
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            // Nút tạo bài học Arcade
+            PixelArcadeButton(
+                text = if (isLoading) "LUMINA ĐANG TẠO... ⏳" else "TẠO 3 TIA SÁNG ▶",
+                color = PixelColors.PixelOrange,
+                fillMaxWidth = true,
+                onClick = onGenerateClick
             )
 
             Spacer(modifier = Modifier.height(12.dp))
 
+            // Vạch ngăn cách pixel
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .background(Color(0xFFFDE68A))
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            // Gợi ý chủ đề nhanh
             QuickSuggestionsSection(
                 onSelectSuggestion = { suggestion ->
                     onPromptChange("${suggestion.title} (${suggestion.hanzi})")
@@ -126,191 +177,19 @@ fun SparkPromptCard(
 }
 
 @Composable
-private fun HeaderSection() {
-    Column {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_sparkle),
-                contentDescription = null,
-                tint = PrimaryPurple,
-                modifier = Modifier.size(14.dp)
-            )
-            Spacer(modifier = Modifier.width(6.dp))
-            Text(
-                text = BADGE_TEXT,
-                color = PrimaryPurple,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.ExtraBold,
-                letterSpacing = 0.5.sp
-            )
-        }
-
-        Spacer(modifier = Modifier.height(6.dp))
-
-        Text(
-            text = TITLE_TEXT,
-            fontSize = 16.5.sp,
-            fontWeight = FontWeight.Bold,
-            color = DarkTitleColor
-        )
-    }
-}
-
-@Composable
-private fun InputAndButtonSection(
-    prompt: String,
-    onPromptChange: (String) -> Unit,
-    onGenerateClick: () -> Unit,
-    isLoading: Boolean
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        PromptTextField(
-            prompt = prompt,
-            onPromptChange = onPromptChange,
-            modifier = Modifier.weight(1f)
-        )
-
-        Spacer(modifier = Modifier.width(8.dp))
-
-        GenerateButton(
-            isLoading = isLoading,
-            onClick = onGenerateClick
-        )
-    }
-}
-
-@Composable
-private fun PromptTextField(
-    prompt: String,
-    onPromptChange: (String) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Surface(
-        modifier = modifier,
-        shape = RoundedCornerShape(50.dp),
-        color = InputBgColor,
-        border = BorderStroke(1.dp, BorderColor)
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 14.dp, vertical = 11.dp),
-            contentAlignment = Alignment.CenterStart
-        ) {
-            if (prompt.isEmpty()) {
-                Text(
-                    text = PLACEHOLDER_TEXT,
-                    color = TextMuted,
-                    fontSize = 12.5.sp,
-                    lineHeight = 17.sp,
-                    maxLines = 1
-                )
-            }
-
-            BasicTextField(
-                value = prompt,
-                onValueChange = onPromptChange,
-                textStyle = TextStyle(
-                    fontSize = 13.sp,
-                    color = DarkTitleColor,
-                    fontWeight = FontWeight.Medium
-                ),
-                cursorBrush = SolidColor(PrimaryPurple),
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
-    }
-}
-
-@Composable
-private fun GenerateButton(
-    isLoading: Boolean,
-    onClick: () -> Unit
-) {
-    val infiniteTransition = rememberInfiniteTransition(label = "spin_transition")
-    val rotationAngle by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 360f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 1000, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart
-        ),
-        label = "spin_angle"
-    )
-
-    Surface(
-        shape = RoundedCornerShape(50.dp),
-        shadowElevation = 2.dp,
-        modifier = Modifier
-            .clip(RoundedCornerShape(50.dp))
-            .then(
-                if (!isLoading) Modifier.bounceClick(scaleDown = 0.94f, onClick = onClick)
-                else Modifier
-            )
-    ) {
-        Row(
-            modifier = Modifier
-                .background(ButtonGradient)
-                .padding(horizontal = 14.dp, vertical = 11.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            if (isLoading) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_refresh),
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier
-                        .size(14.dp)
-                        .rotate(rotationAngle)
-                )
-
-                Spacer(modifier = Modifier.width(6.dp))
-
-                Text(
-                    text = BUTTON_LOADING_TEXT,
-                    color = Color.White,
-                    fontSize = 12.5.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            } else {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_sparkle),
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.size(14.dp)
-                )
-
-                Spacer(modifier = Modifier.width(6.dp))
-
-                Text(
-                    text = BUTTON_TEXT,
-                    color = Color.White,
-                    fontSize = 12.5.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-        }
-    }
-}
-
-@Composable
 private fun QuickSuggestionsSection(
     onSelectSuggestion: (PromptSuggestion) -> Unit
 ) {
     FlowChipsLayout(
         modifier = Modifier.fillMaxWidth(),
-        horizontalSpacing = 8.dp,
-        verticalSpacing = 8.dp
+        horizontalSpacing = 6.dp,
+        verticalSpacing = 6.dp
     ) {
         Text(
             text = "Gợi ý nhanh:",
-            fontSize = 12.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = TextMuted
+            fontSize = 10.5.sp,
+            fontWeight = FontWeight.Black,
+            color = Color(0xFF78350F)
         )
 
         QUICK_SUGGESTIONS.forEach { suggestion ->
@@ -327,29 +206,27 @@ private fun SuggestionChip(
     suggestion: PromptSuggestion,
     onClick: () -> Unit
 ) {
-    Surface(
-        shape = RoundedCornerShape(50.dp),
-        color = Color(0xFFF8FAFC),
-        border = BorderStroke(1.dp, BorderColor),
-        modifier = Modifier.bounceClick(scaleDown = 0.92f, onClick = onClick)
+    val chipShape = PixelStepCornerShape(1.5.dp)
+    Box(
+        modifier = Modifier
+            .clip(chipShape)
+            .background(Color.White)
+            .border(BorderStroke(1.dp, Color(0xFFFDE68A)), chipShape)
+            .bounceClick(scaleDown = 0.94f, onClick = onClick)
+            .padding(horizontal = 7.dp, vertical = 4.dp)
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp)
-        ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = suggestion.title,
-                fontSize = 11.5.sp,
-                fontWeight = FontWeight.SemiBold,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold,
                 color = Color(0xFF4338CA)
             )
-
-            Spacer(modifier = Modifier.width(4.dp))
-
+            Spacer(modifier = Modifier.width(3.dp))
             Text(
                 text = "(${suggestion.hanzi})",
-                fontSize = 11.sp,
-                color = TextMuted
+                fontSize = 9.sp,
+                color = Color(0xFF64748B)
             )
         }
     }

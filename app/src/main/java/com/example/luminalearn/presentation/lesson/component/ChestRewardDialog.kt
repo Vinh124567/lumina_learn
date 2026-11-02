@@ -10,7 +10,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,10 +19,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -33,7 +30,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -41,21 +37,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.example.luminalearn.core.ui.effect.bounceClick
 import com.example.luminalearn.core.util.GameSoundHelper
+import com.example.luminalearn.presentation.vocabulary.component.PixelArcadeButton
+import com.example.luminalearn.presentation.vocabulary.component.PixelCardBox
+import com.example.luminalearn.presentation.vocabulary.component.PixelColors
 import com.example.luminalearn.ui.theme.PlusJakartaSans
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 
-private val BrandGold = Color(0xFFF59E0B)
-private val BrandGoldLight = Color(0xFFFDE68A)
-private val BrandPurple = Color(0xFF6366F1)
-private val BrandCyan = Color(0xFF06B6D4)
-private val TextMain = Color(0xFF0F172A)
-private val TextMuted = Color(0xFF64748B)
-
 /**
  * Dialog mở rương nhận quà khi học viên hoàn thành Unit trên lộ trình.
+ * Phong cách Retro 16-Bit Pixel RPG Victory Chest.
  */
 @Composable
 fun ChestRewardDialog(
@@ -95,175 +87,159 @@ fun ChestRewardDialog(
     ) {
         Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp),
+                .fillMaxWidth(0.92f)
+                .scale(scaleAnim.value),
             contentAlignment = Alignment.Center
         ) {
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .scale(scaleAnim.value),
-                shape = RoundedCornerShape(28.dp),
-                color = Color.White,
-                shadowElevation = 16.dp,
-                border = BorderStroke(1.dp, Color(0xFFE2E8F0))
+            PixelCardBox(
+                modifier = Modifier.fillMaxWidth(),
+                backgroundColor = Color.White,
+                borderWidth = 1.5.dp,
+                shadowOffset = 3.dp,
+                cornerRadius = 12.dp,
+                headerTitle = "★ VICTORY CHEST ★",
+                headerBadge = "PHẦN $unitNumber",
+                headerColor = PixelColors.PixelYellow,
+                showGrille = true,
+                showRivets = false
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 24.dp, vertical = 28.dp),
+                        .padding(horizontal = 20.dp, vertical = 22.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // 1. Rương báu hào quang 3D
+                    // 1. Rương báu pixel hào quang
                     Box(
-                        modifier = Modifier.size(110.dp),
+                        modifier = Modifier.size(100.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        // Hào quang tỏa sáng phía sau
+                        // Hào quang vàng neon phía sau
                         Box(
                             modifier = Modifier
-                                .size(110.dp)
-                                .clip(CircleShape)
-                                .background(
-                                    Brush.radialGradient(
-                                        listOf(
-                                            BrandGoldLight.copy(alpha = auraAlpha),
-                                            BrandGold.copy(alpha = auraAlpha * 0.4f),
-                                            Color.Transparent
-                                        )
-                                    )
-                                )
+                                .size(96.dp)
+                                .clip(RoundedCornerShape(20.dp))
+                                .background(PixelColors.PixelYellow.copy(alpha = auraAlpha * 0.35f))
                         )
 
                         // Biểu tượng Rương vàng mở nắp
                         Text(
                             text = "🎁",
-                            fontSize = 62.sp
+                            fontSize = 58.sp
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(14.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
 
                     // 2. Tiêu đề chúc mừng
                     Text(
                         text = "MỞ KHÓA RƯƠNG BÁU!",
                         fontFamily = PlusJakartaSans,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = TextMain,
-                        letterSpacing = (-0.3).sp
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Black,
+                        color = PixelColors.BorderDark,
+                        letterSpacing = 0.5.sp
                     )
 
-                    Spacer(modifier = Modifier.height(6.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
 
                     Text(
                         text = "Chúc mừng bạn đã hoàn thành xuất sắc tất cả bài học trong Phần $unitNumber!",
                         fontFamily = PlusJakartaSans,
-                        fontSize = 13.sp,
-                        color = TextMuted,
+                        fontSize = 12.sp,
+                        color = PixelColors.MutedText,
                         textAlign = TextAlign.Center,
-                        lineHeight = 18.sp,
+                        lineHeight = 17.sp,
                         modifier = Modifier.padding(horizontal = 8.dp)
                     )
 
-                    Spacer(modifier = Modifier.height(20.dp))
+                    Spacer(modifier = Modifier.height(18.dp))
 
-                    // 3. Khối phần thưởng thu thập được
+                    // 3. Khối phần thưởng thu thập được (2 thẻ pixel)
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
-                        // Thẻ Sparks
-                        Surface(
-                            modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(18.dp),
-                            color = Color(0xFFFFFBEB),
-                            border = BorderStroke(1.dp, Color(0xFFFDE68A))
+                        // Thẻ Sparks Pixel
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(PixelColors.CardYellow)
+                                .border(BorderStroke(1.5.dp, PixelColors.BorderDark), RoundedCornerShape(8.dp))
+                                .padding(vertical = 12.dp),
+                            contentAlignment = Alignment.Center
                         ) {
-                            Column(
-                                modifier = Modifier.padding(vertical = 14.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Text(text = "⚡", fontSize = 24.sp)
-                                Spacer(modifier = Modifier.height(4.dp))
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(text = "⚡", fontSize = 22.sp)
+                                Spacer(modifier = Modifier.height(3.dp))
                                 Text(
                                     text = "+$sparksEarned",
                                     fontFamily = PlusJakartaSans,
-                                    fontSize = 17.sp,
-                                    fontWeight = FontWeight.ExtraBold,
-                                    color = BrandGold
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Black,
+                                    color = PixelColors.PixelYellowDark
                                 )
                                 Text(
-                                    text = "Tia sáng Sparks",
+                                    text = "SPARKS",
                                     fontFamily = PlusJakartaSans,
-                                    fontSize = 10.5.sp,
-                                    fontWeight = FontWeight.Medium,
-                                    color = Color(0xFF92400E)
+                                    fontSize = 9.5.sp,
+                                    fontWeight = FontWeight.Black,
+                                    color = PixelColors.BorderDark,
+                                    letterSpacing = 0.5.sp
                                 )
                             }
                         }
 
-                        // Thẻ EXP
-                        Surface(
-                            modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(18.dp),
-                            color = Color(0xFFEEF2FF),
-                            border = BorderStroke(1.dp, Color(0xFFC7D2FE))
+                        // Thẻ EXP Pixel
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(PixelColors.CardPurple)
+                                .border(BorderStroke(1.5.dp, PixelColors.BorderDark), RoundedCornerShape(8.dp))
+                                .padding(vertical = 12.dp),
+                            contentAlignment = Alignment.Center
                         ) {
-                            Column(
-                                modifier = Modifier.padding(vertical = 14.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Text(text = "🌟", fontSize = 24.sp)
-                                Spacer(modifier = Modifier.height(4.dp))
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(text = "🌟", fontSize = 22.sp)
+                                Spacer(modifier = Modifier.height(3.dp))
                                 Text(
                                     text = "+$expEarned",
                                     fontFamily = PlusJakartaSans,
-                                    fontSize = 17.sp,
-                                    fontWeight = FontWeight.ExtraBold,
-                                    color = BrandPurple
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Black,
+                                    color = PixelColors.PixelPurpleDark
                                 )
                                 Text(
-                                    text = "Kinh nghiệm EXP",
+                                    text = "EXP",
                                     fontFamily = PlusJakartaSans,
-                                    fontSize = 10.5.sp,
-                                    fontWeight = FontWeight.Medium,
-                                    color = Color(0xFF3730A3)
+                                    fontSize = 9.5.sp,
+                                    fontWeight = FontWeight.Black,
+                                    color = PixelColors.BorderDark,
+                                    letterSpacing = 0.5.sp
                                 )
                             }
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(20.dp))
 
-                    // 4. Nút nhận quà
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(52.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(
-                                Brush.horizontalGradient(
-                                    listOf(Color(0xFFF59E0B), Color(0xFFD97706))
-                                )
-                            )
-                            .bounceClick(scaleDown = 0.95f) {
-                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                GameSoundHelper.playClick()
-                                onClaim()
-                                onDismiss()
-                            },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "THU THẬP PHẦN THƯỞNG",
-                            fontFamily = PlusJakartaSans,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = Color.White,
-                            letterSpacing = 0.5.sp
-                        )
-                    }
+                    // 4. Nút Arcade nhận quà
+                    PixelArcadeButton(
+                        text = "🎁 THU THẬP PHẦN THƯỞNG",
+                        onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            GameSoundHelper.playClick()
+                            onClaim()
+                            onDismiss()
+                        },
+                        color = PixelColors.PixelYellow,
+                        fontSize = 12.5f,
+                        height = 46.dp,
+                        shadowOffset = 2.5.dp,
+                        fillMaxWidth = true
+                    )
                 }
             }
         }

@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -35,6 +36,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.luminalearn.R
 import com.example.luminalearn.core.ui.effect.bounceClick
+import com.example.luminalearn.presentation.vocabulary.component.PixelBadge
+import com.example.luminalearn.presentation.vocabulary.component.PixelCardBox
+import com.example.luminalearn.presentation.vocabulary.component.PixelColors
+import com.example.luminalearn.ui.theme.PlusJakartaSans
 
 private data class QuickHubTile(
     val titleRes: Int,
@@ -114,85 +119,67 @@ fun QuickActionBar(
 
 @Composable
 private fun QuickHubCard(tile: QuickHubTile) {
-    Card(
+    PixelCardBox(
         modifier = Modifier
-            .width(136.dp)
-            .height(86.dp)
-            .bounceClick(scaleDown = 0.94f) { tile.onClick() },
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-        border = BorderStroke(1.dp, tile.accentColor.copy(alpha = 0.35f)),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            .width(138.dp)
+            .height(98.dp),
+        backgroundColor = Color.White,
+        borderColor = PixelColors.BorderDark,
+        shadowColor = PixelColors.ShadowDark,
+        borderWidth = 1.8.dp,
+        shadowOffset = 3.dp,
+        headerTitle = tile.badge,
+        headerColor = tile.accentColor.copy(alpha = 0.25f),
+        showGrille = true,
+        onClick = tile.onClick
     ) {
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(
-                    Brush.linearGradient(
-                        colors = listOf(
-                            Color(0xFF161B38),
-                            Color(0xFF0F1328)
-                        )
-                    )
-                )
-                .padding(10.dp)
+                .padding(horizontal = 9.dp, vertical = 7.dp),
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.SpaceBetween
+            // Icon ô vuông Pixel RPG dập nổi
+            Box(
+                modifier = Modifier
+                    .size(26.dp)
+                    .background(
+                        tile.accentColor,
+                        shape = CutCornerShape(topStart = 4.dp, bottomEnd = 4.dp)
+                    )
+                    .border(
+                        BorderStroke(1.2.dp, PixelColors.BorderDark),
+                        shape = CutCornerShape(topStart = 4.dp, bottomEnd = 4.dp)
+                    ),
+                contentAlignment = Alignment.Center
             ) {
-                // Top Row: Mini Icon + Mini Badge
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(26.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(tile.accentColor.copy(alpha = 0.16f))
-                            .border(
-                                BorderStroke(0.8.dp, tile.accentColor.copy(alpha = 0.35f)),
-                                shape = RoundedCornerShape(8.dp)
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            painter = painterResource(id = tile.iconRes),
-                            contentDescription = null,
-                            tint = tile.accentColor,
-                            modifier = Modifier.size(13.dp)
-                        )
-                    }
+                Icon(
+                    painter = painterResource(id = tile.iconRes),
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(13.dp)
+                )
+            }
 
-                    Text(
-                        text = tile.badge,
-                        color = tile.accentColor,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 0.3.sp
-                    )
-                }
-
-                // Bottom Content: Title + Subtitle
-                Column {
-                    Text(
-                        text = stringResource(id = tile.titleRes),
-                        fontSize = 12.5.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White,
-                        maxLines = 1
-                    )
-                    Spacer(modifier = Modifier.height(1.dp))
-                    Text(
-                        text = tile.subtitle,
-                        fontSize = 10.5.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color(0xFF94A3B8),
-                        maxLines = 1
-                    )
-                }
+            // Bottom Content: Title + Subtitle
+            Column {
+                Text(
+                    text = stringResource(id = tile.titleRes),
+                    fontFamily = PlusJakartaSans,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Black,
+                    color = PixelColors.BorderDark,
+                    maxLines = 1
+                )
+                Spacer(modifier = Modifier.height(1.dp))
+                Text(
+                    text = tile.subtitle,
+                    fontFamily = PlusJakartaSans,
+                    fontSize = 9.5.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = PixelColors.MutedText,
+                    maxLines = 1
+                )
             }
         }
     }

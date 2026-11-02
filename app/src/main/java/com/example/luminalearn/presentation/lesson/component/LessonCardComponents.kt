@@ -2,6 +2,8 @@ package com.example.luminalearn.presentation.lesson.component
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -39,16 +41,17 @@ internal fun HanziAndPronunciationCard(
     toneCardData: ToneCardData,
     onPlayAudio: () -> Unit
 ) {
-    Surface(
+    com.example.luminalearn.presentation.vocabulary.component.PixelCardBox(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
-        color = Color.White,
-        border = BorderStroke(1.dp, Color(0xFFE2E8F0))
+        backgroundColor = Color.White,
+        borderColor = com.example.luminalearn.presentation.vocabulary.component.PixelColors.BorderDark,
+        shadowColor = com.example.luminalearn.presentation.vocabulary.component.PixelColors.ShadowDark,
+        cornerRadius = 10.dp
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(14.dp)
         ) {
             // Hàng 4 ô vuông chữ Hán lớn kèm Pinyin dưới chân
             HanziBoxRow(
@@ -56,7 +59,7 @@ internal fun HanziAndPronunciationCard(
                 pinyinList = toneCardData.pinyinVariants
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
             // Hàng phát âm mā · má · mǎ · mà kèm nút Nghe đọc
             PronunciationAndAudioRow(
@@ -64,7 +67,7 @@ internal fun HanziAndPronunciationCard(
                 onPlayAudio = onPlayAudio
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(10.dp))
 
             // Box vàng chứa cả Hán Việt và Ý nghĩa
             HanVietAndMeaningBox(
@@ -88,31 +91,40 @@ internal fun HanziBoxRow(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.CenterStart
         ) {
-            Surface(
-                shape = RoundedCornerShape(14.dp),
-                color = Color(0xFF5538EE),
+            Box(
                 modifier = Modifier
-                    .width(116.dp)
-                    .height(64.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(com.example.luminalearn.presentation.vocabulary.component.PixelColors.ShadowDark)
+                    .padding(bottom = 2.5.dp)
             ) {
-                Row(
-                    modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
+                Box(
+                    modifier = Modifier
+                        .width(116.dp)
+                        .height(64.dp)
+                        .clip(RoundedCornerShape(6.dp))
+                        .background(com.example.luminalearn.presentation.vocabulary.component.PixelColors.ArcadePurple)
+                        .border(1.5.dp, com.example.luminalearn.presentation.vocabulary.component.PixelColors.BorderDark, RoundedCornerShape(6.dp)),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = hanzi,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_speaker),
-                        contentDescription = null,
-                        tint = Color(0xFFDDD6FE),
-                        modifier = Modifier.size(15.dp)
-                    )
+                    Row(
+                        modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = hanzi,
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Black,
+                            color = Color.White
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_speaker),
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
                 }
             }
         }
@@ -126,32 +138,42 @@ internal fun HanziBoxRow(
     ) {
         hanziList.forEachIndexed { index, hanzi ->
             val pinyin = pinyinList.getOrElse(index) { "" }
-            Surface(
-                shape = RoundedCornerShape(14.dp),
-                color = Color(0xFF5538EE),
+            Box(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(horizontal = 4.dp)
-                    .height(68.dp)
+                    .padding(horizontal = 3.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(com.example.luminalearn.presentation.vocabulary.component.PixelColors.ShadowDark)
+                    .padding(bottom = 2.5.dp)
             ) {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(68.dp)
+                        .clip(RoundedCornerShape(6.dp))
+                        .background(com.example.luminalearn.presentation.vocabulary.component.PixelColors.ArcadePurple)
+                        .border(1.5.dp, com.example.luminalearn.presentation.vocabulary.component.PixelColors.BorderDark, RoundedCornerShape(6.dp)),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = hanzi,
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                    if (pinyin.isNotBlank()) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
                         Text(
-                            text = pinyin,
-                            fontSize = 11.5.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = Color(0xFFDDD6FE)
+                            text = hanzi,
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.Black,
+                            color = Color.White
                         )
+                        if (pinyin.isNotBlank()) {
+                            Text(
+                                text = pinyin,
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = com.example.luminalearn.presentation.vocabulary.component.PixelColors.ArcadeAmber
+                            )
+                        }
                     }
                 }
             }
@@ -166,16 +188,16 @@ internal fun PronunciationAndAudioRow(
 ) {
     if (pinyinList.isEmpty()) return
 
-    Surface(
-        shape = RoundedCornerShape(14.dp),
-        color = Color(0xFFF8FAFC),
-        border = BorderStroke(1.dp, Color(0xFFF1F5F9)),
-        modifier = Modifier.fillMaxWidth()
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(8.dp))
+            .background(Color(0xFFF8FAFC))
+            .border(1.2.dp, com.example.luminalearn.presentation.vocabulary.component.PixelColors.BorderDark, RoundedCornerShape(8.dp))
+            .padding(horizontal = 10.dp, vertical = 6.dp)
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 8.dp),
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -185,39 +207,43 @@ internal fun PronunciationAndAudioRow(
                 fontFamily = PlusJakartaSans,
                 fontWeight = FontWeight.Bold,
                 fontSize = 13.sp,
-                color = Color(0xFF4338CA),
+                color = com.example.luminalearn.presentation.vocabulary.component.PixelColors.ArcadePurple,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier
                     .weight(1f)
-                    .padding(end = 10.dp)
+                    .padding(end = 8.dp)
             )
 
-            Surface(
-                onClick = onPlayAudio,
-                shape = RoundedCornerShape(50),
-                color = Color.White,
-                border = BorderStroke(1.dp, Color(0xFF818CF8))
+            // Nút Nghe đọc Arcade Button
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(6.dp))
+                    .background(com.example.luminalearn.presentation.vocabulary.component.PixelColors.ShadowDark)
+                    .padding(bottom = 1.5.dp)
             ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(5.dp)
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(5.dp))
+                        .background(Color.White)
+                        .border(1.2.dp, com.example.luminalearn.presentation.vocabulary.component.PixelColors.BorderDark, RoundedCornerShape(5.dp))
+                        .clickable(onClick = onPlayAudio)
+                        .padding(horizontal = 10.dp, vertical = 5.dp)
                 ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_speaker),
-                        contentDescription = null,
-                        tint = Color(0xFF4F46E5),
-                        modifier = Modifier.size(13.dp)
-                    )
-                    Text(
-                        text = "Nghe đọc",
-                        fontFamily = PlusJakartaSans,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 11.5.sp,
-                        color = Color(0xFF4F46E5),
-                        maxLines = 1
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Text(text = "🔊", fontSize = 11.sp)
+                        Text(
+                            text = "Nghe đọc",
+                            fontFamily = PlusJakartaSans,
+                            fontWeight = FontWeight.Black,
+                            fontSize = 11.sp,
+                            color = com.example.luminalearn.presentation.vocabulary.component.PixelColors.TextDark,
+                            maxLines = 1
+                        )
+                    }
                 }
             }
         }
@@ -233,19 +259,16 @@ internal fun HanVietAndMeaningBox(
 
     val displayHanViet = if (hanViet.startsWith("Hán Việt:")) hanViet.substringAfter("Hán Việt:").trim() else hanViet
 
-    Surface(
-        shape = RoundedCornerShape(14.dp),
-        color = Color(0xFFFFFBEB),
-        border = BorderStroke(1.dp, Color(0xFFFDE68A)),
-        modifier = Modifier.fillMaxWidth()
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(8.dp))
+            .background(Color(0xFFFEF3C7))
+            .border(1.2.dp, com.example.luminalearn.presentation.vocabulary.component.PixelColors.BorderDark, RoundedCornerShape(8.dp))
+            .padding(horizontal = 12.dp, vertical = 8.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 10.dp)
-        ) {
+        Column(modifier = Modifier.fillMaxWidth()) {
             if (displayHanViet.isNotBlank()) {
-                // Dòng 1: Hán Việt
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.Top
@@ -253,14 +276,14 @@ internal fun HanVietAndMeaningBox(
                     Text(
                         text = "Hán Việt: ",
                         fontFamily = PlusJakartaSans,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.Black,
                         fontSize = 11.5.sp,
                         color = Color(0xFF92400E)
                     )
                     Text(
                         text = displayHanViet,
                         fontFamily = PlusJakartaSans,
-                        fontWeight = FontWeight.Medium,
+                        fontWeight = FontWeight.Bold,
                         fontSize = 11.5.sp,
                         color = Color(0xFF78350F),
                         lineHeight = 16.sp
@@ -270,9 +293,8 @@ internal fun HanVietAndMeaningBox(
 
             if (meaning.isNotBlank()) {
                 if (displayHanViet.isNotBlank()) {
-                    Spacer(modifier = Modifier.height(6.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
                 }
-                // Dòng 2: Ý nghĩa
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.Top

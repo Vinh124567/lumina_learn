@@ -37,18 +37,14 @@ fun PitchContourChartCard(
     isListening: Boolean,
     modifier: Modifier = Modifier
 ) {
-    Surface(
+    PixelCardBox(
+        backgroundColor = Color.White,
+        borderColor = PixelColors.BorderDark,
+        shadowColor = PixelColors.ShadowDark,
+        borderWidth = 1.5.dp,
+        shadowOffset = 3.dp,
+        cornerRadius = 6.dp,
         modifier = modifier
-            .fillMaxWidth()
-            .shadow(
-                elevation = 2.dp,
-                shape = RoundedCornerShape(18.dp),
-                spotColor = Color(0x0F000000),
-                ambientColor = Color(0x0A000000)
-            ),
-        shape = RoundedCornerShape(18.dp),
-        color = Color.White,
-        border = BorderStroke(0.5.dp, Color(0xFFE2E8F0))
     ) {
         Column(
             modifier = Modifier
@@ -68,15 +64,15 @@ fun PitchContourChartCard(
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(7.dp)
-                            .clip(CircleShape)
+                            .size(8.dp)
                             .background(Color(0xFF6366F1))
+                            .border(1.dp, PixelColors.BorderDark)
                     )
                     Text(
                         text = "Thang Ngũ Độ (Chao 1–5)",
                         fontSize = 12.5.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF0F172A),
+                        fontWeight = FontWeight.Black,
+                        color = PixelColors.BorderDark,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -84,38 +80,48 @@ fun PitchContourChartCard(
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     // Legend Bản xứ
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    PixelCardBox(
+                        backgroundColor = Color(0xFFEEF2FF),
+                        borderColor = PixelColors.BorderDark,
+                        shadowColor = PixelColors.ShadowDark,
+                        borderWidth = 1.dp,
+                        shadowOffset = 1.dp,
+                        cornerRadius = 3.dp,
+                        showRivets = false
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .size(12.dp, 3.dp)
-                                .clip(RoundedCornerShape(1.5.dp))
-                                .background(
-                                    Brush.horizontalGradient(
-                                        listOf(Color(0xFF6366F1), Color(0xFF06B6D4))
+                        Row(
+                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(10.dp, 3.dp)
+                                    .background(
+                                        Brush.horizontalGradient(
+                                            listOf(Color(0xFF6366F1), Color(0xFF06B6D4))
+                                        )
                                     )
-                                )
-                        )
-                        Text(
-                            text = "Bản xứ",
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = Color(0xFF475569)
-                        )
+                            )
+                            Text(
+                                text = "Bản xứ",
+                                fontSize = 9.5.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = PixelColors.BorderDark
+                            )
+                        }
                     }
 
                     // Legend Người học / Trạng thái
                     val userLegendColor = when {
-                        isListening -> VocabColors.AccentCoral
+                        isListening -> Color(0xFFEF4444)
                         speechSuccess == null -> Color(0xFF94A3B8)
-                        speechSuccess.score >= 80 -> Color(0xFF10B981)
-                        speechSuccess.score >= 60 -> Color(0xFFF59E0B)
-                        else -> Color(0xFFEF4444)
+                        speechSuccess.score >= 80 -> Color(0xFF16A34A)
+                        speechSuccess.score >= 60 -> Color(0xFFD97706)
+                        else -> Color(0xFFDC2626)
                     }
                     val userLegendText = when {
                         isListening -> "Đang thu..."
@@ -123,27 +129,45 @@ fun PitchContourChartCard(
                         else -> "${speechSuccess.score}% Khớp"
                     }
 
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    val userLegendBgColor = when {
+                        isListening -> Color(0xFFFEE2E2)
+                        speechSuccess == null -> Color(0xFFF1F5F9)
+                        speechSuccess.score >= 80 -> Color(0xFFDCFCE7)
+                        speechSuccess.score >= 60 -> Color(0xFFFEF3C7)
+                        else -> Color(0xFFFEE2E2)
+                    }
+
+                    PixelCardBox(
+                        backgroundColor = userLegendBgColor,
+                        borderColor = PixelColors.BorderDark,
+                        shadowColor = PixelColors.ShadowDark,
+                        borderWidth = 1.dp,
+                        shadowOffset = 1.dp,
+                        cornerRadius = 3.dp,
+                        showRivets = false
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .size(12.dp, 3.dp)
-                                .clip(RoundedCornerShape(1.5.dp))
-                                .background(userLegendColor)
-                        )
-                        Text(
-                            text = userLegendText,
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = userLegendColor
-                        )
+                        Row(
+                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(10.dp, 3.dp)
+                                    .background(userLegendColor)
+                            )
+                            Text(
+                                text = userLegendText,
+                                fontSize = 9.5.sp,
+                                fontWeight = FontWeight.Black,
+                                color = userLegendColor
+                            )
+                        }
                     }
                 }
             }
 
-            // Canvas đồ thị cao độ phong cách Apple Audio / ELSA Speak
+            // Canvas đồ thị cao độ phong cách Arcade CRT
             PitchChartCanvas(
                 syllables = syllables,
                 speechSuccess = speechSuccess,
@@ -160,11 +184,15 @@ fun PitchContourChartCard(
                     Spacer(modifier = Modifier.width(28.dp))
 
                     syllables.forEach { syl ->
-                        Surface(
-                            modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(8.dp),
-                            color = Color(0xFFF8FAFC),
-                            border = BorderStroke(0.5.dp, Color(0xFFE2E8F0))
+                        PixelCardBox(
+                            backgroundColor = Color(0xFFF8FAFC),
+                            borderColor = PixelColors.BorderDark,
+                            shadowColor = PixelColors.ShadowDark,
+                            borderWidth = 1.dp,
+                            shadowOffset = 1.5.dp,
+                            cornerRadius = 4.dp,
+                            showRivets = false,
+                            modifier = Modifier.weight(1f)
                         ) {
                             Row(
                                 modifier = Modifier
@@ -176,21 +204,22 @@ fun PitchContourChartCard(
                                 Text(
                                     text = syl.hanzi,
                                     fontSize = 11.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color(0xFF1E293B)
+                                    fontWeight = FontWeight.Black,
+                                    color = PixelColors.BorderDark
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
                                     text = syl.pinyin,
                                     fontSize = 10.5.sp,
-                                    fontWeight = FontWeight.Medium,
-                                    color = Color(0xFF6366F1)
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFF4F46E5)
                                 )
                                 Spacer(modifier = Modifier.width(3.dp))
                                 Text(
                                     text = "(${syl.toneCode})",
                                     fontSize = 9.sp,
-                                    color = Color(0xFF94A3B8)
+                                    fontWeight = FontWeight.Bold,
+                                    color = PixelColors.BorderDark.copy(alpha = 0.6f)
                                 )
                             }
                         }
@@ -200,11 +229,14 @@ fun PitchContourChartCard(
 
             // Hướng dẫn nhẹ nhàng khi chưa thu âm
             if (speechSuccess == null && !isListening) {
-                Surface(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(10.dp),
-                    color = Color(0xFFF8FAFC),
-                    border = BorderStroke(0.5.dp, Color(0xFFF1F5F9))
+                PixelCardBox(
+                    backgroundColor = Color(0xFFF8FAFC),
+                    borderColor = PixelColors.BorderDark.copy(alpha = 0.4f),
+                    shadowColor = Color.Transparent,
+                    borderWidth = 1.dp,
+                    shadowOffset = 0.dp,
+                    cornerRadius = 4.dp,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     Row(
                         modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
@@ -214,14 +246,14 @@ fun PitchContourChartCard(
                         Box(
                             modifier = Modifier
                                 .size(5.dp)
-                                .clip(CircleShape)
-                                .background(Color(0xFF94A3B8))
+                                .background(PixelColors.BorderDark)
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
                             text = "Bấm \"Bật mic\" để phát âm & đối chiếu độ cao thanh điệu",
                             fontSize = 11.sp,
-                            color = Color(0xFF64748B),
+                            fontWeight = FontWeight.Bold,
+                            color = PixelColors.BorderDark.copy(alpha = 0.7f),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )

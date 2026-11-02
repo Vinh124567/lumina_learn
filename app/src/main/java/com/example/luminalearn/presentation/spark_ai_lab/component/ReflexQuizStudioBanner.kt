@@ -11,9 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -23,111 +21,69 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.luminalearn.core.ui.effect.CosmicStarfield
-import com.example.luminalearn.core.ui.effect.animatedMidnightGradient
-
-private val GoldBadgeText = Color(0xFFFEF08A)
-private val MintTextColor = Color(0xFF6EE7B7)
+import com.example.luminalearn.presentation.vocabulary.component.PixelCardBox
+import com.example.luminalearn.presentation.vocabulary.component.PixelColors
+import com.example.luminalearn.presentation.vocabulary.component.PixelStepCornerShape
 
 /**
- * Banner với dải màu Midnight chuyển động động cho Tab 3 (Trắc Nghiệm).
+ * Banner chuẩn Pixel 16-Bit JRPG cho Tab 3 (Trắc Nghiệm).
  */
 @Composable
 fun ReflexQuizStudioBanner(
     modifier: Modifier = Modifier
 ) {
-    Card(
+    PixelCardBox(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-        border = BorderStroke(1.dp, Color(0xFF5C50F6).copy(alpha = 0.35f)),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        backgroundColor = PixelColors.CardOrange, // Cam phiêu lưu RPG ấm áp, không tím than
+        headerTitle = "🎯 SPEED QUIZ ARENA",
+        headerBadge = "5S REFLEX",
+        headerColor = PixelColors.PixelOrange
     ) {
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .animatedMidnightGradient(
-                    colors = listOf(
-                        Color(0xFF14123E),
-                        Color(0xFF2A0845),
-                        Color(0xFF4B1248),
-                        Color(0xFF1E1C59),
-                        Color(0xFF14123E)
-                    )
-                )
+                .padding(horizontal = 14.dp, vertical = 12.dp)
         ) {
-            CosmicStarfield(
-                modifier = Modifier.matchParentSize(),
-                particleCount = 45,
-                focusCenterXRatio = 0.85f,
-                focusCenterYRatio = 0.35f
-            )
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 18.dp, vertical = 15.dp)
-            ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(Color.White.copy(alpha = 0.12f))
-                        .border(
-                            BorderStroke(1.dp, GoldBadgeText.copy(alpha = 0.35f)),
-                            shape = RoundedCornerShape(8.dp)
-                        )
-                        .padding(horizontal = 8.dp, vertical = 3.dp)
-                ) {
-                    Text(
-                        text = "🎯 SPEED QUIZ 4.0",
-                        color = GoldBadgeText,
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        letterSpacing = 0.4.sp
-                    )
-                }
-
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(Color.White.copy(alpha = 0.12f))
-                        .border(
-                            BorderStroke(1.dp, MintTextColor.copy(alpha = 0.35f)),
-                            shape = RoundedCornerShape(8.dp)
-                        )
-                        .padding(horizontal = 8.dp, vertical = 3.dp)
-                ) {
-                    Text(
-                        text = "⏱️ Phản xạ 5s",
-                        color = MintTextColor,
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(10.dp))
-
+            // Tiêu đề
             Text(
                 text = "Đấu Trường Phản Xạ Nghe - Hiểu",
-                fontSize = 17.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Black,
+                color = PixelColors.BorderDark,
+                letterSpacing = 0.3.sp
             )
 
             Spacer(modifier = Modifier.height(4.dp))
 
+            // Mô tả
             Text(
                 text = "Thử thách tốc độ tư duy ngôn ngữ không cần dịch sang tiếng Việt. Rèn luyện phản xạ tự nhiên như người bản xứ.",
-                fontSize = 12.sp,
-                lineHeight = 16.5.sp,
-                color = Color.White.copy(alpha = 0.78f)
+                fontSize = 11.5.sp,
+                lineHeight = 16.sp,
+                fontWeight = FontWeight.Medium,
+                color = Color(0xFF334155)
             )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Tag hỗ trợ
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(6.dp)
+                        .clip(PixelStepCornerShape(1.dp))
+                        .background(PixelColors.PixelOrange)
+                )
+                Text(
+                    text = "Luyện chọn đáp án chuẩn xác trong vòng 5 giây",
+                    fontSize = 9.5.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = PixelColors.BorderDark
+                )
+            }
         }
     }
-}
 }
