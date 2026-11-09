@@ -23,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.luminalearn.R
+import com.example.luminalearn.ui.theme.PlusJakartaSans
 
 @Composable
 fun LessonHeader(
@@ -31,57 +32,52 @@ fun LessonHeader(
     Column(
         modifier = modifier.fillMaxWidth()
     ) {
-        // 1. Badge "THƯ VIỆN HÁN NGỮ VI MÔ"
+        // 1. Tag pill phía trên
         Surface(
-            shape = RoundedCornerShape(16.dp),
-            color = Color(0xFFEEF2FF)
+            shape = RoundedCornerShape(50.dp),
+            color = Color(0xFFEDE9FE)
         ) {
             Row(
-                modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 5.dp)
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_nav_explore),
                     contentDescription = null,
-                    tint = Color(0xFF6366F1),
+                    tint = Color(0xFF5C50F6),
                     modifier = Modifier.size(13.dp)
                 )
-                Spacer(modifier = Modifier.width(5.dp))
+                Spacer(modifier = Modifier.width(6.dp))
                 Text(
-                    text = stringResource(R.string.library_badge),
-                    style = MaterialTheme.typography.labelSmall.copy(
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = Color(0xFF6366F1),
-                        letterSpacing = 0.5.sp
-                    )
+                    text = "LỘ TRÌNH BÀI HỌC HSK",
+                    fontFamily = PlusJakartaSans,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF5C50F6),
+                    letterSpacing = 0.4.sp
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         // 2. Main Title
         Text(
             text = stringResource(R.string.library_title),
-            style = MaterialTheme.typography.headlineMedium.copy(
-                fontSize = 24.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = Color(0xFF0F172A),
-                letterSpacing = (-0.5).sp
-            )
+            fontFamily = PlusJakartaSans,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.ExtraBold,
+            color = Color(0xFF0F172A),
+            letterSpacing = (-0.2).sp
         )
 
-        Spacer(modifier = Modifier.height(6.dp))
+        Spacer(modifier = Modifier.height(2.dp))
 
-        // 3. Subtitle Description
         Text(
-            text = stringResource(R.string.library_desc),
-            style = MaterialTheme.typography.bodyMedium.copy(
-                fontSize = 13.5.sp,
-                color = Color(0xFF64748B),
-                lineHeight = 20.sp
-            )
+            text = "Khóa học tương tác & luyện phản xạ theo cấp độ",
+            fontFamily = PlusJakartaSans,
+            fontSize = 12.5.sp,
+            color = Color(0xFF64748B)
         )
     }
 }

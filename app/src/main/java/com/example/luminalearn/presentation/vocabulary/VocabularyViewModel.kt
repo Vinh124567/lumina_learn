@@ -1,9 +1,14 @@
 package com.example.luminalearn.presentation.vocabulary
 
+import android.content.Context
 import androidx.lifecycle.viewModelScope
 import com.example.luminalearn.core.base.BaseViewModel
+import com.example.luminalearn.data.local.LessonCacheManager
+import com.example.luminalearn.data.local.SrsManager
 import com.example.luminalearn.data.remote.RetrofitClient
 import com.example.luminalearn.presentation.vocabulary.model.HskLevelFilter
+import com.example.luminalearn.presentation.vocabulary.model.SrsRating
+import com.example.luminalearn.presentation.vocabulary.model.SrsWordState
 import com.example.luminalearn.presentation.vocabulary.model.TopicItem
 import com.example.luminalearn.presentation.vocabulary.model.VocabConstants
 import com.example.luminalearn.presentation.vocabulary.model.VocabStudyMode
@@ -14,6 +19,21 @@ import kotlinx.coroutines.launch
 class VocabularyViewModel : BaseViewModel<VocabularyUiState, VocabularyUiIntent, VocabularyUiEffect>(
     VocabularyUiState()
 ) {
+
+    private var srsManager: SrsManager? = null
+
+    fun initSrs(context: Context) {
+        if (srsManager == null) {
+            srsManager = SrsManager(context.applicationContext)
+            val current = currentState.vocabList
+            if (current.isNotEmpty()) {
+                val updated = current.map { word ->
+                    word.copy(srsState = srsManager?.getSrsState(word.id) ?: word.srsState)
+                }
+                setState { copy(vocabList = updated) }
+            }
+        }
+    }
 
     init {
         processIntent(VocabularyUiIntent.LoadInitialData)
@@ -34,6 +54,44 @@ class VocabularyViewModel : BaseViewModel<VocabularyUiState, VocabularyUiIntent,
             is VocabularyUiIntent.StartReflexQuiz -> startReflexQuiz()
             is VocabularyUiIntent.RestartReflexQuiz -> startReflexQuiz()
             is VocabularyUiIntent.SelectQuizOption -> handleSelectQuizOption(intent.option)
+            is VocabularyUiIntent.OpenWordDetail -> setState {
+                copy(
+                    activeDetailWord = intent.word,
+                    activeDetailTab = intent.initialTab
+                )
+            }
+            is VocabularyUiIntent.DismissWordDetail -> setState { copy(activeDetailWord = null) }
+            is VocabularyUiIntent.SetAddVocabSheetVisible -> setState { copy(isAddVocabSheetOpen = intent.visible) }
+            is VocabularyUiIntent.SelectSource -> handleSelectSource(intent.source)
+            is VocabularyUiIntent.AddNewVocabulary -> handleAddNewVocabulary(intent.request, intent.onSuccess)
+            is VocabularyUiIntent.RateWordSrs -> handleRateWordSrs(intent.wordId, intent.rating)
+            is VocabularyUiIntent.ToggleEnrollSrs -> handleToggleEnrollSrs(intent.wordId)
+        }
+    }
+
+    private fun handleToggleEnrollSrs(wordId: String) {
+        val nextSrs = srsManager?.toggleEnrollSrs(wordId)
+        val updatedList = currentState.vocabList.map { word ->
+            if (word.id == wordId && nextSrs != null) word.copy(srsState = nextSrs) else word
+        }
+        val active = currentState.activeDetailWord
+        val updatedActive = if (active != null && active.id == wordId && nextSrs != null) {
+            active.copy(srsState = nextSrs)
+        } else {
+            active
+        }
+        setState { copy(vocabList = updatedList, activeDetailWord = updatedActive) }
+    }
+
+    private fun handleSelectSource(source: com.example.luminalearn.presentation.vocabulary.model.VocabSourceFilter) {
+        if (currentState.selectedSource == source) return
+        setState {
+            copy(
+                selectedSource = source,
+                currentPage = 1,
+                currentFlashcardIndex = 0,
+                isCardFlipped = false
+            )
         }
     }
 
@@ -99,7 +157,19 @@ class VocabularyViewModel : BaseViewModel<VocabularyUiState, VocabularyUiIntent,
         val updatedList = currentState.vocabList.map { item ->
             if (item.id == wordId) item.copy(isMastered = !item.isMastered) else item
         }
-        setState { copy(vocabList = updatedList) }
+        val updatedActive = if (currentState.activeDetailWord?.id == wordId) {
+            currentState.activeDetailWord?.let { it.copy(isMastered = !it.isMastered) }
+        } else {
+            currentState.activeDetailWord
+        }
+        setState { copy(vocabList = updatedList, activeDetailWord = updatedActive) }
+
+        viewModelScope.launch {
+            try {
+                RetrofitClient.vocabularyApiService.toggleMastered(wordId)
+            } catch (_: Exception) {
+            }
+        }
     }
 
     private fun handleNextFlashcard() {
@@ -122,6 +192,55 @@ class VocabularyViewModel : BaseViewModel<VocabularyUiState, VocabularyUiIntent,
             size - 1
         }
         setState { copy(currentFlashcardIndex = prevIndex, isCardFlipped = false) }
+    }
+
+    private fun handleRateWordSrs(wordId: String, rating: SrsRating) {
+        val nextSrs = srsManager?.rateWord(wordId, rating)
+        val updatedList = currentState.vocabList.map { word ->
+            if (word.id == wordId && nextSrs != null) word.copy(srsState = nextSrs) else word
+        }
+        val active = currentState.activeDetailWord
+        val updatedActive = if (active != null && active.id == wordId && nextSrs != null) {
+            active.copy(srsState = nextSrs)
+        } else {
+            active
+        }
+        setState { copy(vocabList = updatedList, activeDetailWord = updatedActive) }
+
+        if (nextSrs != null) {
+            viewModelScope.launch {
+                try {
+                    val req = com.example.luminalearn.data.model.UpdateSrsRatingRequest(
+                        repetition = nextSrs.repetition,
+                        intervalDays = nextSrs.intervalDays,
+                        easeFactor = nextSrs.easeFactor,
+                        nextReviewTimeMillis = nextSrs.nextReviewTimeMillis,
+                        lastReviewTimeMillis = nextSrs.lastReviewTimeMillis
+                    )
+                    RetrofitClient.vocabularyApiService.updateSrsRating(wordId, req)
+                } catch (_: Exception) {
+                    // Local state is already persisted as fallback
+                }
+            }
+        }
+
+        advanceFlashcardAfterRating(wordId)
+    }
+
+    private fun advanceFlashcardAfterRating(targetWordId: String) {
+        val remainingList = currentState.filteredList
+        val size = remainingList.size
+        if (size == 0) {
+            setState { copy(currentFlashcardIndex = 0, isCardFlipped = false) }
+            return
+        }
+        val stillPresent = remainingList.any { it.id == targetWordId }
+        val nextIndex = if (stillPresent) {
+            (currentState.currentFlashcardIndex + 1) % size
+        } else {
+            if (currentState.currentFlashcardIndex >= size) 0 else currentState.currentFlashcardIndex
+        }
+        setState { copy(currentFlashcardIndex = nextIndex, isCardFlipped = false) }
     }
 
     private fun fetchLevels() {
@@ -156,7 +275,28 @@ class VocabularyViewModel : BaseViewModel<VocabularyUiState, VocabularyUiIntent,
                         TopicItem(id = dto.id, name = dto.name, icon = dto.icon, count = dto.count)
                     }
                     if (remoteTopics.isNotEmpty()) {
-                        setState { copy(topics = remoteTopics) }
+                        val customCount = currentState.vocabList.count { it.isCustom }
+                        val hasCustom = remoteTopics.any { it.id == "custom" || it.name.contains("tự thêm") }
+                        val finalTopics = if (!hasCustom) {
+                            val allIdx = remoteTopics.indexOfFirst { it.id == "all" }
+                            val customItem = TopicItem(id = "custom", name = "Từ tôi tự thêm", icon = "✍️", count = customCount)
+                            if (allIdx != -1) {
+                                remoteTopics.toMutableList().apply { add(allIdx + 1, customItem) }
+                            } else {
+                                listOf(customItem) + remoteTopics
+                            }
+                        } else {
+                            remoteTopics
+                        }
+
+                        val topicStillExists = finalTopics.any { it.name == currentState.selectedTopic }
+                        val activeTopic = if (topicStillExists) currentState.selectedTopic else finalTopics.first().name
+                        setState {
+                            copy(
+                                topics = finalTopics,
+                                selectedTopic = activeTopic
+                            )
+                        }
                     }
                 }
             } catch (e: Exception) {
@@ -167,46 +307,102 @@ class VocabularyViewModel : BaseViewModel<VocabularyUiState, VocabularyUiIntent,
         }
     }
 
+    private fun mapDtoToItem(dto: com.example.luminalearn.data.model.VocabularyDto): VocabWordItem {
+        return VocabWordItem(
+            id = dto.id,
+            hanzi = dto.hanzi,
+            pinyin = dto.pinyin,
+            hanViet = dto.hanViet,
+            meaning = dto.meaning,
+            partOfSpeech = dto.partOfSpeech,
+            topic = dto.topic,
+            radical = dto.radical,
+            strokes = dto.strokes,
+            exampleHanzi = dto.exampleHanzi,
+            examplePinyin = dto.examplePinyin,
+            exampleMeaning = dto.exampleMeaning,
+            hskLevel = dto.hskLevel,
+            targetScore = dto.targetScore,
+            isMastered = dto.isMastered,
+            userId = dto.userId,
+            srsState = srsManager?.syncWithBackend(
+                wordId = dto.id,
+                beRep = dto.srsRepetition,
+                beInterval = dto.srsIntervalDays,
+                beEase = dto.srsEaseFactor,
+                beNextReview = dto.nextReviewTimeMillis,
+                beLastReview = dto.lastReviewTimeMillis
+            ) ?: SrsWordState(dto.id)
+        )
+    }
+
+    private fun fallbackFromLocalCache(queryTopic: String?, queryHsk: String?) {
+        val cached = LessonCacheManager.getCachedVocabularies()
+        if (!cached.isNullOrEmpty()) {
+            var filtered = cached
+            if (!queryHsk.isNullOrBlank()) {
+                filtered = filtered.filter { it.hskLevel.equals(queryHsk, ignoreCase = true) }
+            }
+            if (!queryTopic.isNullOrBlank()) {
+                filtered = filtered.filter { it.topic.equals(queryTopic, ignoreCase = true) }
+            }
+            val list = filtered.map { mapDtoToItem(it) }
+            val customCount = list.count { it.isCustom }
+            val updatedTopics = currentState.topics.map { topic ->
+                if (topic.id == "custom" || topic.name.contains("tự thêm")) {
+                    topic.copy(count = customCount)
+                } else {
+                    topic
+                }
+            }
+            setState { copy(vocabList = list, topics = updatedTopics) }
+            if (currentState.selectedMode == VocabStudyMode.REFLEX) {
+                startReflexQuiz()
+            }
+        } else {
+            setState { copy(vocabList = emptyList()) }
+        }
+    }
+
     private fun fetchVocabularies(topicName: String, hskLevel: String?) {
         viewModelScope.launch {
             setState { copy(isLoadingVocab = true) }
+            val isAllTopic = topicName == VocabConstants.ALL_TOPICS ||
+                    topicName == "Tất cả chủ đề" ||
+                    topicName.equals("all", ignoreCase = true)
+            val isCustomTopic = topicName.contains("tự thêm") || topicName.contains("tôi tự thêm") || topicName.contains("từ của tôi") || topicName == "custom"
+            val queryTopic = if (isAllTopic || isCustomTopic) null else topicName
+            val queryHsk = if (hskLevel == VocabConstants.ALL_LEVELS) null else hskLevel
+
             try {
-                val queryTopic = if (topicName == VocabConstants.ALL_TOPICS) null else topicName
-                val queryHsk = if (hskLevel == VocabConstants.ALL_LEVELS) null else hskLevel
                 val response = RetrofitClient.vocabularyApiService.getVocabularies(
                     topic = queryTopic,
                     hskLevel = queryHsk
                 )
                 if (response.isSuccessful && response.body()?.data != null) {
-                    val remoteList = response.body()!!.data!!.map { dto ->
-                        VocabWordItem(
-                            id = dto.id,
-                            hanzi = dto.hanzi,
-                            pinyin = dto.pinyin,
-                            hanViet = dto.hanViet,
-                            meaning = dto.meaning,
-                            partOfSpeech = dto.partOfSpeech,
-                            topic = dto.topic,
-                            radical = dto.radical,
-                            strokes = dto.strokes,
-                            exampleHanzi = dto.exampleHanzi,
-                            examplePinyin = dto.examplePinyin,
-                            exampleMeaning = dto.exampleMeaning,
-                            hskLevel = dto.hskLevel,
-                            targetScore = dto.targetScore,
-                            isMastered = dto.isMastered
-                        )
+                    val dtoList = response.body()!!.data!!
+                    if (queryTopic == null && queryHsk == null) {
+                        LessonCacheManager.cacheVocabularies(dtoList)
                     }
-                    setState { copy(vocabList = remoteList) }
+                    val remoteList = dtoList.map { mapDtoToItem(it) }
+                    val customCount = remoteList.count { it.isCustom }
+                    val updatedTopics = currentState.topics.map { topic ->
+                        if (topic.id == "custom" || topic.name.contains("tự thêm")) {
+                            topic.copy(count = customCount)
+                        } else {
+                            topic
+                        }
+                    }
+                    setState { copy(vocabList = remoteList, topics = updatedTopics) }
                     if (currentState.selectedMode == VocabStudyMode.REFLEX) {
                         startReflexQuiz()
                     }
                 } else {
-                    setState { copy(vocabList = emptyList()) }
+                    fallbackFromLocalCache(queryTopic, queryHsk)
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                setState { copy(vocabList = emptyList()) }
+                fallbackFromLocalCache(queryTopic, queryHsk)
             } finally {
                 setState { copy(isLoadingVocab = false) }
             }
@@ -291,6 +487,76 @@ class VocabularyViewModel : BaseViewModel<VocabularyUiState, VocabularyUiIntent,
                         )
                     )
                 }
+            }
+        }
+    }
+
+    private fun handleAddNewVocabulary(
+        request: com.example.luminalearn.data.model.CreateVocabularyRequest,
+        onSuccess: () -> Unit
+    ) {
+        viewModelScope.launch {
+            setState { copy(isSubmittingVocab = true) }
+            try {
+                val response = RetrofitClient.vocabularyApiService.createVocabulary(request)
+                if (response.isSuccessful && response.body()?.data != null) {
+                    val dto = response.body()!!.data!!
+                    val newWord = VocabWordItem(
+                        id = dto.id,
+                        hanzi = dto.hanzi,
+                        pinyin = dto.pinyin,
+                        hanViet = dto.hanViet,
+                        meaning = dto.meaning,
+                        partOfSpeech = dto.partOfSpeech,
+                        topic = dto.topic,
+                        radical = dto.radical,
+                        strokes = dto.strokes,
+                        exampleHanzi = dto.exampleHanzi,
+                        examplePinyin = dto.examplePinyin,
+                        exampleMeaning = dto.exampleMeaning,
+                        hskLevel = dto.hskLevel,
+                        targetScore = dto.targetScore,
+                        isMastered = dto.isMastered,
+                        userId = dto.userId,
+                        srsState = srsManager?.getSrsState(dto.id) ?: SrsWordState(dto.id)
+                    )
+                    val updatedList = listOf(newWord) + currentState.vocabList
+                    setState {
+                        copy(
+                            vocabList = updatedList,
+                            isAddVocabSheetOpen = false
+                        )
+                    }
+                    setEffect(VocabularyUiEffect.ShowToast("Thêm từ '${dto.hanzi}' thành công!"))
+                    fetchTopics(currentState.selectedHskTitle)
+                    onSuccess()
+                } else {
+                    setEffect(VocabularyUiEffect.ShowToast("Không thể thêm từ: ${response.message()}"))
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                setEffect(VocabularyUiEffect.ShowToast("Lỗi kết nối máy chủ: ${e.localizedMessage}"))
+            } finally {
+                setState { copy(isSubmittingVocab = false) }
+            }
+        }
+    }
+
+    fun lookupAi(query: String, onResult: (com.example.luminalearn.data.model.VocabularyDto?) -> Unit) {
+        viewModelScope.launch {
+            setState { copy(isAiLookingUp = true) }
+            try {
+                val response = RetrofitClient.vocabularyApiService.aiLookup(query)
+                if (response.isSuccessful && response.body()?.data != null) {
+                    onResult(response.body()!!.data)
+                } else {
+                    onResult(null)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                onResult(null)
+            } finally {
+                setState { copy(isAiLookingUp = false) }
             }
         }
     }

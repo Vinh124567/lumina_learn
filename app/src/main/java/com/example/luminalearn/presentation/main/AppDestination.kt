@@ -2,6 +2,7 @@ package com.example.luminalearn.presentation.main
 
 sealed class AppDestination(val route: String) {
     data object Splash : AppDestination("splash")
+    data object Onboarding : AppDestination("onboarding")
     data object Login : AppDestination("login")
     data object Main : AppDestination("main")
     data object Roadmap : AppDestination("roadmap")

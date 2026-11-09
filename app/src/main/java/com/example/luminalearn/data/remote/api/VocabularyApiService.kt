@@ -23,4 +23,30 @@ interface VocabularyApiService {
         @Query("topic") topic: String? = null,
         @Query("hskLevel") hskLevel: String? = null
     ): Response<ApiResponse<List<VocabularyDto>>>
+
+    @retrofit2.http.GET("vocabularies/{id}")
+    suspend fun getVocabularyById(
+        @retrofit2.http.Path("id") id: String
+    ): Response<ApiResponse<VocabularyDto>>
+
+    @retrofit2.http.PUT("vocabularies/{id}/toggle-mastered")
+    suspend fun toggleMastered(
+        @retrofit2.http.Path("id") id: String
+    ): Response<ApiResponse<VocabularyDto>>
+
+    @retrofit2.http.PUT("vocabularies/{id}/srs-rating")
+    suspend fun updateSrsRating(
+        @retrofit2.http.Path("id") id: String,
+        @retrofit2.http.Body request: com.example.luminalearn.data.model.UpdateSrsRatingRequest
+    ): Response<ApiResponse<VocabularyDto>>
+
+    @retrofit2.http.POST("vocabularies")
+    suspend fun createVocabulary(
+        @retrofit2.http.Body request: com.example.luminalearn.data.model.CreateVocabularyRequest
+    ): Response<ApiResponse<VocabularyDto>>
+
+    @GET("vocabularies/ai-lookup")
+    suspend fun aiLookup(
+        @Query("query") query: String
+    ): Response<ApiResponse<VocabularyDto>>
 }

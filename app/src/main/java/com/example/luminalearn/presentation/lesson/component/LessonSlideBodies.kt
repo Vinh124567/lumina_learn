@@ -49,33 +49,35 @@ internal fun SolidExplanationCard(
     backgroundColor: Color = Color(0xFF5538EE),
     modifier: Modifier = Modifier
 ) {
-    Surface(
+    com.example.luminalearn.presentation.vocabulary.component.PixelCardBox(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
-        color = backgroundColor
+        backgroundColor = backgroundColor,
+        borderColor = com.example.luminalearn.presentation.vocabulary.component.PixelColors.BorderDark,
+        shadowColor = com.example.luminalearn.presentation.vocabulary.component.PixelColors.ShadowDark,
+        cornerRadius = 10.dp
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(20.dp)
+                .padding(16.dp)
         ) {
             Text(
                 text = title,
                 fontFamily = PlusJakartaSans,
-                fontWeight = FontWeight.ExtraBold,
-                fontSize = 17.5.sp,
+                fontWeight = FontWeight.Black,
+                fontSize = 17.sp,
                 color = Color.White
             )
 
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             Text(
                 text = content,
                 fontFamily = PlusJakartaSans,
-                fontWeight = FontWeight.Normal,
+                fontWeight = FontWeight.Medium,
                 fontSize = 13.5.sp,
                 color = Color.White.copy(alpha = 0.95f),
-                lineHeight = 22.sp
+                lineHeight = 21.sp
             )
         }
     }

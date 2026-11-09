@@ -22,7 +22,8 @@ data class LessonAction(
     val onReport: () -> Unit = {},
     val onFavorite: () -> Unit = {},
     val onShare: () -> Unit = {},
-    val onComplete: () -> Unit = onDismiss
+    val onComplete: () -> Unit = onDismiss,
+    val onCompleteWithStars: (Int) -> Unit = { onComplete() }
 )
 
 data class ToneRuleItem(

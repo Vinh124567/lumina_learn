@@ -1,12 +1,14 @@
 package com.example.luminalearn.presentation.vocabulary.component
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -16,8 +18,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.luminalearn.R
-import com.example.luminalearn.presentation.vocabulary.model.VocabColors
-import com.example.luminalearn.presentation.vocabulary.model.VocabShapes
+import com.example.luminalearn.core.ui.effect.bounceClick
+import com.example.luminalearn.ui.theme.PlusJakartaSans
 
 @Composable
 fun PaginationBar(
@@ -26,21 +28,28 @@ fun PaginationBar(
     totalItems: Int,
     pageSize: Int,
     onPageChange: (Int) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    itemUnit: String = "từ"
 ) {
     val startItem = if (totalItems > 0) (currentPage - 1) * pageSize + 1 else 0
     val endItem = minOf(currentPage * pageSize, totalItems)
 
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(Color.White, VocabShapes.Card)
-            .border(1.dp, Color(0xFFF1F5F9), VocabShapes.Card)
-            .padding(vertical = 12.dp, horizontal = 16.dp)
+    PixelCardBox(
+        modifier = modifier.fillMaxWidth(),
+        backgroundColor = Color.White,
+        borderColor = PixelColors.BorderDark,
+        shadowColor = PixelColors.ShadowDark,
+        borderWidth = 1.8.dp,
+        shadowOffset = 3.dp,
+        headerTitle = "PAGINATION CONTROL",
+        headerColor = PixelColors.PixelYellow.copy(alpha = 0.35f),
+        showGrille = true
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 10.dp, horizontal = 12.dp)
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -72,12 +81,15 @@ fun PaginationBar(
                 )
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(7.dp))
 
             Text(
-                text = "Trang $currentPage / $totalPages · Hiển thị $startItem–$endItem trong số $totalItems từ",
-                fontSize = 11.sp,
-                color = VocabColors.TextMuted
+                text = "TRANG $currentPage / $totalPages · $startItem–$endItem TRÊN $totalItems $itemUnit",
+                fontFamily = PlusJakartaSans,
+                fontWeight = FontWeight.Bold,
+                fontSize = 10.5.sp,
+                color = PixelColors.MutedText,
+                letterSpacing = 0.3.sp
             )
         }
     }
@@ -90,26 +102,61 @@ private fun PageNavButton(
     contentDescription: String,
     onClick: () -> Unit
 ) {
-    val bgColor = if (enabled) Color(0xFFF8FAFC) else Color(0xFFF1F5F9)
-    val borderColor = if (enabled) Color(0xFFE2E8F0) else Color(0xFFE2E8F0).copy(alpha = 0.5f)
-    val tintColor = if (enabled) Color(0xFF334155) else Color(0xFF94A3B8)
+    val shape = CutCornerShape(topStart = 4.dp, bottomEnd = 4.dp)
+    val bgColor = if (enabled) Color(0xFFF8FAFC) else Color(0xFFE2E8F0)
+    val tintColor = if (enabled) PixelColors.BorderDark else Color(0xFF94A3B8)
 
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
-            .size(36.dp)
-            .clip(VocabShapes.Checkbox)
+            .size(34.dp)
+            .clip(shape)
             .background(bgColor)
-            .border(1.dp, borderColor, VocabShapes.Checkbox)
-            .clickable(enabled = enabled, onClick = onClick)
+            .border(BorderStroke(1.5.dp, PixelColors.BorderDark), shape)
+            .bounceClick(scaleDown = 0.90f, onClick = if (enabled) onClick else null)
     ) {
         Icon(
             painter = painterResource(id = iconRes),
             contentDescription = contentDescription,
             tint = tintColor,
-            modifier = Modifier.size(16.dp)
+            modifier = Modifier.size(15.dp)
         )
     }
+}
+
+private sealed interface PageNumberItem {
+    data class Page(val number: Int) : PageNumberItem
+    data object Ellipsis : PageNumberItem
+}
+
+private fun buildPageList(currentPage: Int, totalPages: Int): List<PageNumberItem> {
+    if (totalPages <= 7) {
+        return (1..totalPages).map { PageNumberItem.Page(it) }
+    }
+    val list = mutableListOf<PageNumberItem>()
+    list.add(PageNumberItem.Page(1))
+
+    if (currentPage <= 4) {
+        for (p in 2..5) {
+            list.add(PageNumberItem.Page(p))
+        }
+        list.add(PageNumberItem.Ellipsis)
+        list.add(PageNumberItem.Page(totalPages))
+    } else if (currentPage >= totalPages - 3) {
+        list.add(PageNumberItem.Ellipsis)
+        for (p in (totalPages - 4) until totalPages) {
+            list.add(PageNumberItem.Page(p))
+        }
+        list.add(PageNumberItem.Page(totalPages))
+    } else {
+        list.add(PageNumberItem.Ellipsis)
+        list.add(PageNumberItem.Page(currentPage - 1))
+        list.add(PageNumberItem.Page(currentPage))
+        list.add(PageNumberItem.Page(currentPage + 1))
+        list.add(PageNumberItem.Ellipsis)
+        list.add(PageNumberItem.Page(totalPages))
+    }
+    return list
 }
 
 @Composable
@@ -118,16 +165,37 @@ private fun PageNumbersRow(
     totalPages: Int,
     onPageChange: (Int) -> Unit
 ) {
+    val items = remember(currentPage, totalPages) {
+        buildPageList(currentPage, totalPages)
+    }
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(6.dp)
+        horizontalArrangement = Arrangement.spacedBy(5.dp)
     ) {
-        for (pageIndex in 1..totalPages) {
-            PageNumberButton(
-                pageIndex = pageIndex,
-                isCurrentPage = pageIndex == currentPage,
-                onClick = { onPageChange(pageIndex) }
-            )
+        items.forEach { item ->
+            when (item) {
+                is PageNumberItem.Page -> {
+                    PageNumberButton(
+                        pageIndex = item.number,
+                        isCurrentPage = item.number == currentPage,
+                        onClick = { onPageChange(item.number) }
+                    )
+                }
+                is PageNumberItem.Ellipsis -> {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier.size(width = 20.dp, height = 34.dp)
+                    ) {
+                        Text(
+                            text = "••",
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Black,
+                            color = PixelColors.BorderDark
+                        )
+                    }
+                }
+            }
         }
     }
 }
@@ -138,25 +206,27 @@ private fun PageNumberButton(
     isCurrentPage: Boolean,
     onClick: () -> Unit
 ) {
-    val bgColor = if (isCurrentPage) VocabColors.BrandPrimary else Color.Transparent
-    val borderColor = if (isCurrentPage) VocabColors.BrandPrimary else Color(0xFFE2E8F0)
-    val textColor = if (isCurrentPage) Color.White else VocabColors.TextDark
-    val fontWeight = if (isCurrentPage) FontWeight.Bold else FontWeight.Medium
+    val shape = CutCornerShape(topStart = 3.dp, bottomEnd = 3.dp)
+    val bgColor = if (isCurrentPage) PixelColors.PixelYellow else Color(0xFFF8FAFC)
+    val textColor = PixelColors.BorderDark
+    val fontWeight = if (isCurrentPage) FontWeight.Black else FontWeight.Bold
 
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier
-            .size(36.dp)
-            .clip(VocabShapes.Checkbox)
+            .size(34.dp)
+            .clip(shape)
             .background(bgColor)
-            .border(1.dp, borderColor, VocabShapes.Checkbox)
-            .clickable(onClick = onClick)
+            .border(BorderStroke(1.5.dp, PixelColors.BorderDark), shape)
+            .bounceClick(scaleDown = 0.90f, onClick = onClick)
     ) {
         Text(
             text = pageIndex.toString(),
-            fontSize = 13.sp,
+            fontFamily = PlusJakartaSans,
+            fontSize = 12.5.sp,
             fontWeight = fontWeight,
             color = textColor
         )
     }
 }
+

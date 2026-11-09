@@ -39,6 +39,45 @@ data class SlideDto(
     @SerializedName("totalCount") val totalCount: Int = 4
 )
 
+data class GrammarExampleDto(
+    @SerializedName("hanzi") val hanzi: String = "",
+    @SerializedName("pinyinOriginal") val pinyinOriginal: String = "",
+    @SerializedName("pinyinActual") val pinyinActual: String = "",
+    @SerializedName("meaning") val meaning: String = "",
+    @SerializedName("tip") val tip: String? = null,
+    @SerializedName("warning") val warning: String? = null,
+    @SerializedName("audioText") val audioText: String? = null
+)
+
+data class GrammarStructureDto(
+    @SerializedName("structureOrder") val structureOrder: Int = 1,
+    @SerializedName("title") val title: String = "",
+    @SerializedName("formula") val formula: String = "",
+    @SerializedName("explanation") val explanation: String = "",
+    @SerializedName("examples") val examples: List<GrammarExampleDto> = emptyList(),
+    @SerializedName("examTip") val examTip: String? = null
+)
+
+data class DialogueLineDto(
+    @SerializedName("speakerRole") val speakerRole: String = "A",
+    @SerializedName("speakerName") val speakerName: String = "",
+    @SerializedName("chinese") val chinese: String = "",
+    @SerializedName("pinyin") val pinyin: String = "",
+    @SerializedName("vietnamese") val vietnamese: String = "",
+    @SerializedName("badgeColor") val badgeColor: String = "#5538EE"
+)
+
+data class LessonVocabDto(
+    @SerializedName("hanzi") val hanzi: String = "",
+    @SerializedName("pinyin") val pinyin: String = "",
+    @SerializedName("hanViet") val hanViet: String = "",
+    @SerializedName("meaning") val meaning: String = "",
+    @SerializedName("partOfSpeech") val partOfSpeech: String = "",
+    @SerializedName("exampleHanzi") val exampleHanzi: String = "",
+    @SerializedName("examplePinyin") val examplePinyin: String = "",
+    @SerializedName("exampleMeaning") val exampleMeaning: String = ""
+)
+
 data class LessonDto(
     @SerializedName("id") val id: String,
     @SerializedName("category") val category: String,
@@ -50,9 +89,98 @@ data class LessonDto(
     @SerializedName("description") val description: String = "",
     @SerializedName("durationMins") val durationMins: Int = 0,
     @SerializedName("sparks") val sparks: Int = 0,
+    @SerializedName("stars") val stars: Int = 0,
     @SerializedName("isCompleted") val isCompleted: Boolean = false,
     @SerializedName("totalSlides") val totalSlides: Int = 0,
+    @SerializedName("objectives") val objectives: List<String> = emptyList(),
+    @SerializedName("grammarStructures") val grammarStructures: List<GrammarStructureDto> = emptyList(),
+    @SerializedName("dialogueContext") val dialogueContext: String = "",
+    @SerializedName("dialogues") val dialogues: List<DialogueLineDto> = emptyList(),
+    @SerializedName("coreVocabularies") val coreVocabularies: List<LessonVocabDto> = emptyList(),
+    @SerializedName("needsReview") val needsReview: Boolean = false,
     @SerializedName("slides") val slides: List<SlideDto> = emptyList()
+)
+
+data class QuickReviewQuestionDto(
+    @SerializedName("id") val id: Int = 1,
+    @SerializedName("hanzi") val hanzi: String = "",
+    @SerializedName("pinyin") val pinyin: String = "",
+    @SerializedName("question") val question: String = "",
+    @SerializedName("options") val options: List<String> = emptyList(),
+    @SerializedName("correctIndex") val correctIndex: Int = 0
+)
+
+data class ReviewResultDto(
+    @SerializedName("lessonId") val lessonId: String = "",
+    @SerializedName("sparksBonus") val sparksBonus: Int = 15,
+    @SerializedName("newStars") val newStars: Int = 3,
+    @SerializedName("message") val message: String = ""
+)
+
+data class ExamQuestionDto(
+    @SerializedName("id") val id: Int = 1,
+    @SerializedName("typeTitle") val typeTitle: String = "",
+    @SerializedName("question") val question: String = "",
+    @SerializedName("pinyinHint") val pinyinHint: String? = null,
+    @SerializedName("options") val options: List<String> = emptyList(),
+    @SerializedName("correctIndex") val correctIndex: Int = 0,
+    @SerializedName("explanation") val explanation: String = ""
+)
+
+data class ChestRewardDto(
+    @SerializedName("unitNumber") val unitNumber: Int = 1,
+    @SerializedName("sparksEarned") val sparksEarned: Int = 50,
+    @SerializedName("expEarned") val expEarned: Int = 100,
+    @SerializedName("message") val message: String = ""
+)
+
+data class JourneyUnitDto(
+    @SerializedName("unitNumber") val unitNumber: Int = 1,
+    @SerializedName("title") val title: String = "",
+    @SerializedName("description") val description: String = "",
+    @SerializedName("icon") val icon: String = "🗣️",
+    @SerializedName("gradientStart") val gradientStart: String = "#4F46E5",
+    @SerializedName("gradientEnd") val gradientEnd: String = "#6366F1"
+)
+
+data class HeartStatusDto(
+    @SerializedName("currentHearts") val currentHearts: Int = 5,
+    @SerializedName("maxHearts") val maxHearts: Int = 5,
+    @SerializedName("nextRefillMinutes") val nextRefillMinutes: Int = 0,
+    @SerializedName("sparksRefillCost") val sparksRefillCost: Int = 50,
+    @SerializedName("message") val message: String = ""
+)
+
+data class LeaderboardUserDto(
+    @SerializedName("rank") val rank: Int = 1,
+    @SerializedName("userId") val userId: String = "",
+    @SerializedName("fullName") val fullName: String = "",
+    @SerializedName("avatarUrl") val avatarUrl: String? = null,
+    @SerializedName("weeklySparks") val weeklySparks: Int = 0,
+    @SerializedName("isCurrentUser") val isCurrentUser: Boolean = false
+)
+
+data class LeaderboardDto(
+    @SerializedName("leagueTier") val leagueTier: String = "VÀNG (GOLD)",
+    @SerializedName("daysRemaining") val daysRemaining: Int = 3,
+    @SerializedName("userRank") val userRank: Int = 1,
+    @SerializedName("users") val users: List<LeaderboardUserDto> = emptyList()
+)
+
+data class SkillRadarScoreDto(
+    @SerializedName("phonetics") val phonetics: Int = 85,
+    @SerializedName("vocabulary") val vocabulary: Int = 90,
+    @SerializedName("grammar") val grammar: Int = 78,
+    @SerializedName("dialogue") val dialogue: Int = 82,
+    @SerializedName("accuracy") val accuracy: Int = 88
+)
+
+data class AnalyticsSummaryDto(
+    @SerializedName("totalLessonsCompleted") val totalLessonsCompleted: Int = 0,
+    @SerializedName("totalStars") val totalStars: Int = 0,
+    @SerializedName("masteredVocabsCount") val masteredVocabsCount: Int = 0,
+    @SerializedName("accuracyPercentage") val accuracyPercentage: Int = 85,
+    @SerializedName("radarScores") val radarScores: SkillRadarScoreDto = SkillRadarScoreDto()
 )
 
 fun LessonDto.toChineseLessonData(): ChineseLessonData {
@@ -68,6 +196,56 @@ fun LessonDto.toChineseLessonData(): ChineseLessonData {
         Color(0xFF7E22CE)
     }
 
+    val mappedGrammar = grammarStructures.map { s ->
+        com.example.luminalearn.presentation.lesson.component.GrammarStructureData(
+            structureOrder = s.structureOrder,
+            title = s.title,
+            formula = s.formula,
+            explanation = s.explanation,
+            examples = s.examples.map { e ->
+                com.example.luminalearn.presentation.lesson.component.GrammarExampleData(
+                    hanzi = e.hanzi,
+                    pinyinOriginal = e.pinyinOriginal,
+                    pinyinActual = e.pinyinActual,
+                    meaning = e.meaning,
+                    tip = e.tip,
+                    warning = e.warning,
+                    audioText = e.audioText
+                )
+            },
+            examTip = s.examTip
+        )
+    }
+
+    val mappedDialogues = dialogues.map { d ->
+        val c = try {
+            Color(d.badgeColor.toColorInt())
+        } catch (_: Exception) {
+            Color(0xFF5538EE)
+        }
+        com.example.luminalearn.presentation.lesson.component.LessonDialogueData(
+            speakerRole = d.speakerRole,
+            speakerName = d.speakerName,
+            chinese = d.chinese,
+            pinyin = d.pinyin,
+            vietnamese = d.vietnamese,
+            badgeColor = c
+        )
+    }
+
+    val mappedVocab = coreVocabularies.map { v ->
+        com.example.luminalearn.presentation.lesson.component.LessonCoreVocabData(
+            hanzi = v.hanzi,
+            pinyin = v.pinyin,
+            hanViet = v.hanViet,
+            meaning = v.meaning,
+            partOfSpeech = v.partOfSpeech,
+            exampleHanzi = v.exampleHanzi,
+            examplePinyin = v.examplePinyin,
+            exampleMeaning = v.exampleMeaning
+        )
+    }
+
     return ChineseLessonData(
         id = id,
         category = category,
@@ -77,11 +255,18 @@ fun LessonDto.toChineseLessonData(): ChineseLessonData {
         description = description,
         durationMins = durationMins,
         sparks = sparks,
+        stars = stars,
         isCompleted = isCompleted,
         totalSlides = totalSlides,
         slides = slides.map { it.toToneCardData() },
         categoryBgColor = bgColor,
-        categoryTextColor = textColor
+        categoryTextColor = textColor,
+        objectives = objectives,
+        grammarStructures = mappedGrammar,
+        dialogueContext = dialogueContext,
+        dialogues = mappedDialogues,
+        coreVocabularies = mappedVocab,
+        needsReview = needsReview
     )
 }
 

@@ -1,0 +1,114 @@
+================================================================================
+                    LUMINALEARN - ĐỀ XUẤT CÁC PHONG CÁCH HERO FLASHCARD
+================================================================================
+
+Tài liệu tổng hợp các phương án thiết kế phong cách Hero Card cho tính năng Flashcard SRS
+trong ứng dụng LuminaLearn, giúp người dùng và đội ngũ thiết kế dễ dàng so sánh, 
+lựa chọn phong cách thẩm mỹ phù hợp nhất.
+
+--------------------------------------------------------------------------------
+1. PHONG CÁCH 1: MIDNIGHT COSMIC HERO (HIỆN TẠI)
+--------------------------------------------------------------------------------
+- Cảm hứng: 
+  Không gian vũ trụ đêm vô tận, đồng bộ với VocabHeroBanner và HeroLessonCard ở màn Home.
+- Mã màu chủ đạo:
+  + Nền Card Gradient: #0F172A (Midnight Slate) -> #1E1C59 (Deep Navy) -> #2E2C80 (Indigo Night) -> #3B2874 (Dark Purple)
+  + Viền phát sáng: LinearGradient(Cyan #00F2FE, Indigo #6366F1, Purple #A855F7)
+  + Hiệu ứng hạt: CosmicStarfield (40 hạt sao lấp lánh ngẫu nhiên)
+  + Chữ Hán: #FFFFFF (Trắng tuyết to bản 56sp)
+  + Pinyin: #00F2FE (Cyan Neon)
+  + Hán-Việt: #FDE68A (Vàng hổ phách viền ấm)
+  + Nút chức năng trong card: Frosted Glass (#FFFFFF alpha 8-12%)
+- Ưu điểm:
+  + Độ tương phản thị giác cực mạnh, tạo cảm giác "WOW" ngay khi mở màn Flashcard.
+  + Đã có sẵn hiệu ứng animatedMidnightGradient và CosmicStarfield trong app.
+- Nhược điểm:
+  + Tương phản cao khi nằm trên nền app sáng (#F6F8FB). Nếu người dùng thích phong cách đồng màu sáng thì card sẽ trông rất nổi bật.
+
+--------------------------------------------------------------------------------
+2. PHONG CÁCH 2: AURORA BOREALIS (BẮC CỰC QUANG & HOLOGRAPHIC GLASS)
+--------------------------------------------------------------------------------
+- Cảm hứng:
+  Hiện tượng cực quang phương Bắc và giao diện thế hệ mới của Perplexity AI, Arc Browser.
+- Mã màu chủ đạo:
+  + Nền Card Gradient: #0B132B (Deep Abyss) -> #064E3B (Emerald Teal) -> #0F766E (Dark Cyan) -> #4338CA (Aurora Violet)
+  + Viền phát quang: Holographic stroke đổi sắc độ nhẹ theo góc nghiêng khi vuốt (Holographic Silver / Mint Glow)
+  + Hiệu ứng hạt: Không dùng sao, thay bằng vệt sáng cực quang mờ (Aurora glow mesh) bồng bềnh sau lưng chữ Hán
+  + Chữ Hán: #F8FAFC (Frost White phủ sương 56sp)
+  + Pinyin: #2DD4BF (Mint Teal tươi sáng)
+  + Hán-Việt: #A7F3D0 (Ngọc lục bảo nhạt)
+  + Nút chức năng: Kính mờ phủ viền ánh ngọc lục bảo (#10B981 alpha 25%)
+- Ưu điểm:
+  + Êm dịu cho mắt nhất trong các phong cách nền tối, giảm mỏi mắt khi học từ vựng 15-30 phút liên tục.
+  + Thẩm mỹ công nghệ hiện đại, mềm mại và sang trọng.
+- Nhược điểm:
+  + Tone màu thiên về xanh lục ngọc (Teal/Emerald), khác tone tím xanh truyền thống của app một chút.
+
+--------------------------------------------------------------------------------
+3. PHONG CÁCH 3: LUMINOUS CALLIGRAPHY & VERMILION (LỤA THƯ PHÁP & DẤU CHU SA)
+--------------------------------------------------------------------------------
+- Cảm hứng:
+  Nghệ thuật thư pháp chữ Hán cổ điển kết hợp phong cách Bento Thụy Sĩ tối giản hiện đại.
+- Mã màu chủ đạo:
+  + Nền Card: #FFFFFF (Trắng tinh khôi lụa mịn) hoặc #FDFBF7 (Trắng ngà giấy Tuyên thủ công)
+  + Bóng đổ: Đổ bóng đa tầng Ambient Shadow (Offset Y 8dp, Blur 24dp, màu #0F172A alpha 6%)
+  + Dải màu trang trí: Viền góc mảnh mạ vàng đồng thau (#D97706 / #F59E0B)
+  + Chữ Hán: #0F172A (Đen mực tàu đậm nét sắc sảo 58sp)
+  + Pinyin: #4F46E5 (Indigo chuẩn mực học thuật)
+  + Hán-Việt: Dạng con dấu triện thư pháp màu Đỏ Chu Sa (Cinnabar Red #BE123C / nền #FFE4E6)
+  + Nút chức năng: Nút bấm Bento tối giản nền trắng (#F8FAFC viền #E2E8F0)
+- Ưu điểm:
+  + Đồng bộ màu sắc 100% với nền sáng #F6F8FB của ứng dụng.
+  + Mang đậm tính văn hóa học tiếng Trung (chữ đen mực tàu trên giấy trắng + dấu đỏ triện).
+  + Rất sạch sẽ, không có bất kỳ yếu tố màu tối nào gây chênh lệch thị giác.
+- Nhược điểm:
+  + Ít yếu tố "Cyber / Viễn tưởng" hơn so với Midnight Cosmic.
+
+--------------------------------------------------------------------------------
+4. PHONG CÁCH 4: OBSIDIAN MINIMALIST / STUDIO FOCUS (HẮC THẠCH & ĐƠN SẮC CÔNG NGHỆ)
+--------------------------------------------------------------------------------
+- Cảm hứng:
+  Phong cách thiết kế công nghệ cao tối giản của Nothing OS, Linear App, Raycast.
+- Mã màu chủ đạo:
+  + Nền Card: #111827 -> #0F172A (Đá đen hắc thạch Obsidian mờ, bề mặt lỳ Matte finish)
+  + Họa tiết nền: Lưới ma trận chấm bi siêu nhỏ (Dot matrix grid) ẩn hiện độ mờ 4%
+  + Viền Card: #374151 mỏng 1dp (không dùng viền nhiều màu)
+  + Điểm nhấn đơn sắc duy nhất: Electric Indigo (#6366F1) hoặc Hyper Amber (#F59E0B)
+  + Chữ Hán: #F3F4F6 (Trắng bạc nguyên khối, typography to dày)
+  + Pinyin: #818CF8 (Tím điện tử)
+  + Hán-Việt: #9CA3AF (Xám kim loại sạch sẽ)
+- Ưu điểm:
+  + Tập trung tuyệt đối vào ghi nhớ mặt chữ, loại bỏ mọi phân tâm thị giác thừa thãi.
+  + Rất nam tính, dứt khoát, phong thái phần mềm chuyên nghiệp.
+- Nhược điểm:
+  + Đơn sắc và nghiêm túc, ít tính vui vẻ gamification.
+
+--------------------------------------------------------------------------------
+5. PHONG CÁCH 5: DEEP INDIGO QUARTZ (THẠCH ANH CHÀM & KÍNH MỜ VISIONOS)
+--------------------------------------------------------------------------------
+- Cảm hứng:
+  Giao diện kính mờ có chiều sâu khúc xạ ánh sáng của Apple VisionOS và macOS Sonoma.
+- Mã màu chủ đạo:
+  + Nền Card Gradient: #1E1B4B (Deep Royal Indigo) -> #2E1065 (Midnight Violet) -> #172554 (Marine Blue)
+  + Hiệu ứng đặc biệt: Spotlight Radial Glow - vùng ánh sáng tâm thẻ chuyển dịch theo ngón tay khi vuốt
+  + Viền Card: Kính khúc xạ 1.2dp với Gradient(White alpha 35% -> Indigo alpha 20%)
+  + Chữ Hán: #FFFFFF kết hợp bóng đổ phát quang nhẹ
+  + Pinyin: #818CF8 (Tím oải hương sáng)
+  + Hán-Việt: #FCD34D (Vàng ánh kim nhạt)
+  + Nút chức năng: Acrylic Glass chìm (Inner shadow + Frosted background)
+- Ưu điểm:
+  + Cực kỳ cao cấp, hòa hợp hoàn hảo với màu tím thương hiệu (#5538EE) của LuminaLearn.
+  + Ánh sáng tương tác theo ngón tay tạo cảm giác phản hồi vật lý cao cấp.
+- Nhược điểm:
+  + Đòi hỏi tính toán Shader/Radial gradient nhẹ khi vuốt.
+
+================================================================================
+BẢNG SO SÁNH NHANH:
+--------------------------------------------------------------------------------
+| Tiêu chí                 | 1. Midnight Cosmic | 2. Aurora Teal | 3. Luminous Paper | 4. Obsidian Grid | 5. Indigo Quartz |
+|--------------------------|--------------------|----------------|-------------------|------------------|------------------|
+| Tone màu nền             | Tối (Vũ trụ)       | Tối (Cực quang)| Sáng (Trắng lụa)  | Tối (Đen nhám)   | Tối (Tím chàm)   |
+| Mức độ nổi bật trên app  | Rất cao            | Cao            | Hoàn hảo đồng bộ  | Vừa phải         | Rất cao          |
+| Mức độ chống mỏi mắt     | Khá                | Xuất sắc       | Tốt               | Tốt              | Rất tốt          |
+| Bản sắc thương hiệu      | Đồng bộ Home       | Hiện đại mới   | Văn hóa chữ Hán   | Minimalist Pro   | Chuẩn tone tím   |
+================================================================================

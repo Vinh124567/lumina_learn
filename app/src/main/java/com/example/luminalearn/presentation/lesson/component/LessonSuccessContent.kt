@@ -3,6 +3,7 @@ package com.example.luminalearn.presentation.lesson.component
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -52,7 +54,8 @@ import com.example.luminalearn.ui.theme.PlusJakartaSans
 internal fun LessonSuccessContent(
     toneCardData: ToneCardData,
     sparksReward: Int,
-    action: LessonAction
+    action: LessonAction,
+    starsEarned: Int = 3
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -74,72 +77,109 @@ internal fun LessonSuccessContent(
 
             Spacer(modifier = Modifier.weight(0.4f))
 
-            // 2. Huy hiệu vàng lấp lánh kèm Confetti trang trí
-            SuccessCelebrationBadge()
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            // 3. Tiêu đề chúc mừng
-            Text(
-                text = "Hoàn thành bài học xuất sắc!",
-                fontFamily = PlusJakartaSans,
-                fontWeight = FontWeight.ExtraBold,
-                fontSize = 20.5.sp,
-                color = Color(0xFF0F172A),
-                textAlign = TextAlign.Center
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // 4. Mô tả chi tiết kèm tên bài học và số Tia Sáng nhận được
-            val congratulatoryText = buildAnnotatedString {
-                withStyle(SpanStyle(color = Color(0xFF475569), fontWeight = FontWeight.Normal, fontSize = 13.5.sp)) {
-                    append("Tuyệt vời! Bạn đã hoàn thành bài học ")
-                }
-                withStyle(SpanStyle(color = Color(0xFF5538EE), fontWeight = FontWeight.Bold, fontSize = 13.5.sp)) {
-                    append(toneCardData.title)
-                }
-                withStyle(SpanStyle(color = Color(0xFF475569), fontWeight = FontWeight.Normal, fontSize = 13.5.sp)) {
-                    append(" và nhận được\n")
-                }
-                withStyle(SpanStyle(color = Color(0xFFD97706), fontWeight = FontWeight.ExtraBold, fontSize = 15.sp)) {
-                    append("+$sparksReward Tia Sáng!")
-                }
+            // 2. Biểu tượng chiến thắng Pixel
+            Box(
+                modifier = Modifier
+                    .size(80.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(com.example.luminalearn.presentation.vocabulary.component.PixelColors.ArcadeAmber)
+                    .border(2.dp, com.example.luminalearn.presentation.vocabulary.component.PixelColors.BorderDark, RoundedCornerShape(16.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = "🏆", fontSize = 42.sp)
             }
 
-            Text(
-                text = congratulatoryText,
-                fontFamily = PlusJakartaSans,
-                textAlign = TextAlign.Center,
-                lineHeight = 22.sp,
-                modifier = Modifier.padding(horizontal = 16.dp)
-            )
+            Spacer(modifier = Modifier.height(14.dp))
 
-            Spacer(modifier = Modifier.weight(0.6f))
-
-            // 5. Nút Hoàn tất & Tiếp tục màu vàng hổ phách nổi bật
-            Surface(
-                onClick = action.onComplete,
-                shape = RoundedCornerShape(50),
-                color = Color(0xFFEBB15B),
-                shadowElevation = 2.dp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp)
+            // Đánh giá cấp độ thành thạo sao (Star Mastery)
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
+                for (i in 1..3) {
+                    val earned = i <= starsEarned
                     Text(
-                        text = "Hoàn tất & Tiếp tục",
-                        fontFamily = PlusJakartaSans,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 15.sp,
-                        color = Color(0xFF1E293B)
+                        text = if (earned) "⭐" else "☆",
+                        fontSize = 28.sp,
+                        color = if (earned) Color(0xFFF59E0B) else Color(0xFFCBD5E1)
                     )
                 }
             }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // 3. Tiêu đề chúc mừng
+            Text(
+                text = when (starsEarned) {
+                    3 -> "★ HOÀN THÀNH XUẤT SẮC 3 SAO! ★"
+                    2 -> "★ HOÀN THÀNH BÀI HỌC 2 SAO! ★"
+                    else -> "★ HOÀN THÀNH BÀI HỌC 1 SAO! ★"
+                },
+                fontFamily = PlusJakartaSans,
+                fontWeight = FontWeight.Black,
+                fontSize = 18.sp,
+                color = com.example.luminalearn.presentation.vocabulary.component.PixelColors.ArcadeAmber,
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            // 4. Khung phần thưởng Pixel CardBox
+            com.example.luminalearn.presentation.vocabulary.component.PixelCardBox(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+                backgroundColor = Color(0xFFFFFBEB),
+                borderColor = com.example.luminalearn.presentation.vocabulary.component.PixelColors.BorderDark,
+                shadowColor = com.example.luminalearn.presentation.vocabulary.component.PixelColors.ShadowDark,
+                borderWidth = 1.5.dp,
+                shadowOffset = 3.dp,
+                cornerRadius = 12.dp
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(14.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Bạn đã hoàn thành xuất sắc bài học:",
+                        fontFamily = PlusJakartaSans,
+                        fontSize = 12.sp,
+                        color = com.example.luminalearn.presentation.vocabulary.component.PixelColors.TextMuted,
+                        textAlign = TextAlign.Center
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = toneCardData.title,
+                        fontFamily = PlusJakartaSans,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Black,
+                        color = com.example.luminalearn.presentation.vocabulary.component.PixelColors.ArcadePurple,
+                        textAlign = TextAlign.Center
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(text = "✨", fontSize = 16.sp)
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = "+$sparksReward Sparks Thưởng",
+                            fontFamily = PlusJakartaSans,
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Black,
+                            color = Color(0xFFD97706)
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.weight(0.6f))
+
+            // 5. Nút Hoàn tất & Tiếp tục Pixel Arcade
+            com.example.luminalearn.presentation.vocabulary.component.PixelArcadeButton(
+                text = "🎁 HOÀN TẤT & TIẾP TỤC",
+                onClick = { action.onCompleteWithStars(starsEarned) },
+                color = com.example.luminalearn.presentation.vocabulary.component.PixelColors.ArcadeAmber,
+                height = 50.dp,
+                fillMaxWidth = true,
+                modifier = Modifier.fillMaxWidth()
+            )
 
             Spacer(modifier = Modifier.height(8.dp))
         }
